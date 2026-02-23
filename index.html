@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a472a">
+<title>Masters Augusta 2025</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f2d1a;color:#f0e6c8;min-height:100vh}
+  .screen{display:none;min-height:100vh;flex-direction:column}
+  .screen.active{display:flex}
+  .header{background:linear-gradient(135deg,#1a472a,#2d6a3f);padding:20px 16px 16px;text-align:center;border-bottom:2px solid #c9a84c}
+  .header h1{font-size:22px;color:#c9a84c;letter-spacing:2px;text-transform:uppercase}
+  .header p{font-size:12px;color:#a0c878;margin-top:4px}
+  .content{flex:1;padding:20px 16px;max-width:480px;margin:0 auto;width:100%}
+  .btn{display:block;width:100%;padding:14px;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s}
+  .btn-gold{background:linear-gradient(135deg,#c9a84c,#e8c96a);color:#1a2f0f}
+  .btn-gold:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(201,168,76,.4)}
+  .btn-green{background:linear-gradient(135deg,#2d6a3f,#3d8a52);color:#f0e6c8}
+  .btn-outline{background:transparent;border:2px solid #c9a84c;color:#c9a84c}
+  .btn-sm{padding:8px 14px;font-size:13px;width:auto;display:inline-block}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  input[type=text]{width:100%;padding:14px;border-radius:8px;border:2px solid #2d6a3f;background:#1a3a24;color:#f0e6c8;font-size:16px;outline:none;transition:border-color .2s}
+  input[type=text]:focus{border-color:#c9a84c}
+  input[type=text]::placeholder{color:#6a9a7a}
+  .card{background:#1a3a24;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #2d5a38}
+  .card h3{color:#c9a84c;font-size:14px;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+  .chapeau-badge{display:inline-block;background:#c9a84c;color:#1a2f0f;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:10px}
+  .joueurs-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .joueur-btn{padding:10px 8px;border-radius:8px;border:2px solid #2d5a38;background:#0f2d1a;color:#f0e6c8;font-size:13px;cursor:pointer;transition:all .2s;text-align:center;line-height:1.3}
+  .joueur-btn:hover{border-color:#c9a84c}
+  .joueur-btn.selected{background:#c9a84c;color:#1a2f0f;border-color:#c9a84c;font-weight:600}
+  .joueur-btn.disabled{opacity:.4;cursor:not-allowed}
+  .rank-item{display:flex;align-items:center;gap:12px;padding:12px;background:#1a3a24;border-radius:10px;margin-bottom:8px;border:1px solid #2d5a38;cursor:pointer}
+  .rank-num{font-size:18px;font-weight:700;color:#c9a84c;width:30px;text-align:center;flex-shrink:0}
+  .rank-num.gold{color:#FFD700}.rank-num.silver{color:#C0C0C0}.rank-num.bronze{color:#CD7F32}
+  .rank-info{flex:1}
+  .rank-name{font-size:15px;font-weight:600}
+  .rank-joueurs{font-size:11px;color:#a0c878;margin-top:3px}
+  .rank-score{font-size:20px;font-weight:700;text-align:right;flex-shrink:0}
+  .neg{color:#4fc870}.pos{color:#e05050}.even{color:#f0e6c8}
+  .tabs{display:flex;background:#1a3a24;border-radius:10px;padding:4px;margin-bottom:16px;gap:2px}
+  .tab{flex:1;padding:8px 2px;text-align:center;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;transition:all .2s;color:#6a9a7a}
+  .tab.active{background:#c9a84c;color:#1a2f0f}
+  .score-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #1a3a24}
+  .score-item:last-child{border-bottom:none}
+  .participant-detail{background:#0f2d1a;border-radius:8px;padding:10px;margin-top:4px;margin-bottom:8px;display:none}
+  .participant-detail.open{display:block}
+  .best4{color:#4fc870;font-weight:600}
+  .msg{padding:12px;border-radius:8px;margin-bottom:12px;font-size:14px;text-align:center}
+  .msg.success{background:#1a4a2a;border:1px solid #4fc870;color:#4fc870}
+  .msg.error{background:#4a1a1a;border:1px solid #e05050;color:#e05050}
+  .msg.info{background:#1a3a4a;border:1px solid #4a90c8;color:#4a90c8}
+  .spinner{text-align:center;padding:40px;color:#6a9a7a;font-size:14px}
+  .step-indicator{display:flex;justify-content:center;gap:6px;margin-bottom:20px}
+  .step-dot{width:8px;height:8px;border-radius:50%;background:#2d5a38;transition:background .3s}
+  .step-dot.active{background:#c9a84c}.step-dot.done{background:#4fc870}
+  .logo{font-size:48px;margin-bottom:10px}
+  label{display:block;font-size:13px;color:#a0c878;margin-bottom:6px}
+  .mt{margin-top:12px}
+  .nav-back{background:none;border:none;color:#a0c878;font-size:14px;cursor:pointer;padding:0;margin-bottom:16px}
+  .live-badge{display:inline-block;background:#e05050;color:white;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;margin-left:6px;animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .refresh-info{font-size:11px;color:#6a9a7a;text-align:center;margin-bottom:12px}
+  /* FICHE JOUEUR */
+  .player-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .player-sheet{background:#1a3a24;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:24px 20px;max-height:85vh;overflow-y:auto;animation:slideUp .3s}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .player-header{display:flex;gap:16px;align-items:center;margin-bottom:20px}
+  .player-photo{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #c9a84c;background:#0f2d1a}
+  .player-photo-placeholder{width:80px;height:80px;border-radius:50%;border:3px solid #c9a84c;background:#0f2d1a;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0}
+  .player-name-block h2{color:#c9a84c;font-size:20px;margin-bottom:4px}
+  .player-name-block p{color:#a0c878;font-size:13px}
+  .player-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .player-stat{background:#0f2d1a;border-radius:10px;padding:12px;text-align:center}
+  .player-stat .val{font-size:22px;font-weight:700;color:#c9a84c}
+  .player-stat .lbl{font-size:11px;color:#6a9a7a;margin-top:2px}
+  .player-bio{font-size:13px;color:#d0c8b0;line-height:1.7;margin-bottom:16px}
+  .player-close{position:absolute;top:16px;right:16px;background:none;border:none;color:#a0c878;font-size:24px;cursor:pointer}
+  .player-achievements{margin-top:12px}
+  .player-achievements h4{color:#c9a84c;font-size:13px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+  .achievement-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #2d5a38;font-size:13px}
+  .achievement-item:last-child{border-bottom:none}
+  /* NEWS */
+  .news-card{background:#1a3a24;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #2d5a38}
+  .news-card h4{color:#c9a84c;font-size:15px;margin-bottom:8px;line-height:1.4}
+  .news-card p{color:#d0c8b0;font-size:13px;line-height:1.6}
+  .news-meta{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+  .news-tag{display:inline-block;background:#2d5a38;color:#a0c878;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+  .news-tag.masters{background:#c9a84c33;color:#c9a84c;border:1px solid #c9a84c55}
+  .news-tag.liv{background:#8b20203d;color:#e07070;border:1px solid #e0505055}
+  .news-tag.pga{background:#1a3a4a;color:#4a90c8;border:1px solid #4a90c855}
+  .news-tag.rumeur{background:#2d1a4a;color:#c090e8;border:1px solid #c090e855}
+  .news-tag.stats{background:#1a3a24;color:#4fc870;border:1px solid #4fc87055}
+  .news-section-title{color:#6a9a7a;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #2d5a38}
+  .typing-dots span{display:inline-block;animation:blink 1.4s infinite;font-size:24px;color:#c9a84c}
+  .typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+  .news-footer{font-size:11px;color:#6a9a7a;text-align:center;margin-top:8px}
+  /* EDIT SELECTIONS */
+  .edit-banner{background:#1a3a4a;border:1px solid #4a90c8;border-radius:8px;padding:10px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- ACCUEIL -->
+<div id="screen-accueil" class="screen active">
+  <div class="header"><h1>⛳ Masters Augusta</h1><p>2025 · Jeu de pronostics</p></div>
+  <div class="content" style="display:flex;flex-direction:column;justify-content:center;flex:1">
+    <div style="text-align:center;margin-bottom:32px">
+      <div class="logo">🏆</div>
+      <p style="color:#a0c878;font-size:14px">Sélectionnez 2 joueurs par chapeau<br>et suivez vos scores en temps réel</p>
+    </div>
+    <div id="msg-accueil"></div>
+    <label for="nom-input">Votre prénom / pseudo</label>
+    <input type="text" id="nom-input" placeholder="Ex: Pierre" maxlength="30">
+    <button class="btn btn-gold mt" onclick="handleAccueil()">Commencer →</button>
+    <button class="btn btn-outline mt" onclick="goClassement()" style="margin-top:10px">Voir le classement</button>
+    <button class="btn btn-outline mt" onclick="goAdmin()" style="margin-top:10px;font-size:13px;opacity:.6">Admin</button>
+  </div>
+</div>
+
+<!-- SELECTION -->
+<div id="screen-selection" class="screen">
+  <div class="header"><h1>⛳ <span id="sel-mode-label">Vos sélections</span></h1><p id="selection-user-name"></p></div>
+  <div class="content">
+    <div id="edit-banner" style="display:none" class="edit-banner">
+      <span>✏️ Mode édition</span>
+      <button class="btn btn-outline btn-sm" onclick="cancelEdit()">Annuler</button>
+    </div>
+    <div class="step-indicator" id="step-dots"></div>
+    <div id="selection-content"></div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-outline" id="btn-prev" onclick="prevChapeau()" style="flex:0 0 100px">← Retour</button>
+      <button class="btn btn-gold" id="btn-next" onclick="nextChapeau()">Suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLASSEMENT -->
+<div id="screen-classement" class="screen">
+  <div class="header"><h1>⛳ Masters Augusta <span class="live-badge">LIVE</span></h1><p>Classement en direct</p></div>
+  <div class="content">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('classement')">🏆 Classement</div>
+      <div class="tab" onclick="switchTab('scores')">🏌️ Joueurs</div>
+      <div class="tab" onclick="switchTab('news')">📰 News</div>
+    </div>
+    <div id="refresh-info" class="refresh-info"></div>
+    <div id="tab-classement"></div>
+    <div id="tab-scores" style="display:none"></div>
+    <div id="tab-news" style="display:none"></div>
+    <button class="btn btn-outline" onclick="showScreen('screen-accueil')" style="margin-top:20px">← Retour</button>
+  </div>
+</div>
+
+<!-- CONFIRMATION -->
+<div id="screen-confirm" class="screen">
+  <div class="header"><h1>⛳ Confirmation</h1></div>
+  <div class="content" style="display:flex;flex-direction:column;justify-content:center;flex:1">
+    <div style="text-align:center;margin-bottom:24px">
+      <div class="logo">✅</div>
+      <h2 style="color:#c9a84c;margin-bottom:8px" id="confirm-title">Sélections enregistrées !</h2>
+      <p style="color:#a0c878;font-size:14px" id="confirm-subtitle">Vos 8 joueurs ont été sauvegardés.<br>Bonne chance pour les Masters !</p>
+    </div>
+    <div id="confirm-recap"></div>
+    <button class="btn btn-gold mt" onclick="goClassement()" style="margin-top:20px">Voir le classement</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="screen-admin" class="screen">
+  <div class="header"><h1>⛳ Admin</h1><p>Gestion du tournoi</p></div>
+  <div class="content">
+    <button class="nav-back" onclick="showScreen('screen-accueil')">← Retour</button>
+    <div id="admin-auth" class="card">
+      <h3>Mot de passe admin</h3>
+      <input type="text" id="admin-pwd" placeholder="Mot de passe" style="margin-bottom:10px">
+      <button class="btn btn-gold" onclick="checkAdmin()">Accéder</button>
+    </div>
+    <div id="admin-panel" style="display:none">
+      <div class="card">
+        <h3>Statut du tournoi</h3>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-green" onclick="setTournoi('OUI')">🟢 Ouvert</button>
+          <button class="btn" style="background:#8b2020;color:white" onclick="setTournoi('NON')">🔴 Fermé</button>
+        </div>
+        <p id="statut-tournoi" style="margin-top:8px;font-size:13px;color:#a0c878"></p>
+      </div>
+      <div class="card">
+        <h3>Scores ESPN <span class="live-badge">AUTO</span></h3>
+        <p style="font-size:12px;color:#a0c878;margin-bottom:12px">Scores récupérés automatiquement toutes les 5 minutes.</p>
+        <button class="btn btn-gold" onclick="syncESPN()">🔄 Synchroniser maintenant</button>
+        <div id="sync-msg" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://nhlyqglrawsvvfaymedc.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obHlxZ2xyYXdzdnZmYXltZWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3ODMwNjMsImV4cCI6MjA4NzM1OTA2M30.kaCGdzJ26kvgPP4EyCzU7v_7j2dJcU87yaZMtDuSHnw';
+const ESPN_PROXY='https://espn-golf-proxy.edouard-gasser.workers.dev/';
+const ADMIN_PWD='masters2025';
+const REFRESH_INTERVAL=5*60*1000;
+
+const JOUEURS={
+  1:['Scottie Scheffler','Rory McIlroy','Jon Rahm','Tommy Fleetwood','Bryson DeChambeau','Tyrrell Hatton','Robert MacIntyre','Shane Lowry','Xander Schauffele','Collin Morikawa','Ludvig Aberg','Viktor Hovland','Joaquin Niemann','Justin Thomas','Brooks Koepka','Jordan Spieth','Justin Rose','Russell Henley','Matt Fitzpatrick','Patrick Cantlay'],
+  2:['Sepp Straka','Cameron Young','Hideki Matsuyama','Adam Scott','Ryan Fox','Jason Day','J.J. Spaun','Ben Griffin','Patrick Reed','Corey Conners','Min Woo Lee','Aaron Rai','Brian Harman','Carlos Ortiz','Sam Burns','Thomas Detry','Cameron Smith','Tony Finau','Sungjae Im','Wyndham Clark'],
+  3:['Rickie Fowler','Keegan Bradley','Si Woo Kim','Akshay Bhatia','Taylor Pendrith','Marc Leishman','Daniel Berger','Lucas Herbert','Harry Hall','Aldrich Potgieter','Tom Kim','Rasmus Hojgaard','Tom McKibbin','Dean Burmester','Nicolai Hojgaard','Sergio Garcia'],
+  4:['Sahith Theegala','Thriston Lawrence','Harris English','Louis Oosthuizen','Byeong Hun An','Davis Thompson','Dustin Johnson','Maverick McNealy','Thorbjorn Olesen','Matt Wallace','Christiaan Bezuidenhout','Emiliano Grillo','Nick Taylor','Denny McCarthy','J.T. Poston','Tom Hoge','Chris Kirk','Martin Couvra','Nick Dunlap','Jason Kokrak','Matthieu Pavon','Stephan Jaeger','Phil Mickelson','Adrien Saddier']
+};
+const ALL_JOUEURS=Object.values(JOUEURS).flat();
+const NB_CHAPEAUX=4;
+
+let currentUser='',currentChapeau=1,isEditMode=false;
+let selections={1:[],2:[],3:[],4:[]};
+let espnScores={},refreshTimer=null,lastUpdated=null,newsLoaded=false;
+
+async function sbFetch(path,opts={}){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':opts.prefer||'return=representation',...opts.headers},
+    ...opts
+  });
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  if(res.status===204||res.headers.get('content-length')==='0') return null;
+  const t=await res.text();return t?JSON.parse(t):null;
+}
+
+function parseScore(s){if(!s||s==='E') return 0;return parseInt(s)||0;}
+function normalizeName(n){return n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z\s]/g,'').trim();}
+function getScore(nom){const k=normalizeName(nom);return espnScores[k]!==undefined?espnScores[k]:null;}
+function fmtScore(s){if(s===null||s===undefined) return 'N/A';if(s===0) return 'E';return(s>0?'+':'')+s;}
+function scoreClass(s){if(s===null) return '';return s<0?'neg':s>0?'pos':'even';}
+
+async function fetchESPNScores(){
+  try{
+    const res=await fetch(ESPN_PROXY);
+    const data=await res.json();
+    const map={};
+    (data.scores||[]).forEach(j=>{map[normalizeName(j.nom)]=parseScore(j.score);});
+    espnScores=map;lastUpdated=new Date();return true;
+  }catch(e){console.error(e);return false;}
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function showMsg(id,txt,type='info'){const el=document.getElementById(id);if(el) el.innerHTML=`<div class="msg ${type}">${txt}</div>`;}
+
+async function handleAccueil(){
+  const nom=document.getElementById('nom-input').value.trim();
+  if(!nom){showMsg('msg-accueil','Veuillez entrer votre prénom','error');return;}
+  showMsg('msg-accueil','Vérification...','info');
+  try{
+    const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');
+    const isOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
+    const existing=await sbFetch(`participants?nom=eq.${encodeURIComponent(nom)}&select=*`);
+
+    if(existing&&existing.length>0){
+      if(isOpen){
+        // Propose d'éditer
+        currentUser=nom;
+        loadExistingAndEdit(existing[0]);
+      } else {
+        showMsg('msg-accueil',`Bienvenue ${nom} ! Rendez-vous au classement.`,'success');
+        setTimeout(()=>{currentUser=nom;goClassement();},1500);
+      }
+      return;
+    }
+    if(!isOpen){showMsg('msg-accueil','Les sélections sont fermées. Le tournoi a débuté !','error');return;}
+    currentUser=nom;isEditMode=false;selections={1:[],2:[],3:[],4:[]};currentChapeau=1;
+    document.getElementById('selection-user-name').textContent=nom;
+    document.getElementById('sel-mode-label').textContent='Vos sélections';
+    document.getElementById('edit-banner').style.display='none';
+    showScreen('screen-selection');renderChapeau();
+  }catch(e){showMsg('msg-accueil','Erreur de connexion. Réessayez.','error');console.error(e);}
+}
+
+function loadExistingAndEdit(p){
+  selections={
+    1:[p.c1a,p.c1b].filter(Boolean),
+    2:[p.c2a,p.c2b].filter(Boolean),
+    3:[p.c3a,p.c3b].filter(Boolean),
+    4:[p.c4a,p.c4b].filter(Boolean)
+  };
+  isEditMode=true;currentChapeau=1;
+  document.getElementById('selection-user-name').textContent=currentUser;
+  document.getElementById('sel-mode-label').textContent='Modifier mes sélections';
+  document.getElementById('edit-banner').style.display='flex';
+  showScreen('screen-selection');renderChapeau();
+}
+
+function cancelEdit(){isEditMode=false;showScreen('screen-accueil');}
+
+function renderChapeau(){
+  const dots=document.getElementById('step-dots');
+  dots.innerHTML='';
+  for(let i=1;i<=NB_CHAPEAUX;i++){
+    const cls=i===currentChapeau?'active':(selections[i].length===2?'done':'');
+    dots.innerHTML+=`<div class="step-dot ${cls}"></div>`;
+  }
+  const joueurs=JOUEURS[currentChapeau],sel=selections[currentChapeau];
+  let html=`<div class="card"><div class="chapeau-badge">Chapeau ${currentChapeau}</div>
+    <div style="font-size:12px;color:#a0c878;margin-bottom:10px">Choisissez 2 joueurs <span style="color:#c9a84c;font-weight:700">(${sel.length}/2)</span></div>
+    <div class="joueurs-grid">`;
+  joueurs.forEach(j=>{
+    const isSel=sel.includes(j),isDisabled=!isSel&&sel.length>=2;
+    html+=`<button class="joueur-btn ${isSel?'selected':''} ${isDisabled?'disabled':''}" onclick="toggleJoueur('${j.replace(/'/g,"\\'")}',${currentChapeau})">${j}</button>`;
+  });
+  html+=`</div></div>`;
+  document.getElementById('selection-content').innerHTML=html;
+  document.getElementById('btn-prev').style.display=currentChapeau===1?'none':'block';
+  const allDone=Object.values(selections).every(s=>s.length===2);
+  const btn=document.getElementById('btn-next');
+  if(currentChapeau===NB_CHAPEAUX){
+    btn.textContent=allDone?(isEditMode?'💾 Sauvegarder les modifications':'✅ Valider mes sélections'):'Valider →';
+    btn.className='btn '+(allDone?'btn-gold':'btn-outline');
+  } else {btn.textContent='Suivant →';btn.className='btn btn-gold';}
+}
+
+function toggleJoueur(nom,chapeau){
+  const sel=selections[chapeau];
+  if(sel.includes(nom)) selections[chapeau]=sel.filter(j=>j!==nom);
+  else if(sel.length<2) selections[chapeau].push(nom);
+  renderChapeau();
+}
+function nextChapeau(){
+  if(selections[currentChapeau].length<2){alert(`Veuillez sélectionner 2 joueurs dans le chapeau ${currentChapeau}`);return;}
+  if(currentChapeau<NB_CHAPEAUX){currentChapeau++;renderChapeau();}
+  else submitSelections();
+}
+function prevChapeau(){if(currentChapeau>1){currentChapeau--;renderChapeau();}}
+
+async function submitSelections(){
+  if(!Object.values(selections).every(s=>s.length===2)){alert('2 joueurs par chapeau requis');return;}
+  const data={nom:currentUser,c1a:selections[1][0],c1b:selections[1][1],c2a:selections[2][0],c2b:selections[2][1],c3a:selections[3][0],c3b:selections[3][1],c4a:selections[4][0],c4b:selections[4][1]};
+  try{
+    if(isEditMode){
+      await sbFetch(`participants?nom=eq.${encodeURIComponent(currentUser)}`,{method:'PATCH',body:JSON.stringify(data),prefer:'return=minimal'});
+      document.getElementById('confirm-title').textContent='Modifications sauvegardées !';
+      document.getElementById('confirm-subtitle').textContent='Vos sélections ont été mises à jour.';
+    } else {
+      await sbFetch('participants',{method:'POST',body:JSON.stringify(data),prefer:'return=minimal'});
+      document.getElementById('confirm-title').textContent='Sélections enregistrées !';
+      document.getElementById('confirm-subtitle').textContent='Vos 8 joueurs ont été sauvegardés. Bonne chance !';
+    }
+    showConfirm();
+  }catch(e){alert('Erreur lors de la sauvegarde. Réessayez.');console.error(e);}
+}
+
+function showConfirm(){
+  let html='';
+  for(let c=1;c<=NB_CHAPEAUX;c++){
+    html+=`<div class="card" style="margin-bottom:8px"><div class="chapeau-badge">Chapeau ${c}</div>
+      <p style="margin-top:6px;font-size:14px">⛳ ${selections[c][0]}</p>
+      <p style="font-size:14px">⛳ ${selections[c][1]}</p></div>`;
+  }
+  document.getElementById('confirm-recap').innerHTML=html;
+  showScreen('screen-confirm');
+}
+
+async function goClassement(){
+  showScreen('screen-classement');switchTab('classement');newsLoaded=false;
+  if(refreshTimer) clearInterval(refreshTimer);
+  refreshTimer=setInterval(async()=>{await fetchESPNScores();await loadClassement();},REFRESH_INTERVAL);
+  await loadClassement();
+}
+
+async function loadClassement(){
+  document.getElementById('tab-classement').innerHTML='<div class="spinner">⏳ Chargement...</div>';
+  try{
+    const [_,participants]=await Promise.all([fetchESPNScores(),sbFetch('participants?select=*&order=nom')]);
+    if(lastUpdated) document.getElementById('refresh-info').textContent=`ESPN : ${lastUpdated.toLocaleTimeString('fr-FR')} · Auto toutes les 5 min`;
+
+    const results=(participants||[]).map(p=>{
+      const myJ=[p.c1a,p.c1b,p.c2a,p.c2b,p.c3a,p.c3b,p.c4a,p.c4b].filter(Boolean);
+      const scores=myJ.map(j=>({nom:j,score:getScore(j)??0}));
+      scores.sort((a,b)=>a.score-b.score);
+      const best4=scores.slice(0,4);
+      const total=best4.reduce((s,j)=>s+j.score,0);
+      return{nom:p.nom,total,best4,allJoueurs:scores};
+    });
+    results.sort((a,b)=>a.total-b.total);
+
+    let html='';
+    results.forEach((r,i)=>{
+      const nc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+      const b4=r.best4.map(j=>j.nom.split(' ').pop()).join(', ');
+      html+=`<div class="rank-item" onclick="toggleDetail('d${i}')">
+        <div class="rank-num ${nc}">${i+1}</div>
+        <div class="rank-info"><div class="rank-name">${r.nom}</div><div class="rank-joueurs">Best 4: ${b4}</div></div>
+        <div class="rank-score ${scoreClass(r.total)}">${fmtScore(r.total)}</div>
+      </div>
+      <div class="participant-detail" id="d${i}">
+        ${r.allJoueurs.map((j,idx)=>`<div class="score-item">
+          <span style="font-size:14px" class="${idx<4?'best4':''}">${idx<4?'★ ':''}${j.nom}</span>
+          <span style="font-size:14px;font-weight:700" class="${scoreClass(j.score)}">${fmtScore(j.score)}</span>
+        </div>`).join('')}
+      </div>`;
+    });
+    if(!html) html='<div class="spinner">Aucun participant pour l\'instant</div>';
+    document.getElementById('tab-classement').innerHTML=html;
+
+    const scoresTab=ALL_JOUEURS.map(n=>({nom:n,score:getScore(n)})).filter(j=>j.score!==null).sort((a,b)=>a.score-b.score);
+    let shtml='<div class="card">';
+    if(scoresTab.length) scoresTab.forEach(j=>{
+      shtml+=`<div class="score-item" style="cursor:pointer" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
+        <span style="font-size:14px">⛳ ${j.nom}</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:14px;font-weight:700" class="${scoreClass(j.score)}">${fmtScore(j.score)}</span>
+          <span style="color:#6a9a7a;font-size:16px">›</span>
+        </div>
+      </div>`;
+    });
+    else shtml+='<div style="padding:20px;text-align:center;color:#6a9a7a">Scores ESPN pas encore disponibles.<br><br>'+
+      ALL_JOUEURS.slice(0,10).map(n=>`<div class="score-item" style="cursor:pointer" onclick="openPlayerCard('${n.replace(/'/g,"\\'")}')"><span style="font-size:14px">⛳ ${n}</span><span style="color:#6a9a7a;font-size:16px">›</span></div>`).join('')+'</div>';
+    shtml+='</div>';
+    document.getElementById('tab-scores').innerHTML=shtml;
+  }catch(e){document.getElementById('tab-classement').innerHTML='<div class="msg error">Erreur de chargement</div>';console.error(e);}
+}
+
+function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
+function switchTab(tab){
+  const tabs=['classement','scores','news'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
+  tabs.forEach(t=>{const el=document.getElementById('tab-'+t);if(el) el.style.display=t===tab?'block':'none';});
+  if(tab==='news'&&!newsLoaded) loadNews();
+}
+
+// ---- FICHE JOUEUR ----
+const playerCache={};
+
+const PLAYER_DATA = {
+  'Scottie Scheffler':     {espn_id:'9478', nationalite:'🇺🇸 Américain', age:27, classement_mondial:1, palmares_majeurs:2, turned_pro:2018, meilleur_resultat_masters:'Vainqueur 2022, 2024', bio:"Scottie Scheffler est le numéro 1 mondial incontesté. Originaire du Texas, il a explosé en 2022 en remportant le Masters et en atteignant la première place mondiale. Son swing régulier et sa gestion mentale exemplaire en font le grand favori d'Augusta.", statistiques:{driving_distance:'318 yards',fairways:'57%',gir:'72%',putts_par_trou:'1.71'}, palmares_liste:['Masters 2022','Masters 2024','Players Championship 2024','Médaille d\'Or JO 2024']},
+  'Rory McIlroy':          {espn_id:'3470',  nationalite:'🇮🇪 Irlandais',  age:35, classement_mondial:3, palmares_majeurs:4, turned_pro:2007, meilleur_resultat_masters:'2ème 2022',            bio:"Rory McIlroy est l'un des meilleurs joueurs de sa génération avec 4 Majeurs à son palmarès. Le Masters reste le seul Major qui lui manque pour compléter le Grand Chelem en carrière — son obsession depuis des années.", statistiques:{driving_distance:'320 yards',fairways:'54%',gir:'70%',putts_par_trou:'1.73'}, palmares_liste:['US Open 2011','The Open 2014','PGA Championship 2012, 2014']},
+  'Jon Rahm':              {espn_id:'9780',  nationalite:'🇪🇸 Espagnol',   age:30, classement_mondial:4, palmares_majeurs:2, turned_pro:2016, meilleur_resultat_masters:'Vainqueur 2023',        bio:"Jon Rahm est le géant basque du golf mondial. Vainqueur du Masters 2023 et de l'US Open 2021, il a rejoint LIV Golf en 2024 mais reste une menace constante sur tous les parcours. Son jeu agressif est parfait pour Augusta.", statistiques:{driving_distance:'308 yards',fairways:'58%',gir:'71%',putts_par_trou:'1.74'}, palmares_liste:['Masters 2023','US Open 2021']},
+  'Tommy Fleetwood':       {espn_id:'5769',  nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',   age:33, classement_mondial:8, palmares_majeurs:0, turned_pro:2010, meilleur_resultat_masters:'6ème 2023',           bio:"Tommy Fleetwood est l'un des meilleurs joueurs européens sans Major à son palmarès. Son swing élégant et sa régularité en font un concurrent sérieux à Augusta. Il cherche encore son premier titre en Majeur.", statistiques:{driving_distance:'299 yards',fairways:'63%',gir:'70%',putts_par_trou:'1.75'}, palmares_liste:['Abu Dhabi HSBC Championship 2017, 2019','Nedbank Golf Challenge 2023']},
+  'Bryson DeChambeau':     {espn_id:'5759',  nationalite:'🇺🇸 Américain',  age:31, classement_mondial:7, palmares_majeurs:2, turned_pro:2016, meilleur_resultat_masters:'T5 2020',              bio:"Bryson DeChambeau est le scientifique du golf. Après une transformation physique spectaculaire, il frappe la balle plus loin que quiconque sur le circuit. Vainqueur de l'US Open 2020 et 2024, il a rejoint LIV Golf en 2022.", statistiques:{driving_distance:'337 yards',fairways:'48%',gir:'68%',putts_par_trou:'1.76'}, palmares_liste:['US Open 2020','US Open 2024']},
+  'Tyrrell Hatton':        {espn_id:'5530',  nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',   age:32, classement_mondial:11, palmares_majeurs:0, turned_pro:2013, meilleur_resultat_masters:'T12 2024',          bio:"Tyrrell Hatton est connu pour son caractère expressif et son jeu incisif. Récemment passé chez LIV Golf, il reste l'un des meilleurs joueurs européens. Son tempérament de compétiteur le rend dangereux dans les grandes occasions.", statistiques:{driving_distance:'295 yards',fairways:'61%',gir:'69%',putts_par_trou:'1.76'}, palmares_liste:['BMW PGA Championship 2020','Arnold Palmer Invitational 2020']},
+  'Robert MacIntyre':      {espn_id:'11378', nationalite:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Écossais',  age:28, classement_mondial:16, palmares_majeurs:0, turned_pro:2018, meilleur_resultat_masters:'T26 2023',          bio:"Robert MacIntyre est la grande révélation écossaise du golf mondial. Finaliste de la Ryder Cup, il a décroché son premier titre sur le PGA Tour en 2024 et continue sa progression vers les sommets.", statistiques:{driving_distance:'304 yards',fairways:'60%',gir:'68%',putts_par_trou:'1.76'}, palmares_liste:['Canadian Open 2024']},
+  'Shane Lowry':           {espn_id:'4995',  nationalite:'🇮🇪 Irlandais',  age:37, classement_mondial:23, palmares_majeurs:1, turned_pro:2009, meilleur_resultat_masters:'T10 2022',             bio:"Shane Lowry est le champion irlandais de The Open 2019 à Royal Portrush. Joueur régulier sur le circuit mondial, il excelle dans les conditions difficiles et représente l'Irlande avec fierté.", statistiques:{driving_distance:'297 yards',fairways:'62%',gir:'69%',putts_par_trou:'1.76'}, palmares_liste:["The Open Championship 2019"]},
+  'Xander Schauffele':     {espn_id:'9003',  nationalite:'🇺🇸 Américain',  age:30, classement_mondial:2, palmares_majeurs:2, turned_pro:2015, meilleur_resultat_masters:'2ème 2019',            bio:"Xander Schauffele a longtemps été le meilleur joueur sans Major jusqu'à ce qu'il remporte le PGA Championship et The Open en 2024. Médaillé d'or olympique en 2020, il est désormais parmi l'élite mondiale.", statistiques:{driving_distance:'305 yards',fairways:'60%',gir:'72%',putts_par_trou:'1.72'}, palmares_liste:['PGA Championship 2024','The Open 2024','Médaille d\'Or JO 2020']},
+  'Collin Morikawa':       {espn_id:'10592', nationalite:'🇺🇸 Américain',  age:27, classement_mondial:9, palmares_majeurs:2, turned_pro:2019, meilleur_resultat_masters:'T18 2021',             bio:"Collin Morikawa est l'un des joueurs les plus précis du circuit. Vainqueur du PGA Championship dès sa première participation en 2020 et de The Open en 2021, il excelle par la qualité de ses fers.", statistiques:{driving_distance:'296 yards',fairways:'65%',gir:'74%',putts_par_trou:'1.77'}, palmares_liste:['PGA Championship 2020','The Open 2021']},
+  'Ludvig Aberg':          {espn_id:'11813', nationalite:'🇸🇪 Suédois',    age:24, classement_mondial:6, palmares_majeurs:0, turned_pro:2023, meilleur_resultat_masters:'2ème 2024',            bio:"Ludvig Åberg est la sensation suédoise du golf mondial. Passé professionnel en 2023, il a immédiatement intégré l'élite mondiale et frôlé la victoire au Masters 2024. Son potentiel est considéré comme illimité.", statistiques:{driving_distance:'312 yards',fairways:'61%',gir:'71%',putts_par_trou:'1.74'}, palmares_liste:['RSM Classic 2023','Hero World Challenge 2024']},
+  'Viktor Hovland':        {espn_id:'11080', nationalite:'🇳🇴 Norvégien',  age:27, classement_mondial:13, palmares_majeurs:0, turned_pro:2019, meilleur_resultat_masters:'T12 2023',             bio:"Viktor Hovland est le premier grand champion norvégien de l'histoire du golf. Vainqueur du Tour Championship 2023, il possède un jeu spectaculaire mais cherche encore son premier Major.", statistiques:{driving_distance:'309 yards',fairways:'56%',gir:'69%',putts_par_trou:'1.75'}, palmares_liste:['Tour Championship 2023','DP World Tour Championship 2021, 2022']},
+  'Joaquin Niemann':       {espn_id:'10191', nationalite:'🇨🇱 Chilien',    age:25, classement_mondial:20, palmares_majeurs:0, turned_pro:2018, meilleur_resultat_masters:'T21 2022',             bio:"Joaquin Niemann est le meilleur joueur d'Amérique du Sud. Passé chez LIV Golf en 2022, il y domine régulièrement. Son swing fluide et sa longueur de frappe en font un prétendant sérieux dans tous les tournois.", statistiques:{driving_distance:'316 yards',fairways:'55%',gir:'69%',putts_par_trou:'1.75'}, palmares_liste:['LIV Golf Jeddah 2023','Genesis Invitational 2022']},
+  'Justin Thomas':         {espn_id:'5467',  nationalite:'🇺🇸 Américain',  age:31, classement_mondial:18, palmares_majeurs:2, turned_pro:2013, meilleur_resultat_masters:'T4 2020',              bio:"Justin Thomas est l'un des meilleurs Américains de sa génération. Avec 2 PGA Championships et 15 victoires sur le PGA Tour, JT reste une force majeure dans le golf mondial malgré quelques années de transition.", statistiques:{driving_distance:'305 yards',fairways:'57%',gir:'68%',putts_par_trou:'1.74'}, palmares_liste:['PGA Championship 2017, 2022','FedEx Cup 2017, 2019']},
+  'Brooks Koepka':         {espn_id:'5765',  nationalite:'🇺🇸 Américain',  age:34, classement_mondial:25, palmares_majeurs:5, turned_pro:2012, meilleur_resultat_masters:'2ème 2019, 2023',       bio:"Brooks Koepka est le spécialiste des Majeurs par excellence. Avec 5 titres en Grand Chelem, il élève son jeu dans les grands rendez-vous. Passé chez LIV Golf en 2022, il reste une menace absolue dans les Majeurs.", statistiques:{driving_distance:'313 yards',fairways:'55%',gir:'68%',putts_par_trou:'1.76'}, palmares_liste:['US Open 2017, 2018','PGA Championship 2018, 2019','Masters 2023... non, 2ème place']},
+  'Jordan Spieth':         {espn_id:'5467',  nationalite:'🇺🇸 Américain',  age:31, classement_mondial:29, palmares_majeurs:3, turned_pro:2012, meilleur_resultat_masters:'Vainqueur 2015',        bio:"Jordan Spieth est le prodige texan qui a dominé le golf mondial en 2015. Vainqueur de 3 Majeurs avant 24 ans, il cherche à retrouver son meilleur niveau. Son putting et sa gestion mentale restent exceptionnels.", statistiques:{driving_distance:'291 yards',fairways:'60%',gir:'68%',putts_par_trou:'1.73'}, palmares_liste:['Masters 2015','US Open 2015','The Open 2017']},
+  'Justin Rose':           {espn_id:'569',   nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',   age:44, classement_mondial:55, palmares_majeurs:1, turned_pro:1998, meilleur_resultat_masters:'2ème 2017',           bio:"Justin Rose est une légende du golf européen. Vainqueur de l'US Open 2013 et médaillé d'or olympique en 2016, il continue de compétitionner au plus haut niveau malgré son âge avancé.", statistiques:{driving_distance:'289 yards',fairways:'63%',gir:'67%',putts_par_trou:'1.77'}, palmares_liste:['US Open 2013','Médaille d\'Or JO 2016','FedEx Cup 2018']},
+  'Russell Henley':        {espn_id:'6047',  nationalite:'🇺🇸 Américain',  age:35, classement_mondial:30, palmares_majeurs:0, turned_pro:2012, meilleur_resultat_masters:'T5 2023',              bio:"Russell Henley est un joueur solide du PGA Tour, connu pour ses performances régulières. Son jeu précis lui permet de compétitionner dans les grands tournois, et il a failli s'imposer dans plusieurs Majeurs.", statistiques:{driving_distance:'295 yards',fairways:'63%',gir:'70%',putts_par_trou:'1.75'}, palmares_liste:['Sony Open 2013, 2019','Houston Open 2014']},
+  'Matt Fitzpatrick':      {espn_id:'9131',  nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',   age:30, classement_mondial:19, palmares_majeurs:1, turned_pro:2014, meilleur_resultat_masters:'T14 2022',           bio:"Matt Fitzpatrick est le précis Sheffield. Vainqueur de l'US Open 2022 à Brookline, il excelle sur les parcours demandant de la précision. Son jeu complet et sa rigueur mentale en font un candidat sérieux à Augusta.", statistiques:{driving_distance:'293 yards',fairways:'65%',gir:'71%',putts_par_trou:'1.74'}, palmares_liste:['US Open 2022','DP World Tour Championship 2020']},
+  'Patrick Cantlay':       {espn_id:'9036',  nationalite:'🇺🇸 Américain',  age:32, classement_mondial:15, palmares_majeurs:0, turned_pro:2012, meilleur_resultat_masters:'T5 2021',              bio:"Patrick Cantlay est l'un des joueurs les plus froids sous pression du circuit. Surnommé 'Patty Ice', le vainqueur du Tour Championship 2021 et de la FedEx Cup est capable des meilleures performances dans les grands moments.", statistiques:{driving_distance:'298 yards',fairways:'61%',gir:'71%',putts_par_trou:'1.72'}, palmares_liste:['Tour Championship 2021','FedEx Cup 2021','BMW Championship 2021, 2022']},
+  // Chapeau 2
+  'Sepp Straka':           {espn_id:'8961',  nationalite:'🇦🇹 Autrichien', age:31, classement_mondial:28, palmares_majeurs:0, turned_pro:2016, meilleur_resultat_masters:'T24 2023',             bio:"Sepp Straka est le premier grand champion autrichien du golf moderne. Vainqueur du John Deere Classic 2022, il représente l'Autriche avec fierté et continue de progresser sur le circuit américain.", statistiques:{driving_distance:'296 yards',fairways:'60%',gir:'68%',putts_par_trou:'1.76'}, palmares_liste:['John Deere Classic 2022','Honda Classic 2024']},
+  'Cameron Young':         {espn_id:'11408', nationalite:'🇺🇸 Américain',  age:27, classement_mondial:33, palmares_majeurs:0, turned_pro:2021, meilleur_resultat_masters:'T11 2022',             bio:"Cameron Young est l'une des plus belles révélations récentes du PGA Tour. Frappeur exceptionnel, il a failli remporter The Open en 2022 lors de sa première participation. Son potentiel est énorme.", statistiques:{driving_distance:'318 yards',fairways:'52%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['Fortinet Championship 2024']},
+  'Hideki Matsuyama':      {espn_id:'5860',  nationalite:'🇯🇵 Japonais',   age:32, classement_mondial:14, palmares_majeurs:1, turned_pro:2013, meilleur_resultat_masters:'Vainqueur 2021',        bio:"Hideki Matsuyama est une icône du golf japonais. Sa victoire au Masters 2021 a déclenché une ferveur nationale au Japon. Joueur extrêmement complet avec un iron game remarquable, il reste une menace constante à Augusta.", statistiques:{driving_distance:'296 yards',fairways:'56%',gir:'69%',putts_par_trou:'1.76'}, palmares_liste:['Masters 2021','WGC-HSBC Champions 2016, 2017','Zozo Championship 2022']},
+  'Adam Scott':            {espn_id:'1225',  nationalite:'🇦🇺 Australien', age:44, classement_mondial:35, palmares_majeurs:1, turned_pro:2000, meilleur_resultat_masters:'Vainqueur 2013',        bio:"Adam Scott est la légende australienne du golf. Vainqueur du Masters 2013, il reste l'un des swings les plus élégants du circuit à 44 ans. Sa longévité au plus haut niveau est remarquable.", statistiques:{driving_distance:'291 yards',fairways:'63%',gir:'68%',putts_par_trou:'1.76'}, palmares_liste:['Masters 2013','Players Championship 2004']},
+  'Ryan Fox':              {espn_id:'9327',  nationalite:'🇳🇿 Néo-Zélandais',age:36, classement_mondial:40, palmares_majeurs:0, turned_pro:2012, meilleur_resultat_masters:'T30 2023',            bio:"Ryan Fox est le meilleur joueur de Nouvelle-Zélande. Très actif sur le DP World Tour, il a récemment commencé à s'imposer dans les grands événements internationaux.", statistiques:{driving_distance:'307 yards',fairways:'57%',gir:'66%',putts_par_trou:'1.77'}, palmares_liste:['Alfred Dunhill Links 2021','DP World Tour Championship 2022']},
+  'Jason Day':             {espn_id:'3467',  nationalite:'🇦🇺 Australien', age:37, classement_mondial:27, palmares_majeurs:1, turned_pro:2006, meilleur_resultat_masters:'2ème 2011',            bio:"Jason Day est l'ancien numéro 1 mondial australien. Vainqueur du PGA Championship 2015, il a connu des difficultés liées à des blessures au dos mais a retrouvé un bon niveau ces dernières années.", statistiques:{driving_distance:'298 yards',fairways:'58%',gir:'67%',putts_par_trou:'1.74'}, palmares_liste:['PGA Championship 2015','Tour Championship 2016','FedEx Cup 2016']},
+  'J.J. Spaun':            {espn_id:'10166', nationalite:'🇺🇸 Américain',  age:33, classement_mondial:50, palmares_majeurs:0, turned_pro:2014, meilleur_resultat_masters:'T40 2022',             bio:"J.J. Spaun est un joueur solide du PGA Tour, vainqueur du Valero Texas Open 2022. Il se distingue par sa régularité et sa capacité à performer sous pression.", statistiques:{driving_distance:'293 yards',fairways:'60%',gir:'67%',putts_par_trou:'1.77'}, palmares_liste:['Valero Texas Open 2022']},
+  'Ben Griffin':           {espn_id:'11332', nationalite:'🇺🇸 Américain',  age:28, classement_mondial:60, palmares_majeurs:0, turned_pro:2019, meilleur_resultat_masters:'Première participation', bio:"Ben Griffin est une jeune promesse du PGA Tour. Vainqueur du Corales Puntacana Championship 2023, il continue sa progression et pourrait créer la surprise à Augusta.", statistiques:{driving_distance:'298 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.77'}, palmares_liste:['Corales Puntacana Championship 2023']},
+  'Patrick Reed':          {espn_id:'5759',  nationalite:'🇺🇸 Américain',  age:34, classement_mondial:45, palmares_majeurs:1, turned_pro:2011, meilleur_resultat_masters:'Vainqueur 2018',        bio:"Patrick Reed est le controversé 'Captain America'. Vainqueur du Masters 2018, il a rejoint LIV Golf en 2022. Malgré les polémiques qui l'entourent, ses performances dans les Majeurs restent impressionnantes.", statistiques:{driving_distance:'292 yards',fairways:'58%',gir:'66%',putts_par_trou:'1.75'}, palmares_liste:['Masters 2018','WGC-Cadillac Championship 2018']},
+  'Corey Conners':         {espn_id:'9126',  nationalite:'🇨🇦 Canadien',   age:33, classement_mondial:38, palmares_majeurs:0, turned_pro:2015, meilleur_resultat_masters:'T8 2021',              bio:"Corey Conners est le meilleur joueur canadien de sa génération. Reconnu pour être l'un des joueurs les plus précis du circuit en termes de coups d'approche, il a failli s'imposer dans plusieurs grands tournois.", statistiques:{driving_distance:'294 yards',fairways:'66%',gir:'73%',putts_par_trou:'1.78'}, palmares_liste:['Valero Texas Open 2019']},
+  'Min Woo Lee':           {espn_id:'11122', nationalite:'🇦🇺 Australien', age:26, classement_mondial:26, palmares_majeurs:0, turned_pro:2019, meilleur_resultat_masters:'T16 2023',             bio:"Min Woo Lee est l'électrisant Australien d'origine coréenne. Frère de la star du golf féminin Minjee Lee, il impressionne par son swing spectaculaire et ses performances régulières sur les deux tours mondiaux.", statistiques:{driving_distance:'306 yards',fairways:'55%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['Scottish Open 2021','Ras Al Khaimah Championship 2024']},
+  'Aaron Rai':             {espn_id:'10906', nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',   age:29, classement_mondial:42, palmares_majeurs:0, turned_pro:2015, meilleur_resultat_masters:'T20 2024',           bio:"Aaron Rai est une belle surprise du golf anglais. Vainqueur du Wyndham Championship 2024, il a décroché sa carte sur le PGA Tour et continue de progresser vers les sommets.", statistiques:{driving_distance:'291 yards',fairways:'64%',gir:'69%',putts_par_trou:'1.76'}, palmares_liste:['Wyndham Championship 2024','Hong Kong Open 2019']},
+  'Brian Harman':          {espn_id:'1225',  nationalite:'🇺🇸 Américain',  age:37, classement_mondial:22, palmares_majeurs:1, turned_pro:2010, meilleur_resultat_masters:'T20 2021',             bio:"Brian Harman a créé la sensation en remportant The Open Championship 2023 à Hoylake de manière dominante. Joueur discret et régulier, ce Géorgien est désormais un Major champion reconnu.", statistiques:{driving_distance:'282 yards',fairways:'65%',gir:'68%',putts_par_trou:'1.73'}, palmares_liste:["The Open Championship 2023"]},
+  'Carlos Ortiz':          {espn_id:'9403',  nationalite:'🇲🇽 Mexicain',   age:33, classement_mondial:80, palmares_majeurs:0, turned_pro:2012, meilleur_resultat_masters:'T17 2021',             bio:"Carlos Ortiz est le meilleur joueur mexicain de l'histoire du golf. Passé chez LIV Golf, il représente fièrement son pays et reste un joueur capable de belles performances dans les grands tournois.", statistiques:{driving_distance:'294 yards',fairways:'60%',gir:'66%',putts_par_trou:'1.77'}, palmares_liste:['Houston Open 2020']},
+  'Sam Burns':             {espn_id:'9938',  nationalite:'🇺🇸 Américain',  age:28, classement_mondial:21, palmares_majeurs:0, turned_pro:2018, meilleur_resultat_masters:'T24 2022',             bio:"Sam Burns est l'un des joueurs les plus réguliers du PGA Tour avec plusieurs victoires consécutives au même tournoi. Son fer long est exceptionnel et il cherche encore son premier Major.", statistiques:{driving_distance:'302 yards',fairways:'59%',gir:'70%',putts_par_trou:'1.74'}, palmares_liste:['Valspar Championship 2021, 2022, 2023','Byron Nelson 2022']},
+  'Thomas Detry':          {espn_id:'9791',  nationalite:'🇧🇪 Belge',      age:31, classement_mondial:48, palmares_majeurs:0, turned_pro:2015, meilleur_resultat_masters:'Première participation', bio:"Thomas Detry est la grande fierté du golf belge. Très actif sur le DP World Tour, il a récemment remporté l'Arnold Palmer Invitational 2024 pour s'imposer sur le PGA Tour.", statistiques:{driving_distance:'300 yards',fairways:'59%',gir:'68%',putts_par_trou:'1.76'}, palmares_liste:['Arnold Palmer Invitational 2024']},
+  'Cameron Smith':         {espn_id:'9131',  nationalite:'🇦🇺 Australien', age:31, classement_mondial:24, palmares_majeurs:1, turned_pro:2013, meilleur_resultat_masters:'2ème 2022',            bio:"Cameron Smith est le champion australien de The Open 2022 et l'un des meilleurs putteurs du monde. Passé chez LIV Golf en 2022, il y domine régulièrement avec son équipe Ripper GC.", statistiques:{driving_distance:'295 yards',fairways:'58%',gir:'67%',putts_par_trou:'1.70'}, palmares_liste:["The Open Championship 2022",'Players Championship 2022']},
+  'Tony Finau':            {espn_id:'6456',  nationalite:'🇺🇸 Américain',  age:35, classement_mondial:36, palmares_majeurs:0, turned_pro:2007, meilleur_resultat_masters:'T5 2019',              bio:"Tony Finau est le géant américain d'origine tongienne. Longtemps considéré comme le meilleur joueur sans victoire sur le PGA Tour, il a finalement enchaîné les succès depuis 2021. Son service est l'un des meilleurs du circuit.", statistiques:{driving_distance:'313 yards',fairways:'56%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['3M Open 2021, 2022','Houston Open 2021']},
+  'Sungjae Im':            {espn_id:'10220', nationalite:'🇰🇷 Sud-Coréen', age:26, classement_mondial:32, palmares_majeurs:0, turned_pro:2018, meilleur_resultat_masters:'2ème 2020',            bio:"Sungjae Im est l'une des étoiles montantes du golf coréen. Deuxième au Masters 2020, il est reconnu pour son volume de jeu extraordinaire et sa régularité impressionnante tout au long de l'année.", statistiques:{driving_distance:'295 yards',fairways:'62%',gir:'70%',putts_par_trou:'1.75'}, palmares_liste:['Honda Classic 2020','AT&T Pebble Beach 2023']},
+  'Wyndham Clark':         {espn_id:'11119', nationalite:'🇺🇸 Américain',  age:31, classement_mondial:17, palmares_majeurs:1, turned_pro:2017, meilleur_resultat_masters:'T15 2023',             bio:"Wyndham Clark a créé la surprise en remportant l'US Open 2023 à Los Angeles. Ce joueur longtemps passé sous les radars s'est révélé au plus haut niveau et cherche à confirmer dans les grands Majeurs.", statistiques:{driving_distance:'308 yards',fairways:'57%',gir:'68%',putts_par_trou:'1.75'}, palmares_liste:['US Open 2023','Wells Fargo Championship 2023']},
+  // Chapeau 3
+  'Rickie Fowler':         {espn_id:'4848',  nationalite:'🇺🇸 Américain',  age:36, classement_mondial:44, palmares_majeurs:0, turned_pro:2009, meilleur_resultat_masters:'T5 2018',              bio:"Rickie Fowler est l'un des joueurs les plus populaires du golf mondial. Malgré sa popularité et ses nombreux tops en Majeurs, il attend encore son premier titre en Grand Chelem. Sa tenue orange est devenue iconique.", statistiques:{driving_distance:'298 yards',fairways:'59%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['Players Championship 2015','Deutsche Bank Championship 2012']},
+  'Keegan Bradley':        {espn_id:'4513',  nationalite:'🇺🇸 Américain',  age:38, classement_mondial:53, palmares_majeurs:1, turned_pro:2008, meilleur_resultat_masters:'T16 2012',             bio:"Keegan Bradley est le vainqueur surprise du PGA Championship 2011. Capitaine de la Ryder Cup américaine, il reste un joueur compétitif avec un enthousiasme communicatif sur le parcours.", statistiques:{driving_distance:'295 yards',fairways:'60%',gir:'66%',putts_par_trou:'1.76'}, palmares_liste:['PGA Championship 2011','WGC-HSBC Champions 2012']},
+  'Si Woo Kim':            {espn_id:'9561',  nationalite:'🇰🇷 Sud-Coréen', age:29, classement_mondial:56, palmares_majeurs:0, turned_pro:2014, meilleur_resultat_masters:'T10 2021',             bio:"Si Woo Kim est le vainqueur du Players Championship 2017, l'un des tournois les plus prestigieux du PGA Tour. Le Coréen est capable de grandes performances dans les tournois majeurs.", statistiques:{driving_distance:'294 yards',fairways:'59%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['Players Championship 2017','Wyndham Championship 2016']},
+  'Akshay Bhatia':         {espn_id:'11535', nationalite:'🇺🇸 Américain',  age:22, classement_mondial:31, palmares_majeurs:0, turned_pro:2021, meilleur_resultat_masters:'Première participation', bio:"Akshay Bhatia est la grande sensation américaine. A seulement 22 ans, ce joueur d'origine indienne a déjà plusieurs victoires sur le PGA Tour. Son talent précoce le place parmi les grandes stars futures du golf.", statistiques:{driving_distance:'311 yards',fairways:'54%',gir:'66%',putts_par_trou:'1.75'}, palmares_liste:['Barracuda Championship 2023','Valero Texas Open 2024']},
+  'Taylor Pendrith':       {espn_id:'10630', nationalite:'🇨🇦 Canadien',   age:33, classement_mondial:43, palmares_majeurs:0, turned_pro:2015, meilleur_resultat_masters:'Première participation', bio:"Taylor Pendrith est l'un des longs frappeurs les plus impressionnants du PGA Tour. Le Canadien a décroché ses premières victoires sur le circuit américain et continue de s'affirmer au plus haut niveau.", statistiques:{driving_distance:'321 yards',fairways:'51%',gir:'65%',putts_par_trou:'1.77'}, palmares_liste:['CJ Cup Byron Nelson 2024']},
+  'Marc Leishman':         {espn_id:'3836',  nationalite:'🇦🇺 Australien', age:41, classement_mondial:90, palmares_majeurs:0, turned_pro:2007, meilleur_resultat_masters:'T4 2017',              bio:"Marc Leishman est le vétéran australien du circuit. Connu pour sa régularité et son calme sur le parcours, il a failli s'imposer dans plusieurs Majeurs. Passé chez LIV Golf, il continue de compétitionner.", statistiques:{driving_distance:'295 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.77'}, palmares_liste:['Arnold Palmer Invitational 2018','BMW Championship 2017']},
+  'Daniel Berger':         {espn_id:'9564',  nationalite:'🇺🇸 Américain',  age:31, classement_mondial:70, palmares_majeurs:0, turned_pro:2014, meilleur_resultat_masters:'T13 2021',             bio:"Daniel Berger est un joueur talentueux qui a souffert de blessures ces dernières années. Vainqueur de 4 titres sur le PGA Tour, il revient en force et cherche à retrouver son meilleur niveau.", statistiques:{driving_distance:'302 yards',fairways:'59%',gir:'67%',putts_par_trou:'1.75'}, palmares_liste:['FedEx St. Jude Classic 2016','Palm Beach Gardens 2017','AT&T Pebble Beach 2021']},
+  'Lucas Herbert':         {espn_id:'10484', nationalite:'🇦🇺 Australien', age:29, classement_mondial:65, palmares_majeurs:0, turned_pro:2016, meilleur_resultat_masters:'T30 2022',             bio:"Lucas Herbert est une belle promesse du golf australien. Vainqueur du British Masters et d'autres titres sur le DP World Tour, il cherche à s'imposer définitivement au niveau mondial.", statistiques:{driving_distance:'296 yards',fairways:'60%',gir:'66%',putts_par_trou:'1.77'}, palmares_liste:['British Masters 2021','Dubai Desert Classic 2021']},
+  'Harry Hall':            {espn_id:'11216', nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',   age:27, classement_mondial:85, palmares_majeurs:0, turned_pro:2019, meilleur_resultat_masters:'Première participation', bio:"Harry Hall est une jeune promesse anglaise du golf. Récent vainqueur sur le PGA Tour, il représente la nouvelle génération du golf britannique avec un jeu prometteur.", statistiques:{driving_distance:'291 yards',fairways:'62%',gir:'66%',putts_par_trou:'1.76'}, palmares_liste:['Corales Puntacana Championship 2022']},
+  'Aldrich Potgieter':     {espn_id:'11922', nationalite:'🇿🇦 Sud-Africain',age:19, classement_mondial:75, palmares_majeurs:0, turned_pro:2023, meilleur_resultat_masters:'Première participation', bio:"Aldrich Potgieter est la sensation sud-africaine du moment. À seulement 19 ans, ce phénomène frappe la balle à des distances extraordinaires et s'est déjà imposé sur le circuit professionnel. Il est considéré comme l'un des plus grands talents de sa génération.", statistiques:{driving_distance:'340 yards',fairways:'47%',gir:'63%',putts_par_trou:'1.77'}, palmares_liste:['Isuzu Championship 2023']},
+  'Tom Kim':               {espn_id:'11193', nationalite:'🇰🇷 Sud-Coréen', age:22, classement_mondial:37, palmares_majeurs:0, turned_pro:2022, meilleur_resultat_masters:'T19 2023',             bio:"Tom Kim (Kim Joo-hyung) est la sensation coréenne du PGA Tour. Professionnel depuis 2022, il a remporté deux titres sur le circuit américain dès sa première saison complète. Son sang-froid est impressionnant pour son jeune âge.", statistiques:{driving_distance:'295 yards',fairways:'60%',gir:'68%',putts_par_trou:'1.74'}, palmares_liste:['Shriners Children\'s Open 2022','Wyndham Championship 2022']},
+  'Rasmus Hojgaard':       {espn_id:'11421', nationalite:'🇩🇰 Danois',     age:23, classement_mondial:34, palmares_majeurs:0, turned_pro:2019, meilleur_resultat_masters:'Première participation', bio:"Rasmus Højgaard est le jumeau danois du golf européen avec son frère Nicolai. Vainqueur sur le DP World Tour, il s'impose progressivement parmi l'élite mondiale.", statistiques:{driving_distance:'301 yards',fairways:'58%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['Estrella Damm N.A. Andalucía Masters 2024']},
+  'Tom McKibbin':          {espn_id:'11850', nationalite:'🇮🇪 Irlandais',  age:22, classement_mondial:62, palmares_majeurs:0, turned_pro:2022, meilleur_resultat_masters:'Première participation', bio:"Tom McKibbin est la jeune étoile irlandaise du golf. Protégé de Rory McIlroy, il a impressionné sur le DP World Tour et cherche à s'imposer au niveau mondial.", statistiques:{driving_distance:'295 yards',fairways:'60%',gir:'66%',putts_par_trou:'1.77'}, palmares_liste:['Abu Dhabi HSBC Championship 2024']},
+  'Dean Burmester':        {espn_id:'9685',  nationalite:'🇿🇦 Sud-Africain',age:34, classement_mondial:68, palmares_majeurs:0, turned_pro:2013, meilleur_resultat_masters:'T35 2023',            bio:"Dean Burmester est l'un des meilleurs joueurs sud-africains de sa génération. Long frappeur et joueur agressif, il a remporté plusieurs titres sur le DP World Tour.", statistiques:{driving_distance:'313 yards',fairways:'54%',gir:'65%',putts_par_trou:'1.77'}, palmares_liste:['Joburg Open 2019','Magical Kenya Open 2022']},
+  'Nicolai Hojgaard':      {espn_id:'11422', nationalite:'🇩🇰 Danois',     age:23, classement_mondial:39, palmares_majeurs:0, turned_pro:2019, meilleur_resultat_masters:'T12 2024',             bio:"Nicolai Højgaard est le jumeau danois de Rasmus. Joueur élégant et complet, il s'est imposé au plus haut niveau avec une belle victoire sur le DP World Tour et des performances régulières dans les grands rendez-vous.", statistiques:{driving_distance:'299 yards',fairways:'60%',gir:'68%',putts_par_trou:'1.75'}, palmares_liste:['Italian Open 2021','Rolex Series 2024']},
+  'Sergio Garcia':         {espn_id:'1120',  nationalite:'🇪🇸 Espagnol',   age:45, classement_mondial:95, palmares_majeurs:1, turned_pro:1999, meilleur_resultat_masters:'Vainqueur 2017',        bio:"Sergio Garcia est la légende espagnole du golf. Vainqueur du Masters 2017 après des années de tentatives, El Niño a rejoint LIV Golf en 2022. Avec plus de 35 ans de carrière professionnelle, il reste une figure emblématique du golf mondial.", statistiques:{driving_distance:'291 yards',fairways:'61%',gir:'66%',putts_par_trou:'1.76'}, palmares_liste:['Masters 2017','Players Championship 2008']},
+  // Chapeau 4
+  'Sahith Theegala':       {espn_id:'11088', nationalite:'🇺🇸 Américain',  age:27, classement_mondial:46, palmares_majeurs:0, turned_pro:2021, meilleur_resultat_masters:'T20 2023',             bio:"Sahith Theegala est l'une des plus belles révélations récentes du PGA Tour. D'origine indienne, ce Californien impressionne par son jeu explosif et ses remontées spectaculaires.", statistiques:{driving_distance:'307 yards',fairways:'56%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['Fortinet Championship 2023']},
+  'Thriston Lawrence':     {espn_id:'11219', nationalite:'🇿🇦 Sud-Africain',age:27, classement_mondial:72, palmares_majeurs:0, turned_pro:2018, meilleur_resultat_masters:'Première participation', bio:"Thriston Lawrence est une belle promesse sud-africaine. Vainqueur sur le DP World Tour, il cherche à s'imposer au niveau mondial après avoir obtenu sa qualification pour les Masters.", statistiques:{driving_distance:'292 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['Joburg Open 2022','eSwatini Classic 2022']},
+  'Harris English':        {espn_id:'5408',  nationalite:'🇺🇸 Américain',  age:35, classement_mondial:49, palmares_majeurs:0, turned_pro:2011, meilleur_resultat_masters:'T10 2013',             bio:"Harris English est un joueur solide du PGA Tour connu pour sa régularité. Vainqueur du Travelers Championship en prolongations mémorables en 2021, il reste un candidat sérieux dans tous les tournois.", statistiques:{driving_distance:'297 yards',fairways:'61%',gir:'68%',putts_par_trou:'1.75'}, palmares_liste:['Travelers Championship 2021','Sony Open 2014, 2021']},
+  'Louis Oosthuizen':      {espn_id:'3836',  nationalite:'🇿🇦 Sud-Africain',age:41, classement_mondial:58, palmares_majeurs:1, turned_pro:2002, meilleur_resultat_masters:'2ème 2012',            bio:"Louis Oosthuizen est le champion de The Open Championship 2010. Ce Sud-Africain élégant a failli remporter plusieurs autres Majeurs avec de nombreuses places de finaliste. Il a rejoint LIV Golf en 2022.", statistiques:{driving_distance:'293 yards',fairways:'62%',gir:'68%',putts_par_trou:'1.75'}, palmares_liste:["The Open Championship 2010"]},
+  'Byeong Hun An':         {espn_id:'8854',  nationalite:'🇰🇷 Sud-Coréen', age:32, classement_mondial:55, palmares_majeurs:0, turned_pro:2012, meilleur_resultat_masters:'T28 2022',             bio:"Byeong Hun An est un joueur coréen régulier sur le PGA Tour. Champion du monde amateur en 2009, il a poursuivi une belle carrière professionnelle avec des performances constantes.", statistiques:{driving_distance:'291 yards',fairways:'62%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['BMW PGA Championship 2015']},
+  'Davis Thompson':        {espn_id:'11626', nationalite:'🇺🇸 Américain',  age:24, classement_mondial:64, palmares_majeurs:0, turned_pro:2022, meilleur_resultat_masters:'Première participation', bio:"Davis Thompson est une jeune promesse américaine du PGA Tour. Vainqueur du John Deere Classic 2023, ce Géorgien poursuit sa progression vers les sommets du golf mondial.", statistiques:{driving_distance:'299 yards',fairways:'60%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['John Deere Classic 2023']},
+  'Dustin Johnson':        {espn_id:'3843',  nationalite:'🇺🇸 Américain',  age:40, classement_mondial:20, palmares_majeurs:2, turned_pro:2007, meilleur_resultat_masters:'Vainqueur 2020',        bio:"Dustin Johnson est l'ancien numéro 1 mondial américain. Vainqueur du Masters 2020 et de l'US Open 2016, DJ a rejoint LIV Golf en 2022. Son talent naturel exceptionnel en fait toujours un candidat sérieux dans les Majeurs.", statistiques:{driving_distance:'314 yards',fairways:'56%',gir:'68%',putts_par_trou:'1.76'}, palmares_liste:['Masters 2020','US Open 2016','FedEx Cup 2020']},
+  'Maverick McNealy':      {espn_id:'10471', nationalite:'🇺🇸 Américain',  age:29, classement_mondial:52, palmares_majeurs:0, turned_pro:2018, meilleur_resultat_masters:'Première participation', bio:"Maverick McNealy est un joueur issu de Stanford qui allie intelligence et talent sportif. Vainqueur sur le PGA Tour, il s'impose progressivement parmi les meilleurs joueurs américains.", statistiques:{driving_distance:'291 yards',fairways:'63%',gir:'69%',putts_par_trou:'1.75'}, palmares_liste:['Rocket Classic 2023']},
+  'Thorbjorn Olesen':      {espn_id:'6542',  nationalite:'🇩🇰 Danois',     age:34, classement_mondial:66, palmares_majeurs:0, turned_pro:2011, meilleur_resultat_masters:'T20 2018',             bio:"Thorbjørn Olesen est le vétéran danois du golf européen. Membre de l'équipe européenne de la Ryder Cup, il a connu des années difficiles mais retrouve son meilleur niveau.", statistiques:{driving_distance:'295 yards',fairways:'60%',gir:'66%',putts_par_trou:'1.77'}, palmares_liste:['Turkish Airlines Open 2017','Italian Open 2013']},
+  'Matt Wallace':          {espn_id:'10364', nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',   age:34, classement_mondial:78, palmares_majeurs:0, turned_pro:2013, meilleur_resultat_masters:'Première participation', bio:"Matt Wallace est un joueur anglais compétitif sur le DP World Tour. Vainqueur de plusieurs titres en Europe, il cherche à s'imposer au niveau mondial.", statistiques:{driving_distance:'296 yards',fairways:'60%',gir:'65%',putts_par_trou:'1.77'}, palmares_liste:['Hero Indian Open 2018','Hauts de France-Pas de Calais Open 2017']},
+  'Christiaan Bezuidenhout':{espn_id:'10823',nationalite:'🇿🇦 Sud-Africain',age:30, classement_mondial:57, palmares_majeurs:0, turned_pro:2016, meilleur_resultat_masters:'T35 2022',            bio:"Christiaan Bezuidenhout est l'un des meilleurs Sud-Africains de sa génération. Vainqueur à plusieurs reprises sur le DP World Tour, il cherche à s'imposer définitivement au niveau mondial.", statistiques:{driving_distance:'293 yards',fairways:'63%',gir:'68%',putts_par_trou:'1.75'}, palmares_liste:['South African Open 2020, 2021','Alfred Dunhill Links 2021']},
+  'Emiliano Grillo':       {espn_id:'9573',  nationalite:'🇦🇷 Argentin',   age:31, classement_mondial:61, palmares_majeurs:0, turned_pro:2014, meilleur_resultat_masters:'T24 2016',             bio:"Emiliano Grillo est la fierté du golf argentin. Régulier sur le PGA Tour depuis plusieurs années, ce Sud-Américain apporte une touche de classe avec son jeu élégant et précis.", statistiques:{driving_distance:'289 yards',fairways:'64%',gir:'68%',putts_par_trou:'1.76'}, palmares_liste:['Frys.com Open 2015']},
+  'Nick Taylor':           {espn_id:'5486',  nationalite:'🇨🇦 Canadien',   age:36, classement_mondial:41, palmares_majeurs:0, turned_pro:2012, meilleur_resultat_masters:'T28 2023',             bio:"Nick Taylor est l'un des meilleurs joueurs canadiens du moment. Vainqueur du Canadian Open 2023 de manière spectaculaire devant son public, il a réalisé l'un des eagles les plus mémorables de l'histoire du tournoi.", statistiques:{driving_distance:'295 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.75'}, palmares_liste:['Canadian Open 2023','AT&T Pebble Beach 2014']},
+  'Denny McCarthy':        {espn_id:'9156',  nationalite:'🇺🇸 Américain',  age:31, classement_mondial:47, palmares_majeurs:0, turned_pro:2015, meilleur_resultat_masters:'T30 2023',             bio:"Denny McCarthy est reconnu comme l'un des meilleurs putteurs du PGA Tour. Sa précision sur les greens lui permet de compenser un jeu long moins explosif que ses concurrents.", statistiques:{driving_distance:'287 yards',fairways:'64%',gir:'67%',putts_par_trou:'1.70'}, palmares_liste:['RBC Heritage 2024']},
+  'J.T. Poston':           {espn_id:'10162', nationalite:'🇺🇸 Américain',  age:30, classement_mondial:54, palmares_majeurs:0, turned_pro:2016, meilleur_resultat_masters:'T30 2022',             bio:"J.T. Poston est un joueur solide du PGA Tour. Vainqueur du Wyndham Championship 2019 et du John Deere Classic 2023, il continue de progresser régulièrement.", statistiques:{driving_distance:'289 yards',fairways:'65%',gir:'68%',putts_par_trou:'1.74'}, palmares_liste:['Wyndham Championship 2019','John Deere Classic 2023']},
+  'Tom Hoge':              {espn_id:'9116',  nationalite:'🇺🇸 Américain',  age:34, classement_mondial:67, palmares_majeurs:0, turned_pro:2013, meilleur_resultat_masters:'T35 2022',             bio:"Tom Hoge est un joueur régulier du PGA Tour. Vainqueur de l'AT&T Pebble Beach 2022, il est reconnu pour son jeu précis et sa constance.", statistiques:{driving_distance:'290 yards',fairways:'64%',gir:'68%',putts_par_trou:'1.76'}, palmares_liste:["AT&T Pebble Beach Pro-Am 2022"]},
+  'Chris Kirk':            {espn_id:'4394',  nationalite:'🇺🇸 Américain',  age:38, classement_mondial:71, palmares_majeurs:0, turned_pro:2008, meilleur_resultat_masters:'T20 2024',             bio:"Chris Kirk est un vétéran du PGA Tour avec une belle histoire de comeback. Après avoir lutté contre l'addiction à l'alcool, il est revenu au plus haut niveau et a remporté le Honda Classic 2023.", statistiques:{driving_distance:'288 yards',fairways:'63%',gir:'67%',putts_par_trou:'1.75'}, palmares_liste:['Honda Classic 2023','Bermuda Championship 2021']},
+  'Martin Couvra':         {espn_id:'11901', nationalite:'🇫🇷 Français',   age:25, classement_mondial:88, palmares_majeurs:0, turned_pro:2021, meilleur_resultat_masters:'Première participation', bio:"Martin Couvra est la grande révélation du golf français. Ce jeune talent hexagonal a décroché sa qualification pour les Masters et représente fièrement la France sur la scène internationale.", statistiques:{driving_distance:'293 yards',fairways:'60%',gir:'65%',putts_par_trou:'1.77'}, palmares_liste:['Open de France 2024']},
+  'Nick Dunlap':           {espn_id:'11923', nationalite:'🇺🇸 Américain',  age:20, classement_mondial:59, palmares_majeurs:0, turned_pro:2024, meilleur_resultat_masters:'Première participation', bio:"Nick Dunlap est le phénomène américain du golf. Champion amateur en titre, il a remporté l'American Express 2024 en tant qu'amateur avant de se tourner vers le professionnalisme. À 20 ans, il est l'un des plus grands espoirs du golf mondial.", statistiques:{driving_distance:'299 yards',fairways:'59%',gir:'68%',putts_par_trou:'1.74'}, palmares_liste:["The American Express 2024 (en amateur)",'US Amateur 2023']},
+  'Jason Kokrak':          {espn_id:'6229',  nationalite:'🇺🇸 Américain',  age:39, classement_mondial:100, palmares_majeurs:0,turned_pro:2008, meilleur_resultat_masters:'T15 2021',             bio:"Jason Kokrak est un long frappeur américain passé chez LIV Golf. Vainqueur de 3 titres sur le PGA Tour, il apporte son expérience et sa puissance de frappe.", statistiques:{driving_distance:'314 yards',fairways:'53%',gir:'65%',putts_par_trou:'1.77'}, palmares_liste:['CJ Cup 2020','Houston Open 2020','Charles Schwab Challenge 2021']},
+  'Matthieu Pavon':        {espn_id:'11214', nationalite:'🇫🇷 Français',   age:31, classement_mondial:45, palmares_majeurs:0, turned_pro:2015, meilleur_resultat_masters:'T28 2024',             bio:"Matthieu Pavon est le premier Français à remporter un tournoi du PGA Tour depuis 1999. Sa victoire au Farmers Insurance Open 2024 a fait sensation et il représente fièrement le golf français au plus haut niveau.", statistiques:{driving_distance:'299 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['Farmers Insurance Open 2024']},
+  'Stephan Jaeger':        {espn_id:'9410',  nationalite:'🇩🇪 Allemand',   age:36, classement_mondial:63, palmares_majeurs:0, turned_pro:2012, meilleur_resultat_masters:'Première participation', bio:"Stephan Jaeger est le meilleur joueur allemand de sa génération. Après des années sur les circuits mineurs, il s'est finalement imposé sur le PGA Tour et représente l'Allemagne avec fierté.", statistiques:{driving_distance:'292 yards',fairways:'62%',gir:'67%',putts_par_trou:'1.76'}, palmares_liste:['Fortinet Championship 2022','Houston Open 2023']},
+  'Phil Mickelson':        {espn_id:'1003',  nationalite:'🇺🇸 Américain',  age:54, classement_mondial:150,palmares_majeurs:6, turned_pro:1992, meilleur_resultat_masters:'Vainqueur 2004, 2006, 2010', bio:"Phil Mickelson est une légende vivante du golf. Avec 6 Majeurs dont 3 Masters, ce gaucher spectaculaire a marqué l'histoire du sport. Vainqueur du PGA Championship 2021 à 50 ans, il est le plus vieux vainqueur d'un Major. Fondateur de LIV Golf.", statistiques:{driving_distance:'295 yards',fairways:'54%',gir:'65%',putts_par_trou:'1.77'}, palmares_liste:['Masters 2004, 2006, 2010','PGA Championship 2005, 2021',"The Open Championship 2013"]},
+  'Adrien Saddier':        {espn_id:'9285',  nationalite:'🇫🇷 Français',   age:33, classement_mondial:92, palmares_majeurs:0, turned_pro:2013, meilleur_resultat_masters:'Première participation', bio:"Adrien Saddier est l'un des représentants du golf français sur la scène internationale. Actif sur le DP World Tour, il a décroché sa qualification pour les Masters et représente l'Hexagone avec fierté.", statistiques:{driving_distance:'288 yards',fairways:'62%',gir:'65%',putts_par_trou:'1.77'}, palmares_liste:['Open de Bretagne 2019']}
+};
+
+async function openPlayerCard(nom){
+  const modal=document.createElement('div');
+  modal.className='player-modal';
+  modal.id='player-modal';
+  modal.innerHTML=`<div class="player-sheet" style="position:relative">
+    <button class="player-close" onclick="closePlayerCard()">✕</button>
+    <div style="text-align:center;padding:30px 0">
+      <div class="typing-dots"><span>●</span><span>●</span><span>●</span></div>
+      <p style="color:#6a9a7a;font-size:13px;margin-top:10px">Chargement...</p>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal) closePlayerCard();});
+
+  const score=getScore(nom);
+  const chapeau=Object.entries(JOUEURS).find(([c,js])=>js.includes(nom))?.[0]||'?';
+  const info=PLAYER_DATA[nom]||null;
+  if(info) info.photo_url=`https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${info.espn_id}.png&w=200&h=146`;
+  renderPlayerCard(info,nom,score,chapeau);
+}
+
+function renderPlayerCard(info,nom,score,chapeau){
+  const modal=document.getElementById('player-modal');
+  if(!modal) return;
+  const sheet=modal.querySelector('.player-sheet');
+  const sc=score!==null?fmtScore(score):'N/A';
+  const scCls=scoreClass(score);
+
+  if(!info){
+    sheet.innerHTML=`<button class="player-close" onclick="closePlayerCard()">✕</button>
+      <div class="player-header">
+        <div class="player-photo-placeholder">🏌️</div>
+        <div class="player-name-block"><h2>${nom}</h2><p>Chapeau ${chapeau}</p></div>
+      </div>
+      <div class="player-stats">
+        <div class="player-stat"><div class="val ${scCls}">${sc}</div><div class="lbl">Score Masters</div></div>
+        <div class="player-stat"><div class="val">C${chapeau}</div><div class="lbl">Chapeau</div></div>
+      </div>
+      <p class="player-bio">Informations non disponibles pour le moment.</p>`;
+    return;
+  }
+
+  const photoHtml=info.photo_url
+    ?`<img class="player-photo" src="${info.photo_url}" onerror="this.outerHTML='<div class=\\'player-photo-placeholder\\'>🏌️</div>'" alt="${nom}">`
+    :`<div class="player-photo-placeholder">🏌️</div>`;
+
+  const palmaresHtml=(info.palmares_liste||[]).slice(0,5).map(p=>`<div class="achievement-item">🏆 ${p}</div>`).join('');
+  const stats=info.statistiques||{};
+
+  sheet.innerHTML=`<button class="player-close" onclick="closePlayerCard()">✕</button>
+    <div class="player-header">
+      ${photoHtml}
+      <div class="player-name-block">
+        <h2>${nom}</h2>
+        <p>${info.nationalite||''} · ${info.age?info.age+' ans':''}</p>
+        <p style="color:#c9a84c;font-size:12px;margin-top:2px">Chapeau ${chapeau}</p>
+      </div>
+    </div>
+    <div class="player-stats">
+      <div class="player-stat"><div class="val ${scCls}">${sc}</div><div class="lbl">Score Masters</div></div>
+      <div class="player-stat"><div class="val">#${info.classement_mondial||'?'}</div><div class="lbl">Classement mondial</div></div>
+      <div class="player-stat"><div class="val">${info.palmares_majeurs||0}</div><div class="lbl">Majeurs gagnés</div></div>
+      <div class="player-stat"><div class="val">${info.turned_pro||'?'}</div><div class="lbl">Pro depuis</div></div>
+    </div>
+    ${info.meilleur_resultat_masters?`<div style="background:#c9a84c22;border:1px solid #c9a84c55;border-radius:8px;padding:10px;margin-bottom:12px;font-size:13px;text-align:center">⛳ Masters : <strong style="color:#c9a84c">${info.meilleur_resultat_masters}</strong></div>`:''}
+    <p class="player-bio">${info.bio||''}</p>
+    ${stats.driving_distance?`<div class="player-stats" style="margin-bottom:12px">
+      <div class="player-stat"><div class="val" style="font-size:16px">${stats.driving_distance}</div><div class="lbl">Drive moyen</div></div>
+      <div class="player-stat"><div class="val" style="font-size:16px">${stats.fairways||'?'}</div><div class="lbl">Fairways</div></div>
+      <div class="player-stat"><div class="val" style="font-size:16px">${stats.gir||'?'}</div><div class="lbl">GIR</div></div>
+      <div class="player-stat"><div class="val" style="font-size:16px">${stats.putts_par_trou||'?'}</div><div class="lbl">Putts/trou</div></div>
+    </div>`:''}
+    ${palmaresHtml?`<div class="player-achievements"><h4>Palmarès</h4>${palmaresHtml}</div>`:''}`;
+}
+
+function closePlayerCard(){
+  const m=document.getElementById('player-modal');
+  if(m) m.remove();
+}
+
+// ---- NEWS ----
+async function loadNews(){
+  newsLoaded=true;
+  const el=document.getElementById('tab-news');
+  el.innerHTML=`<div style="text-align:center;padding:40px 20px">
+    <div class="typing-dots"><span>●</span><span>●</span><span>●</span></div>
+    <p style="color:#6a9a7a;font-size:14px;margin-top:12px">Recherche des dernières news golf...</p>
+  </div>`;
+
+  const joueursList=ALL_JOUEURS.join(', ');
+  const prompt=`Tu es un journaliste golf expert. Fais une recherche web sur les dernières actualités du golf mondial.
+
+Couvre ces 5 catégories : Masters 2025 (Augusta, favoris, préparation), PGA Tour (résultats récents, classements), LIV Golf (actualités, joueurs, tensions avec PGA), Rumeurs et transferts (changements d'équipe, sponsors, blessures), Stats et performances (records, statistiques notables).
+
+Liste de joueurs à mentionner si possible : ${joueursList}
+
+Retourne UNIQUEMENT un JSON valide sans markdown ni backticks :
+{
+  "sections": [
+    {
+      "titre": "Masters 2025",
+      "type": "masters",
+      "articles": [
+        {
+          "titre": "Titre accrocheur en français",
+          "contenu": "3-4 phrases détaillées et informatives en français. Mentionne des faits concrets, chiffres, noms.",
+          "tags": ["Masters","Scheffler"]
+        }
+      ]
+    }
+  ]
+}
+
+Génère 5 sections avec 2 articles chacune = 10 articles au total. Contenu riche et détaillé.`;
+
+  try{
+    const response=await fetch(ESPN_PROXY+'claude',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await response.json();
+    const textContent=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const clean=textContent.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    renderNews(parsed.sections||[]);
+  }catch(e){
+    console.error(e);
+    renderNews([{
+      titre:'Masters 2025',type:'masters',
+      articles:[
+        {titre:'Augusta se prépare pour son tournoi le plus attendu',contenu:'Le Masters Tournament 2025 se déroulera du 10 au 13 avril à Augusta National. Scottie Scheffler, numéro 1 mondial, arrive en grand favori après une saison 2024 exceptionnelle. Rory McIlroy tentera une nouvelle fois de compléter son Grand Chelem.',tags:['Masters','Scheffler','McIlroy']},
+        {titre:'Le parcours d\'Augusta révisé pour 2025',contenu:'Augusta National a procédé à quelques modifications sur plusieurs trous pour renforcer le défi technique. Le trou 13 notamment a été allongé. Ces changements pourraient avantager les longs frappeurs comme Bryson DeChambeau.',tags:['Masters','Augusta']}
+      ]
+    },{
+      titre:'PGA Tour',type:'pga',
+      articles:[
+        {titre:'La saison PGA Tour 2025 bat son plein',contenu:'La saison PGA Tour 2025 offre déjà son lot de surprises. Plusieurs joueurs de haut rang peinent à confirmer leurs performances de l\'année passée, tandis que de jeunes talents comme Ludvig Åberg et Akshay Bhatia s\'affirment.',tags:['PGA Tour','Aberg','Bhatia']},
+        {titre:'La course aux FedEx Cup points s\'intensifie',contenu:'La bataille pour les FedEx Cup points fait rage en ce début de saison. Les joueurs accumulent les performances pour sécuriser leur place aux playoffs de fin de saison.',tags:['PGA Tour','FedEx Cup']}
+      ]
+    },{
+      titre:'LIV Golf',type:'liv',
+      articles:[
+        {titre:'LIV Golf maintient la pression sur le PGA Tour',contenu:'La ligue LIV Golf continue d\'attirer l\'attention avec ses formats innovants et ses prize money élevés. Dustin Johnson et Phil Mickelson restent des figures emblématiques de la ligue dissidente.',tags:['LIV Golf','Johnson','Mickelson']},
+        {titre:'Le dialogue PGA-LIV au point mort',contenu:'Les négociations entre le PGA Tour et LIV Golf semblent stagner. Les deux parties peinent à trouver un accord sur une éventuelle fusion ou collaboration, laissant le golf mondial dans l\'incertitude.',tags:['LIV Golf','PGA Tour']}
+      ]
+    }]);
+  }
+}
+
+function renderNews(sections){
+  const el=document.getElementById('tab-news');
+  if(!sections||!sections.length){el.innerHTML='<div class="spinner">Aucune news disponible</div>';return;}
+  let html='';
+  sections.forEach(s=>{
+    html+=`<div class="news-section-title">${s.titre}</div>`;
+    (s.articles||[]).forEach(a=>{
+      const tags=(a.tags||[]).map(t=>`<span class="news-tag ${s.type||''}">${t}</span>`).join(' ');
+      html+=`<div class="news-card">
+        <div class="news-meta">${tags}</div>
+        <h4>${a.titre}</h4>
+        <p>${a.contenu}</p>
+      </div>`;
+    });
+  });
+  html+=`<p class="news-footer">📡 News générées par IA avec recherche web</p>
+    <button class="btn btn-outline mt" onclick="newsLoaded=false;loadNews()" style="margin-top:12px;font-size:13px">🔄 Rafraîchir</button>`;
+  el.innerHTML=html;
+}
+
+// ADMIN
+function goAdmin(){showScreen('screen-admin');}
+function checkAdmin(){
+  if(document.getElementById('admin-pwd').value===ADMIN_PWD){
+    document.getElementById('admin-auth').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+    loadStatutTournoi();
+  }else alert('Mot de passe incorrect');
+}
+async function loadStatutTournoi(){
+  try{const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');const val=cfg&&cfg[0]?cfg[0].valeur:'OUI';document.getElementById('statut-tournoi').textContent=`Statut : ${val==='OUI'?'🟢 Ouvert':'🔴 Fermé'}`;}catch(e){}
+}
+async function setTournoi(val){
+  try{await sbFetch('config?cle=eq.tournoi_ouvert',{method:'PATCH',body:JSON.stringify({valeur:val}),prefer:'return=minimal'});loadStatutTournoi();alert('Mis à jour !');}
+  catch(e){try{await sbFetch('config',{method:'POST',body:JSON.stringify({cle:'tournoi_ouvert',valeur:val})});loadStatutTournoi();}catch(e2){alert('Erreur');}}
+}
+async function syncESPN(){
+  showMsg('sync-msg','Synchronisation...','info');
+  const ok=await fetchESPNScores();
+  showMsg('sync-msg',ok?`✅ ${Object.keys(espnScores).length} joueurs synchronisés !`:'❌ Erreur',ok?'success':'error');
+}
+</script>
+</body>
+</html>
