@@ -29,17 +29,13 @@ body {
   background: var(--green-deep);
   color: var(--text);
   min-height: 100vh;
-  background-image: 
+  background-image:
     radial-gradient(ellipse at 20% 50%, rgba(42,90,58,0.15) 0%, transparent 60%),
     radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.05) 0%, transparent 50%);
 }
-
-/* SCREENS */
 .screen { display: none; min-height: 100vh; flex-direction: column; opacity: 0; transition: opacity 0.4s; }
 .screen.active { display: flex; }
 .screen.visible { opacity: 1; }
-
-/* HEADER */
 .header {
   background: linear-gradient(180deg, #0a1f12 0%, var(--green-dark) 100%);
   padding: 24px 20px 20px;
@@ -48,435 +44,122 @@ body {
   position: relative;
   overflow: hidden;
 }
-.header::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-.header::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
-}
+.header::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(201,168,76,0.5),transparent); }
 .logo-container { margin-bottom: 12px; }
-.logo-img { width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(201,168,76,0.4)); }
-.header h1 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 26px;
-  font-weight: 600;
-  color: var(--gold);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-.header-sub {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px;
-  color: var(--text-muted);
-  letter-spacing: 2px;
-  margin-top: 4px;
-  font-style: italic;
-}
-.header-divider {
-  width: 60px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  margin: 10px auto 0;
-}
-
-/* CONTENT */
-.content { flex: 1; padding: 24px 20px; max-width: 480px; margin: 0 auto; width: 100%; }
-
-/* BUTTONS */
-.btn {
-  display: block; width: 100%;
-  padding: 14px 20px;
-  border: none; border-radius: 2px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 16px; font-weight: 600;
-  letter-spacing: 1.5px; text-transform: uppercase;
-  cursor: pointer; transition: all 0.3s;
-  position: relative; overflow: hidden;
-}
-.btn::after {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 0; height: 0;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.4s, height 0.4s;
-}
-.btn:active::after { width: 200px; height: 200px; }
-.btn-gold {
-  background: linear-gradient(135deg, var(--gold), var(--gold-light));
-  color: var(--green-deep);
-}
-.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,76,0.35); }
-.btn-outline {
-  background: transparent;
-  border: 1px solid rgba(201,168,76,0.5);
-  color: var(--gold);
-}
-.btn-outline:hover { border-color: var(--gold); background: rgba(201,168,76,0.05); }
-.btn-ghost {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: var(--text-muted);
-  font-size: 13px;
-}
-.btn-danger { background: rgba(139,32,32,0.8); border: 1px solid rgba(220,80,80,0.3); color: #f0a0a0; }
-.btn-success { background: rgba(26,74,42,0.8); border: 1px solid rgba(79,200,112,0.3); color: #80e0a0; }
-
-/* INPUTS */
+.logo-img { width:60px; height:60px; object-fit:contain; filter:drop-shadow(0 2px 8px rgba(201,168,76,0.4)); }
+.header h1 { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:600; color:var(--gold); letter-spacing:3px; text-transform:uppercase; }
+.header-sub { font-family:'Cormorant Garamond',serif; font-size:13px; color:var(--text-muted); letter-spacing:2px; margin-top:4px; font-style:italic; }
+.header-divider { width:60px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:10px auto 0; }
+.content { flex:1; padding:24px 20px; max-width:480px; margin:0 auto; width:100%; }
+.btn { display:block; width:100%; padding:14px 20px; border:none; border-radius:2px; font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all 0.3s; position:relative; overflow:hidden; }
+.btn::after { content:''; position:absolute; top:50%; left:50%; width:0; height:0; background:rgba(255,255,255,0.1); border-radius:50%; transform:translate(-50%,-50%); transition:width 0.4s,height 0.4s; }
+.btn:active::after { width:200px; height:200px; }
+.btn-gold { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:var(--green-deep); }
+.btn-gold:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(201,168,76,0.35); }
+.btn-outline { background:transparent; border:1px solid rgba(201,168,76,0.5); color:var(--gold); }
+.btn-outline:hover { border-color:var(--gold); background:rgba(201,168,76,0.05); }
+.btn-ghost { background:transparent; border:1px solid rgba(255,255,255,0.1); color:var(--text-muted); font-size:13px; }
+.btn-danger { background:rgba(139,32,32,0.8); border:1px solid rgba(220,80,80,0.3); color:#f0a0a0; }
+.btn-success { background:rgba(26,74,42,0.8); border:1px solid rgba(79,200,112,0.3); color:#80e0a0; }
 .input-group { margin-bottom: 16px; }
-.input-label {
-  display: block;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 12px; letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-input[type=text], input[type=password] {
-  width: 100%; padding: 14px 16px;
-  border: 1px solid rgba(201,168,76,0.2);
-  border-radius: 2px;
-  background: rgba(26,61,40,0.5);
-  color: var(--text);
-  font-family: 'EB Garamond', serif;
-  font-size: 16px;
-  outline: none;
-  transition: all 0.3s;
-  backdrop-filter: blur(4px);
-}
-input[type=text]:focus, input[type=password]:focus {
-  border-color: rgba(201,168,76,0.6);
-  background: rgba(26,61,40,0.7);
-  box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
-}
-input::placeholder { color: rgba(168,196,168,0.4); }
-
-/* CARDS */
-.card {
-  background: rgba(26,61,40,0.4);
-  border: 1px solid rgba(201,168,76,0.15);
-  border-radius: 2px;
-  padding: 20px;
-  margin-bottom: 16px;
-  backdrop-filter: blur(4px);
-  position: relative;
-}
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 20px; right: 20px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
-}
-.card-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 12px; letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 14px;
-}
-
-/* CHAPEAU */
-.chapeau-header {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 16px;
-}
-.chapeau-num {
-  width: 36px; height: 36px;
-  border: 1px solid var(--gold);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px; font-weight: 600;
-  color: var(--gold);
-  flex-shrink: 0;
-}
-.chapeau-info h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px; font-weight: 600;
-  color: var(--text);
-}
-.chapeau-info p { font-size: 13px; color: var(--text-muted); font-style: italic; }
-
-/* JOUEURS GRID */
-.joueurs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.joueur-btn {
-  padding: 10px 8px;
-  border: 1px solid rgba(201,168,76,0.15);
-  border-radius: 2px;
-  background: rgba(13,40,24,0.6);
-  color: var(--cream-dark);
-  font-family: 'EB Garamond', serif;
-  font-size: 13px;
-  cursor: pointer; transition: all 0.2s;
-  text-align: center; line-height: 1.3;
-}
-.joueur-btn:hover { border-color: rgba(201,168,76,0.4); background: rgba(26,61,40,0.8); }
-.joueur-btn.selected {
-  background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.15));
-  border-color: var(--gold);
-  color: var(--gold-pale);
-  font-weight: 500;
-}
-.joueur-btn.disabled { opacity: 0.35; cursor: not-allowed; }
-
-/* STEPS */
-.step-indicator { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 24px; }
-.step-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(201,168,76,0.2); transition: all 0.3s; }
-.step-dot.active { background: var(--gold); transform: scale(1.4); }
-.step-dot.done { background: rgba(201,168,76,0.6); }
-.step-line { width: 20px; height: 1px; background: rgba(201,168,76,0.2); }
-
-/* CLASSEMENT */
-.rank-item {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 16px;
-  background: rgba(26,61,40,0.3);
-  border: 1px solid rgba(201,168,76,0.1);
-  border-radius: 2px;
-  margin-bottom: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.rank-item:hover { background: rgba(26,61,40,0.5); border-color: rgba(201,168,76,0.25); }
-.rank-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 20px; font-weight: 600;
-  color: var(--text-muted);
-  width: 28px; text-align: center; flex-shrink: 0;
-}
-.rank-num.gold { color: #FFD700; }
-.rank-num.silver { color: #C0C0C0; }
-.rank-num.bronze { color: #CD7F32; }
-.rank-info { flex: 1; }
-.rank-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; }
-.rank-joueurs { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-style: italic; }
-.rank-score { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; flex-shrink: 0; }
-.neg { color: #5dd880; } .pos { color: #e07070; } .even { color: var(--cream); }
-
-/* DETAIL */
-.participant-detail {
-  background: rgba(13,40,24,0.5);
-  border: 1px solid rgba(201,168,76,0.1);
-  border-top: none;
-  border-radius: 0 0 2px 2px;
-  padding: 12px;
-  margin-top: -6px; margin-bottom: 6px;
-  display: none;
-}
-.participant-detail.open { display: block; }
-.detail-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 7px 0;
-  border-bottom: 1px solid rgba(201,168,76,0.06);
-  font-size: 13px;
-}
-.detail-row:last-child { border-bottom: none; }
-.best4-name { color: var(--gold-pale); }
-.best4-star { color: var(--gold); margin-right: 4px; font-size: 10px; }
-
-/* TABS */
-.tabs {
-  display: flex;
-  border-bottom: 1px solid rgba(201,168,76,0.2);
-  margin-bottom: 20px; gap: 0;
-}
-.tab {
-  flex: 1; padding: 10px 4px;
-  text-align: center;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px; letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  cursor: pointer; transition: all 0.2s;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-}
-.tab.active { color: var(--gold); border-bottom-color: var(--gold); }
-
-/* SCORE ITEM */
-.score-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(201,168,76,0.06);
-  cursor: pointer; transition: all 0.2s;
-}
-.score-item:hover { padding-left: 4px; }
-.score-item:last-child { border-bottom: none; }
-
-/* MSG */
-.msg {
-  padding: 12px 16px;
-  border-radius: 2px;
-  margin-bottom: 14px;
-  font-size: 14px;
-  font-style: italic;
-  text-align: center;
-}
-.msg.success { background: rgba(26,74,42,0.5); border: 1px solid rgba(79,200,112,0.3); color: #80e0a0; }
-.msg.error { background: rgba(74,26,26,0.5); border: 1px solid rgba(220,80,80,0.3); color: #e09090; }
-.msg.info { background: rgba(26,42,74,0.5); border: 1px solid rgba(74,144,200,0.3); color: #90b8e0; }
-
-/* BADGES */
-.live-badge {
-  display: inline-block;
-  background: rgba(220,60,60,0.8);
-  color: white; padding: 2px 8px;
-  border-radius: 1px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 10px; letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-left: 8px;
-  animation: pulse 2s infinite;
-}
+.input-label { display:block; font-family:'Cormorant Garamond',serif; font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
+input[type=text], input[type=password] { width:100%; padding:14px 16px; border:1px solid rgba(201,168,76,0.2); border-radius:2px; background:rgba(26,61,40,0.5); color:var(--text); font-family:'EB Garamond',serif; font-size:16px; outline:none; transition:all 0.3s; backdrop-filter:blur(4px); }
+input[type=text]:focus, input[type=password]:focus { border-color:rgba(201,168,76,0.6); background:rgba(26,61,40,0.7); box-shadow:0 0 0 3px rgba(201,168,76,0.08); }
+input::placeholder { color:rgba(168,196,168,0.4); }
+.card { background:rgba(26,61,40,0.4); border:1px solid rgba(201,168,76,0.15); border-radius:2px; padding:20px; margin-bottom:16px; backdrop-filter:blur(4px); position:relative; }
+.card::before { content:''; position:absolute; top:0; left:20px; right:20px; height:1px; background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent); }
+.card-title { font-family:'Cormorant Garamond',serif; font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+.chapeau-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.chapeau-num { width:36px; height:36px; border:1px solid var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--gold); flex-shrink:0; }
+.chapeau-info h3 { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--text); }
+.chapeau-info p { font-size:13px; color:var(--text-muted); font-style:italic; }
+.joueurs-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.joueur-btn { padding:10px 8px; border:1px solid rgba(201,168,76,0.15); border-radius:2px; background:rgba(13,40,24,0.6); color:var(--cream-dark); font-family:'EB Garamond',serif; font-size:13px; cursor:pointer; transition:all 0.2s; text-align:center; line-height:1.3; }
+.joueur-btn:hover { border-color:rgba(201,168,76,0.4); background:rgba(26,61,40,0.8); }
+.joueur-btn.selected { background:linear-gradient(135deg,rgba(201,168,76,0.25),rgba(201,168,76,0.15)); border-color:var(--gold); color:var(--gold-pale); font-weight:500; }
+.joueur-btn.disabled { opacity:0.35; cursor:not-allowed; }
+.step-indicator { display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:24px; }
+.step-dot { width:6px; height:6px; border-radius:50%; background:rgba(201,168,76,0.2); transition:all 0.3s; }
+.step-dot.active { background:var(--gold); transform:scale(1.4); }
+.step-dot.done { background:rgba(201,168,76,0.6); }
+.step-line { width:20px; height:1px; background:rgba(201,168,76,0.2); }
+.rank-item { display:flex; align-items:center; gap:14px; padding:14px 16px; background:rgba(26,61,40,0.3); border:1px solid rgba(201,168,76,0.1); border-radius:2px; margin-bottom:6px; cursor:pointer; transition:all 0.2s; }
+.rank-item:hover { background:rgba(26,61,40,0.5); border-color:rgba(201,168,76,0.25); }
+.rank-num { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--text-muted); width:28px; text-align:center; flex-shrink:0; }
+.rank-num.gold { color:#FFD700; }
+.rank-num.silver { color:#C0C0C0; }
+.rank-num.bronze { color:#CD7F32; }
+.rank-info { flex:1; }
+.rank-name { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:600; }
+.rank-joueurs { font-size:12px; color:var(--text-muted); margin-top:2px; font-style:italic; }
+.rank-score { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; flex-shrink:0; }
+.neg { color:#5dd880; } .pos { color:#e07070; } .even { color:var(--cream); }
+.participant-detail { background:rgba(13,40,24,0.5); border:1px solid rgba(201,168,76,0.1); border-top:none; border-radius:0 0 2px 2px; padding:12px; margin-top:-6px; margin-bottom:6px; display:none; }
+.participant-detail.open { display:block; }
+.detail-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid rgba(201,168,76,0.06); font-size:13px; }
+.detail-row:last-child { border-bottom:none; }
+.best4-name { color:var(--gold-pale); }
+.best4-star { color:var(--gold); margin-right:4px; font-size:10px; }
+.tabs { display:flex; border-bottom:1px solid rgba(201,168,76,0.2); margin-bottom:20px; gap:0; }
+.tab { flex:1; padding:10px 4px; text-align:center; font-family:'Cormorant Garamond',serif; font-size:13px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); cursor:pointer; transition:all 0.2s; border-bottom:2px solid transparent; margin-bottom:-1px; }
+.tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+.score-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(201,168,76,0.06); cursor:pointer; transition:all 0.2s; }
+.score-item:hover { padding-left:4px; }
+.score-item:last-child { border-bottom:none; }
+.msg { padding:12px 16px; border-radius:2px; margin-bottom:14px; font-size:14px; font-style:italic; text-align:center; }
+.msg.success { background:rgba(26,74,42,0.5); border:1px solid rgba(79,200,112,0.3); color:#80e0a0; }
+.msg.error { background:rgba(74,26,26,0.5); border:1px solid rgba(220,80,80,0.3); color:#e09090; }
+.msg.info { background:rgba(26,42,74,0.5); border:1px solid rgba(74,144,200,0.3); color:#90b8e0; }
+.live-badge { display:inline-block; background:rgba(220,60,60,0.8); color:white; padding:2px 8px; border-radius:1px; font-family:'Cormorant Garamond',serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-left:8px; animation:pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
-
-.refresh-info {
-  font-size: 11px; font-style: italic;
-  color: var(--text-muted);
-  text-align: center; margin-bottom: 14px;
-  letter-spacing: 0.5px;
-}
-
-/* ORNEMENT */
-.ornement {
-  text-align: center; color: var(--gold);
-  font-size: 18px; opacity: 0.4;
-  margin: 12px 0; letter-spacing: 6px;
-}
-.divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
-  margin: 16px 0;
-}
-
-/* EDIT BANNER */
-.edit-banner {
-  background: rgba(26,42,74,0.4);
-  border: 1px solid rgba(74,144,200,0.3);
-  border-radius: 2px; padding: 10px 14px;
-  margin-bottom: 16px;
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 13px; font-style: italic; color: #90b8e0;
-}
-
-/* PLAYER MODAL */
-.player-modal {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.85);
-  z-index: 1000;
-  display: flex; align-items: flex-end; justify-content: center;
-  animation: fadeIn 0.25s;
-}
+.refresh-info { font-size:11px; font-style:italic; color:var(--text-muted); text-align:center; margin-bottom:14px; letter-spacing:0.5px; }
+.ornement { text-align:center; color:var(--gold); font-size:18px; opacity:0.4; margin:12px 0; letter-spacing:6px; }
+.divider { height:1px; background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent); margin:16px 0; }
+.edit-banner { background:rgba(26,42,74,0.4); border:1px solid rgba(74,144,200,0.3); border-radius:2px; padding:10px 14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-style:italic; color:#90b8e0; }
+.player-modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1000; display:flex; align-items:flex-end; justify-content:center; animation:fadeIn 0.25s; }
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-.player-sheet {
-  background: linear-gradient(180deg, #1a3d28 0%, #0d2818 100%);
-  border-top: 1px solid rgba(201,168,76,0.3);
-  border-radius: 12px 12px 0 0;
-  width: 100%; max-width: 480px;
-  padding: 28px 24px;
-  max-height: 85vh; overflow-y: auto;
-  animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1);
-  position: relative;
-}
-.player-sheet::before {
-  content: '';
-  position: absolute; top: 0; left: 60px; right: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
+.player-sheet { background:linear-gradient(180deg,#1a3d28 0%,#0d2818 100%); border-top:1px solid rgba(201,168,76,0.3); border-radius:12px 12px 0 0; width:100%; max-width:480px; padding:28px 24px; max-height:85vh; overflow-y:auto; animation:slideUp 0.35s cubic-bezier(0.16,1,0.3,1); position:relative; }
+.player-sheet::before { content:''; position:absolute; top:0; left:60px; right:60px; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
 @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-.player-header { display: flex; gap: 18px; align-items: center; margin-bottom: 22px; }
-.player-photo {
-  width: 80px; height: 80px; border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid rgba(201,168,76,0.5);
-  flex-shrink: 0;
-}
-.player-photo-placeholder {
-  width: 80px; height: 80px; border-radius: 50%;
-  border: 2px solid rgba(201,168,76,0.3);
-  background: rgba(26,61,40,0.5);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 30px; flex-shrink: 0;
-}
-.player-name-h { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--gold); }
-.player-name-sub { font-size: 13px; color: var(--text-muted); margin-top: 3px; font-style: italic; }
-.player-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
-.pstat {
-  background: rgba(13,40,24,0.6);
-  border: 1px solid rgba(201,168,76,0.12);
-  border-radius: 2px; padding: 12px; text-align: center;
-}
-.pstat-val { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--gold); }
-.pstat-lbl { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
-.player-bio { font-size: 14px; line-height: 1.8; color: var(--cream-dark); margin-bottom: 18px; font-style: italic; }
-.palmares-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(201,168,76,0.08); font-size: 13px; }
-.palmares-item:last-child { border-bottom: none; }
-.player-close { position: absolute; top: 18px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; transition: color 0.2s; }
-.player-close:hover { color: var(--gold); }
-
-/* NEWS */
-.news-section-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 12px; letter-spacing: 2.5px;
-  text-transform: uppercase; color: var(--text-muted);
-  margin: 20px 0 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(201,168,76,0.15);
-}
-.news-card {
-  background: rgba(26,61,40,0.3);
-  border: 1px solid rgba(201,168,76,0.1);
-  border-radius: 2px; padding: 16px;
-  margin-bottom: 10px; transition: all 0.2s;
-}
-.news-card:hover { background: rgba(26,61,40,0.5); }
-.news-tag {
-  display: inline-block; padding: 2px 8px;
-  border-radius: 1px; font-size: 10px; letter-spacing: 1px;
-  text-transform: uppercase; margin-bottom: 8px; margin-right: 4px;
-}
-.news-tag.masters { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
-.news-tag.pga { background: rgba(74,144,200,0.1); color: #90b8e0; border: 1px solid rgba(74,144,200,0.2); }
-.news-tag.liv { background: rgba(200,74,74,0.1); color: #e09090; border: 1px solid rgba(200,74,74,0.2); }
-.news-tag.rumeur { background: rgba(144,74,200,0.1); color: #c090e0; border: 1px solid rgba(144,74,200,0.2); }
-.news-tag.stats { background: rgba(74,200,112,0.1); color: #80e0a0; border: 1px solid rgba(74,200,112,0.2); }
-.news-card h4 { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: var(--cream); margin-bottom: 8px; line-height: 1.4; }
-.news-card p { font-size: 13px; line-height: 1.7; color: var(--cream-dark); font-style: italic; }
-.typing-dots span { display: inline-block; animation: blink 1.4s infinite; font-size: 22px; color: var(--gold); }
-.typing-dots span:nth-child(2) { animation-delay: .2s; }
-.typing-dots span:nth-child(3) { animation-delay: .4s; }
+.player-header { display:flex; gap:18px; align-items:center; margin-bottom:22px; }
+.player-photo { width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid rgba(201,168,76,0.5); flex-shrink:0; }
+.player-photo-placeholder { width:80px; height:80px; border-radius:50%; border:2px solid rgba(201,168,76,0.3); background:rgba(26,61,40,0.5); display:flex; align-items:center; justify-content:center; font-size:30px; flex-shrink:0; }
+.player-name-h { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--gold); }
+.player-name-sub { font-size:13px; color:var(--text-muted); margin-top:3px; font-style:italic; }
+.player-stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:18px; }
+.pstat { background:rgba(13,40,24,0.6); border:1px solid rgba(201,168,76,0.12); border-radius:2px; padding:12px; text-align:center; }
+.pstat-val { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--gold); }
+.pstat-lbl { font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-top:2px; }
+.player-bio { font-size:14px; line-height:1.8; color:var(--cream-dark); margin-bottom:18px; font-style:italic; }
+.palmares-item { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(201,168,76,0.08); font-size:13px; }
+.palmares-item:last-child { border-bottom:none; }
+.player-close { position:absolute; top:18px; right:20px; background:none; border:none; color:var(--text-muted); font-size:22px; cursor:pointer; transition:color 0.2s; }
+.player-close:hover { color:var(--gold); }
+.news-section-title { font-family:'Cormorant Garamond',serif; font-size:12px; letter-spacing:2.5px; text-transform:uppercase; color:var(--text-muted); margin:20px 0 10px; padding-bottom:6px; border-bottom:1px solid rgba(201,168,76,0.15); }
+.news-card { background:rgba(26,61,40,0.3); border:1px solid rgba(201,168,76,0.1); border-radius:2px; padding:16px; margin-bottom:10px; transition:all 0.2s; }
+.news-card:hover { background:rgba(26,61,40,0.5); }
+.news-tag { display:inline-block; padding:2px 8px; border-radius:1px; font-size:10px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; margin-right:4px; }
+.news-tag.masters { background:rgba(201,168,76,0.15); color:var(--gold); border:1px solid rgba(201,168,76,0.3); }
+.news-tag.pga { background:rgba(74,144,200,0.1); color:#90b8e0; border:1px solid rgba(74,144,200,0.2); }
+.news-tag.liv { background:rgba(200,74,74,0.1); color:#e09090; border:1px solid rgba(200,74,74,0.2); }
+.news-tag.rumeur { background:rgba(144,74,200,0.1); color:#c090e0; border:1px solid rgba(144,74,200,0.2); }
+.news-tag.stats { background:rgba(74,200,112,0.1); color:#80e0a0; border:1px solid rgba(74,200,112,0.2); }
+.news-card h4 { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:600; color:var(--cream); margin-bottom:8px; line-height:1.4; }
+.news-card p { font-size:13px; line-height:1.7; color:var(--cream-dark); font-style:italic; }
+.typing-dots span { display:inline-block; animation:blink 1.4s infinite; font-size:22px; color:var(--gold); }
+.typing-dots span:nth-child(2) { animation-delay:.2s; }
+.typing-dots span:nth-child(3) { animation-delay:.4s; }
 @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
-
-/* ADMIN */
-.admin-code-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 0; border-bottom: 1px solid rgba(201,168,76,0.08);
-  font-size: 14px;
-}
-.admin-code-row:last-child { border-bottom: none; }
-.admin-code-row span { flex: 1; }
-.code-badge {
-  font-family: monospace; font-size: 13px;
-  background: rgba(201,168,76,0.1);
-  border: 1px solid rgba(201,168,76,0.2);
-  padding: 3px 8px; border-radius: 2px;
-  color: var(--gold);
-}
-.mt { margin-top: 12px; }
-.nav-back { background: none; border: none; color: var(--text-muted); font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 1px; cursor: pointer; padding: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
-.nav-back:hover { color: var(--gold); }
+.admin-code-row { display:flex; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid rgba(201,168,76,0.08); font-size:14px; }
+.admin-code-row:last-child { border-bottom:none; }
+.admin-code-row span { flex:1; }
+.code-badge { font-family:monospace; font-size:13px; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.2); padding:3px 8px; border-radius:2px; color:var(--gold); }
+.mt { margin-top:12px; }
+.nav-back { background:none; border:none; color:var(--text-muted); font-family:'Cormorant Garamond',serif; font-size:14px; letter-spacing:1px; cursor:pointer; padding:0; margin-bottom:20px; display:flex; align-items:center; gap:6px; }
+.nav-back:hover { color:var(--gold); }
+.toggle-link { background:none; border:none; color:var(--gold); font-family:'Cormorant Garamond',serif; font-size:14px; font-style:italic; cursor:pointer; text-decoration:underline; text-underline-offset:3px; display:block; text-align:center; margin-top:12px; }
+.toggle-link:hover { color:var(--gold-light); }
 </style>
 </head>
 <body>
@@ -497,15 +180,43 @@ input::placeholder { color: rgba(168,196,168,0.4); }
       <p style="font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--text-muted);line-height:1.6">Sélectionnez vos joueurs par chapeau<br>et suivez le tournoi en temps réel</p>
     </div>
     <div id="msg-accueil"></div>
-    <div class="input-group">
-      <label class="input-label">Votre prénom</label>
-      <input type="text" id="nom-input" placeholder="Ex : Pierre" maxlength="30">
+
+    <!-- CONNEXION -->
+    <div id="form-connexion">
+      <div class="input-group">
+        <label class="input-label">Votre pseudo</label>
+        <input type="text" id="nom-input" placeholder="Ex : Pilou" maxlength="30">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Code d'accès</label>
+        <input type="password" id="code-input" placeholder="Votre code personnel" maxlength="20">
+      </div>
+      <button class="btn btn-gold mt" onclick="handleAccueil()">Accéder · Mes sélections</button>
+      <button class="toggle-link" onclick="toggleForm()">Première visite ? Créer un compte</button>
     </div>
-    <div class="input-group">
-      <label class="input-label">Code d'accès</label>
-      <input type="password" id="code-input" placeholder="Code personnel" maxlength="20">
+
+    <!-- INSCRIPTION -->
+    <div id="form-inscription" style="display:none">
+      <div class="input-group">
+        <label class="input-label">Prénom</label>
+        <input type="text" id="reg-prenom" placeholder="Ex : Pierre" maxlength="30">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Nom</label>
+        <input type="text" id="reg-nom" placeholder="Ex : Dupont" maxlength="30">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Pseudo (affiché dans le classement)</label>
+        <input type="text" id="reg-pseudo" placeholder="Ex : Pilou" maxlength="30">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Code d'accès personnel</label>
+        <input type="text" id="reg-code" placeholder="Ex : Pierre2025" maxlength="20">
+      </div>
+      <button class="btn btn-gold mt" onclick="handleInscription()">Créer mon compte</button>
+      <button class="toggle-link" onclick="toggleForm()">Déjà inscrit ? Se connecter</button>
     </div>
-    <button class="btn btn-gold mt" onclick="handleAccueil()">Accéder · Mes sélections</button>
+
     <div class="divider"></div>
     <button class="btn btn-outline" onclick="goClassement()">Consulter le classement</button>
     <button class="btn btn-ghost mt" onclick="goAdmin()" style="margin-top:8px;font-size:12px;letter-spacing:1px">Administration</button>
@@ -600,14 +311,22 @@ input::placeholder { color: rgba(168,196,168,0.4); }
         <p id="statut-tournoi" style="font-size:13px;font-style:italic;color:var(--text-muted)"></p>
       </div>
       <div class="card">
-        <div class="card-title">Codes participants</div>
-        <p style="font-size:13px;font-style:italic;color:var(--text-muted);margin-bottom:14px">Gérez les codes d'accès personnels de chaque participant.</p>
+        <div class="card-title">Participants inscrits</div>
+        <p style="font-size:13px;font-style:italic;color:var(--text-muted);margin-bottom:14px">Nom réel, pseudo et code de chaque participant.</p>
         <div id="admin-codes-list"></div>
         <div class="divider"></div>
-        <div class="card-title" style="margin-bottom:10px">Ajouter un participant</div>
+        <div class="card-title" style="margin-bottom:10px">Ajouter manuellement</div>
         <div class="input-group">
-          <label class="input-label">Prénom</label>
-          <input type="text" id="new-participant-nom" placeholder="Pierre">
+          <label class="input-label">Prénom réel</label>
+          <input type="text" id="new-prenom" placeholder="Pierre">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Nom réel</label>
+          <input type="text" id="new-nom" placeholder="Dupont">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Pseudo</label>
+          <input type="text" id="new-participant-nom" placeholder="Pilou">
         </div>
         <div class="input-group">
           <label class="input-label">Code d'accès</label>
@@ -645,6 +364,7 @@ const NB_CHAPEAUX=4;
 let currentUser='',currentCode='',currentChapeau=1,isEditMode=false;
 let selections={1:[],2:[],3:[],4:[]};
 let espnScores={},refreshTimer=null,lastUpdated=null,newsLoaded=false;
+let showingInscription=false;
 
 // ---- SUPABASE ----
 async function sbFetch(path,opts={}){
@@ -663,7 +383,6 @@ function normalizeName(n){return n.toLowerCase().normalize('NFD').replace(/[\u03
 function getScore(nom){const k=normalizeName(nom);return espnScores[k]!==undefined?espnScores[k]:null;}
 function fmtScore(s){if(s===null||s===undefined) return 'N/A';if(s===0) return 'E';return(s>0?'+':'')+s;}
 function scoreClass(s){if(s===null) return '';return s<0?'neg':s>0?'pos':'even';}
-
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active','visible');});
   const el=document.getElementById(id);
@@ -672,6 +391,14 @@ function showScreen(id){
   window.scrollTo(0,0);
 }
 function showMsg(id,txt,type='info'){const el=document.getElementById(id);if(el) el.innerHTML=`<div class="msg ${type}">${txt}</div>`;}
+
+// ---- TOGGLE FORM ----
+function toggleForm(){
+  showingInscription=!showingInscription;
+  document.getElementById('form-connexion').style.display=showingInscription?'none':'block';
+  document.getElementById('form-inscription').style.display=showingInscription?'block':'none';
+  document.getElementById('msg-accueil').innerHTML='';
+}
 
 // ---- ESPN ----
 async function fetchESPNScores(){
@@ -684,32 +411,49 @@ async function fetchESPNScores(){
   }catch(e){console.error(e);return false;}
 }
 
-// ---- ACCUEIL ----
+// ---- INSCRIPTION ----
+async function handleInscription(){
+  const prenom=document.getElementById('reg-prenom').value.trim();
+  const nom=document.getElementById('reg-nom').value.trim();
+  const pseudo=document.getElementById('reg-pseudo').value.trim();
+  const code=document.getElementById('reg-code').value.trim();
+  if(!prenom||!nom||!pseudo||!code){showMsg('msg-accueil','Tous les champs sont requis.','error');return;}
+  showMsg('msg-accueil','Création du compte...','info');
+  try{
+    // Vérifier que le pseudo n'existe pas déjà
+    const existing=await sbFetch(`codes_acces?nom=eq.${encodeURIComponent(pseudo)}&select=id`);
+    if(existing&&existing.length>0){showMsg('msg-accueil','Ce pseudo est déjà pris. Choisissez-en un autre.','error');return;}
+    await sbFetch('codes_acces',{method:'POST',body:JSON.stringify({nom:pseudo,code,prenom_reel:prenom,nom_reel:nom}),prefer:'return=minimal'});
+    showMsg('msg-accueil',`✓ Compte créé ! Bienvenue ${pseudo}.`,'success');
+    // Auto-connexion
+    currentUser=pseudo;currentCode=code;
+    const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');
+    const isOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
+    if(!isOpen){showMsg('msg-accueil','Compte créé mais les sélections sont fermées. Le tournoi a débuté !','error');return;}
+    selections={1:[],2:[],3:[],4:[]};currentChapeau=1;isEditMode=false;
+    document.getElementById('selection-user-name').textContent=pseudo;
+    document.getElementById('edit-banner').style.display='none';
+    setTimeout(()=>{showScreen('screen-selection');renderChapeau();},800);
+  }catch(e){showMsg('msg-accueil','Erreur lors de la création. Réessayez.','error');console.error(e);}
+}
+
+// ---- CONNEXION ----
 async function handleAccueil(){
   const nom=document.getElementById('nom-input').value.trim();
   const code=document.getElementById('code-input').value.trim();
-  if(!nom){showMsg('msg-accueil','Veuillez entrer votre prénom.','error');return;}
+  if(!nom){showMsg('msg-accueil','Veuillez entrer votre pseudo.','error');return;}
   if(!code){showMsg('msg-accueil','Veuillez entrer votre code d\'accès.','error');return;}
   showMsg('msg-accueil','Vérification en cours...','info');
   try{
-    // Vérifier le code dans la table codes_acces
     const codeCheck=await sbFetch(`codes_acces?nom=eq.${encodeURIComponent(nom)}&code=eq.${encodeURIComponent(code)}&select=*`);
-    if(!codeCheck||codeCheck.length===0){
-      showMsg('msg-accueil','Prénom ou code incorrect. Contactez l\'organisateur.','error');
-      return;
-    }
+    if(!codeCheck||codeCheck.length===0){showMsg('msg-accueil','Pseudo ou code incorrect.','error');return;}
     const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');
     const isOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
     const existing=await sbFetch(`participants?nom=eq.${encodeURIComponent(nom)}&select=*`);
     currentUser=nom;currentCode=code;
-
     if(existing&&existing.length>0){
-      if(isOpen){
-        loadExistingAndEdit(existing[0]);
-      } else {
-        showMsg('msg-accueil','Bienvenue '+nom+' ! Les sélections sont fermées.','info');
-        setTimeout(()=>goClassement(),1500);
-      }
+      if(isOpen){loadExistingAndEdit(existing[0]);}
+      else{showMsg('msg-accueil','Bienvenue '+nom+' ! Les sélections sont fermées.','info');setTimeout(()=>goClassement(),1500);}
       return;
     }
     if(!isOpen){showMsg('msg-accueil','Les sélections sont fermées. Le tournoi a débuté !','error');return;}
@@ -731,7 +475,6 @@ function cancelEdit(){isEditMode=false;showScreen('screen-accueil');}
 
 // ---- SELECTION ----
 function renderChapeau(){
-  // Step dots
   let dotsHtml='';
   for(let i=1;i<=NB_CHAPEAUX;i++){
     if(i>1) dotsHtml+=`<div class="step-line"></div>`;
@@ -739,17 +482,8 @@ function renderChapeau(){
     dotsHtml+=`<div class="step-dot ${cls}"></div>`;
   }
   document.getElementById('step-dots').innerHTML=dotsHtml;
-
   const joueurs=JOUEURS[currentChapeau],sel=selections[currentChapeau];
-  let html=`<div class="card">
-    <div class="chapeau-header">
-      <div class="chapeau-num">${currentChapeau}</div>
-      <div class="chapeau-info">
-        <h3>Chapeau ${currentChapeau}</h3>
-        <p>${sel.length}/2 joueurs sélectionnés</p>
-      </div>
-    </div>
-    <div class="joueurs-grid">`;
+  let html=`<div class="card"><div class="chapeau-header"><div class="chapeau-num">${currentChapeau}</div><div class="chapeau-info"><h3>Chapeau ${currentChapeau}</h3><p>${sel.length}/2 joueurs sélectionnés</p></div></div><div class="joueurs-grid">`;
   joueurs.forEach(j=>{
     const isSel=sel.includes(j),isDisabled=!isSel&&sel.length>=2;
     html+=`<button class="joueur-btn ${isSel?'selected':''} ${isDisabled?'disabled':''}" onclick="toggleJoueur('${j.replace(/'/g,"\\'")}',${currentChapeau})">${j}</button>`;
@@ -759,12 +493,9 @@ function renderChapeau(){
   document.getElementById('btn-prev').style.display=currentChapeau===1?'none':'block';
   const allDone=Object.values(selections).every(s=>s.length===2);
   const btn=document.getElementById('btn-next');
-  if(currentChapeau===NB_CHAPEAUX){
-    btn.textContent=allDone?(isEditMode?'Sauvegarder les modifications':'Valider mes sélections'):'Valider →';
-    btn.className='btn '+(allDone?'btn-gold':'btn-outline');
-  } else {btn.textContent='Suivant →';btn.className='btn btn-gold';}
+  if(currentChapeau===NB_CHAPEAUX){btn.textContent=allDone?(isEditMode?'Sauvegarder les modifications':'Valider mes sélections'):'Valider →';btn.className='btn '+(allDone?'btn-gold':'btn-outline');}
+  else{btn.textContent='Suivant →';btn.className='btn btn-gold';}
 }
-
 function toggleJoueur(nom,chapeau){
   const sel=selections[chapeau];
   if(sel.includes(nom)) selections[chapeau]=sel.filter(j=>j!==nom);
@@ -786,18 +517,14 @@ async function submitSelections(){
       await sbFetch(`participants?nom=eq.${encodeURIComponent(currentUser)}`,{method:'PATCH',body:JSON.stringify(data),prefer:'return=minimal'});
       document.getElementById('confirm-title').textContent='Modifications sauvegardées';
       document.getElementById('confirm-subtitle').textContent='Vos sélections ont été mises à jour.';
-    } else {
+    }else{
       await sbFetch('participants',{method:'POST',body:JSON.stringify(data),prefer:'return=minimal'});
       document.getElementById('confirm-title').textContent='Sélections enregistrées';
       document.getElementById('confirm-subtitle').textContent='Bonne chance pour les Masters !';
     }
     let html='';
     for(let c=1;c<=NB_CHAPEAUX;c++){
-      html+=`<div class="card" style="margin-bottom:8px">
-        <div class="card-title">Chapeau ${c}</div>
-        <p style="font-size:15px;font-style:italic">⛳ ${selections[c][0]}</p>
-        <p style="font-size:15px;font-style:italic;margin-top:4px">⛳ ${selections[c][1]}</p>
-      </div>`;
+      html+=`<div class="card" style="margin-bottom:8px"><div class="card-title">Chapeau ${c}</div><p style="font-size:15px;font-style:italic">⛳ ${selections[c][0]}</p><p style="font-size:15px;font-style:italic;margin-top:4px">⛳ ${selections[c][1]}</p></div>`;
     }
     document.getElementById('confirm-recap').innerHTML=html;
     showScreen('screen-confirm');
@@ -811,13 +538,11 @@ async function goClassement(){
   refreshTimer=setInterval(async()=>{await fetchESPNScores();await loadClassement();},REFRESH_INTERVAL);
   await loadClassement();
 }
-
 async function loadClassement(){
   document.getElementById('tab-classement').innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Chargement...</div>';
   try{
     const [_,participants]=await Promise.all([fetchESPNScores(),sbFetch('participants?select=*&order=nom')]);
     if(lastUpdated) document.getElementById('refresh-info').textContent=`Scores ESPN mis à jour à ${lastUpdated.toLocaleTimeString('fr-FR')} · Actualisation automatique`;
-
     const results=(participants||[]).map(p=>{
       const myJ=[p.c1a,p.c1b,p.c2a,p.c2b,p.c3a,p.c3b,p.c4a,p.c4b].filter(Boolean);
       const scores=myJ.map(j=>({nom:j,score:getScore(j)??0}));
@@ -827,17 +552,13 @@ async function loadClassement(){
       return{nom:p.nom,total,best4,allJoueurs:scores};
     });
     results.sort((a,b)=>a.total-b.total);
-
     let html='';
     results.forEach((r,i)=>{
       const nc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
       const b4=r.best4.map(j=>j.nom.split(' ').pop()).join(', ');
       html+=`<div class="rank-item" onclick="toggleDetail('d${i}')">
         <div class="rank-num ${nc}">${i+1}</div>
-        <div class="rank-info">
-          <div class="rank-name">${r.nom}</div>
-          <div class="rank-joueurs">Best 4 : ${b4}</div>
-        </div>
+        <div class="rank-info"><div class="rank-name">${r.nom}</div><div class="rank-joueurs">Best 4 : ${b4}</div></div>
         <div class="rank-score ${scoreClass(r.total)}">${fmtScore(r.total)}</div>
       </div>
       <div class="participant-detail" id="d${i}">
@@ -849,8 +570,6 @@ async function loadClassement(){
     });
     if(!html) html='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Aucun participant pour l\'instant</div>';
     document.getElementById('tab-classement').innerHTML=html;
-
-    // Scores joueurs
     const scoresTab=ALL_JOUEURS.map(n=>({nom:n,score:getScore(n)})).filter(j=>j.score!==null).sort((a,b)=>a.score-b.score);
     let shtml='<div class="card">';
     if(scoresTab.length) scoresTab.forEach(j=>{
@@ -865,17 +584,13 @@ async function loadClassement(){
     else{
       shtml+='<div style="padding:16px 0;font-style:italic;color:var(--text-muted);font-size:14px;text-align:center">Les scores ne sont pas encore disponibles</div>';
       ALL_JOUEURS.forEach(n=>{
-        shtml+=`<div class="score-item" onclick="openPlayerCard('${n.replace(/'/g,"\\'")}')">
-          <span style="font-size:14px;font-style:italic">⛳ ${n}</span>
-          <span style="color:var(--text-muted);font-size:14px">›</span>
-        </div>`;
+        shtml+=`<div class="score-item" onclick="openPlayerCard('${n.replace(/'/g,"\\'")}')"><span style="font-size:14px;font-style:italic">⛳ ${n}</span><span style="color:var(--text-muted);font-size:14px">›</span></div>`;
       });
     }
     shtml+='</div>';
     document.getElementById('tab-scores').innerHTML=shtml;
   }catch(e){document.getElementById('tab-classement').innerHTML='<div class="msg error">Erreur de chargement</div>';console.error(e);}
 }
-
 function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
 function switchTab(tab){
   const tabs=['classement','scores','news'];
@@ -886,93 +601,22 @@ function switchTab(tab){
 
 // ---- PLAYER DATA ----
 const PLAYER_DATA={
-  'Scottie Scheffler':{espn_id:'9478',nationalite:'🇺🇸 Américain',age:27,classement_mondial:1,palmares_majeurs:2,turned_pro:2018,meilleur_resultat_masters:'Vainqueur 2022, 2024',bio:"Numéro 1 mondial incontesté, Scottie Scheffler a dominé la saison 2024 de manière écrasante. Son swing régulier et sa gestion mentale exemplaire en font le grand favori d'Augusta.",statistiques:{driving_distance:'318 yards',fairways:'57%',gir:'72%',putts_par_trou:'1.71'},palmares_liste:['Masters 2022, 2024','Players Championship 2024','Médaille d\'Or JO 2024']},
-  'Rory McIlroy':{espn_id:'3470',nationalite:'🇮🇪 Irlandais',age:35,classement_mondial:3,palmares_majeurs:4,turned_pro:2007,meilleur_resultat_masters:'2ème 2022',bio:"Le Masters reste le seul Major qui manque à Rory McIlroy pour compléter le Grand Chelem. Cette obsession de longue date le pousse à donner le meilleur de lui-même à Augusta chaque année.",statistiques:{driving_distance:'320 yards',fairways:'54%',gir:'70%',putts_par_trou:'1.73'},palmares_liste:['US Open 2011','The Open 2014','PGA Championship 2012, 2014']},
-  'Jon Rahm':{espn_id:'9780',nationalite:'🇪🇸 Espagnol',age:30,classement_mondial:4,palmares_majeurs:2,turned_pro:2016,meilleur_resultat_masters:'Vainqueur 2023',bio:"Le géant basque a remporté Augusta en 2023 de façon magistrale. Passé chez LIV Golf, il reste une menace absolue sur tous les parcours, particulièrement à Augusta qu'il affectionne.",statistiques:{driving_distance:'308 yards',fairways:'58%',gir:'71%',putts_par_trou:'1.74'},palmares_liste:['Masters 2023','US Open 2021']},
-  'Tommy Fleetwood':{espn_id:'5769',nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',age:33,classement_mondial:8,palmares_majeurs:0,turned_pro:2010,meilleur_resultat_masters:'6ème 2023',bio:"Tommy Fleetwood est l'un des meilleurs joueurs sans Major. Son swing élégant et sa régularité en font un candidat permanent dans les grands rendez-vous du golf mondial.",statistiques:{driving_distance:'299 yards',fairways:'63%',gir:'70%',putts_par_trou:'1.75'},palmares_liste:['Abu Dhabi HSBC Championship 2017, 2019','Nedbank Golf Challenge 2023']},
-  'Bryson DeChambeau':{espn_id:'5759',nationalite:'🇺🇸 Américain',age:31,classement_mondial:7,palmares_majeurs:2,turned_pro:2016,meilleur_resultat_masters:'T5 2020',bio:"Le scientifique du golf a révolutionné l'approche du jeu par sa transformation physique. Double vainqueur de l'US Open, DeChambeau chez LIV reste une force de la nature.",statistiques:{driving_distance:'337 yards',fairways:'48%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['US Open 2020, 2024']},
-  'Tyrrell Hatton':{espn_id:'5530',nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',age:32,classement_mondial:11,palmares_majeurs:0,turned_pro:2013,meilleur_resultat_masters:'T12 2024',bio:"Connu pour son caractère expressif, Tyrrell Hatton est l'un des meilleurs européens de sa génération. Passé chez LIV, son tempérament de compétiteur le rend redoutable.",statistiques:{driving_distance:'295 yards',fairways:'61%',gir:'69%',putts_par_trou:'1.76'},palmares_liste:['BMW PGA Championship 2020','Arnold Palmer Invitational 2020']},
-  'Robert MacIntyre':{espn_id:'11378',nationalite:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Écossais',age:28,classement_mondial:16,palmares_majeurs:0,turned_pro:2018,meilleur_resultat_masters:'T26 2023',bio:"La grande révélation écossaise du golf mondial. Vainqueur du Canadian Open 2024, MacIntyre s'impose comme l'une des figures montantes du circuit international.",statistiques:{driving_distance:'304 yards',fairways:'60%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['Canadian Open 2024']},
-  'Shane Lowry':{espn_id:'4995',nationalite:'🇮🇪 Irlandais',age:37,classement_mondial:23,palmares_majeurs:1,turned_pro:2009,meilleur_resultat_masters:'T10 2022',bio:"Champion de The Open 2019 à Royal Portrush, Shane Lowry excelle dans les conditions difficiles. Son jeu solide et son mental de fer en font un concurrent sérieux.",statistiques:{driving_distance:'297 yards',fairways:'62%',gir:'69%',putts_par_trou:'1.76'},palmares_liste:['The Open Championship 2019']},
-  'Xander Schauffele':{espn_id:'9003',nationalite:'🇺🇸 Américain',age:30,classement_mondial:2,palmares_majeurs:2,turned_pro:2015,meilleur_resultat_masters:'2ème 2019',bio:"Longtemps le meilleur joueur sans Major, Schauffele a tout raflé en 2024 avec le PGA Championship et The Open. Médaillé d'or olympique, il est désormais parmi l'élite mondiale.",statistiques:{driving_distance:'305 yards',fairways:'60%',gir:'72%',putts_par_trou:'1.72'},palmares_liste:['PGA Championship 2024','The Open 2024','Médaille d\'Or JO 2020']},
-  'Collin Morikawa':{espn_id:'10592',nationalite:'🇺🇸 Américain',age:27,classement_mondial:9,palmares_majeurs:2,turned_pro:2019,meilleur_resultat_masters:'T18 2021',bio:"L'homme aux fers de précision. Vainqueur du PGA Championship dès sa première participation et de The Open en 2021, Morikawa bâtit une carrière d'exception.",statistiques:{driving_distance:'296 yards',fairways:'65%',gir:'74%',putts_par_trou:'1.77'},palmares_liste:['PGA Championship 2020','The Open 2021']},
-  'Ludvig Aberg':{espn_id:'11813',nationalite:'🇸🇪 Suédois',age:24,classement_mondial:6,palmares_majeurs:0,turned_pro:2023,meilleur_resultat_masters:'2ème 2024',bio:"La sensation suédoise. Passé professionnel en 2023, il a immédiatement intégré l'élite et frôlé la victoire au Masters 2024. Son potentiel est considéré comme illimité.",statistiques:{driving_distance:'312 yards',fairways:'61%',gir:'71%',putts_par_trou:'1.74'},palmares_liste:['RSM Classic 2023','Hero World Challenge 2024']},
-  'Viktor Hovland':{espn_id:'11080',nationalite:'🇳🇴 Norvégien',age:27,classement_mondial:13,palmares_majeurs:0,turned_pro:2019,meilleur_resultat_masters:'T12 2023',bio:"Premier grand champion norvégien de l'histoire. Vainqueur du Tour Championship 2023, il possède un jeu spectaculaire mais cherche encore son premier Major.",statistiques:{driving_distance:'309 yards',fairways:'56%',gir:'69%',putts_par_trou:'1.75'},palmares_liste:['Tour Championship 2023','DP World Tour Championship 2021, 2022']},
-  'Joaquin Niemann':{espn_id:'10191',nationalite:'🇨🇱 Chilien',age:25,classement_mondial:20,palmares_majeurs:0,turned_pro:2018,meilleur_resultat_masters:'T21 2022',bio:"Meilleur joueur d'Amérique du Sud, Niemann domine chez LIV Golf. Son swing fluide et sa longueur en font un prétendant sérieux dans tous les grands tournois.",statistiques:{driving_distance:'316 yards',fairways:'55%',gir:'69%',putts_par_trou:'1.75'},palmares_liste:['LIV Golf Jeddah 2023','Genesis Invitational 2022']},
-  'Justin Thomas':{espn_id:'5467',nationalite:'🇺🇸 Américain',age:31,classement_mondial:18,palmares_majeurs:2,turned_pro:2013,meilleur_resultat_masters:'T4 2020',bio:"JT est l'un des meilleurs Américains de sa génération. Avec 2 PGA Championships, il reste une force majeure malgré quelques années de transition.",statistiques:{driving_distance:'305 yards',fairways:'57%',gir:'68%',putts_par_trou:'1.74'},palmares_liste:['PGA Championship 2017, 2022','FedEx Cup 2017, 2019']},
-  'Brooks Koepka':{espn_id:'5765',nationalite:'🇺🇸 Américain',age:34,classement_mondial:25,palmares_majeurs:5,turned_pro:2012,meilleur_resultat_masters:'2ème 2019, 2023',bio:"Le spécialiste des Majeurs par excellence. Avec 5 titres en Grand Chelem, Koepka élève systématiquement son niveau dans les grands rendez-vous.",statistiques:{driving_distance:'313 yards',fairways:'55%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['US Open 2017, 2018','PGA Championship 2018, 2019']},
-  'Jordan Spieth':{espn_id:'5467',nationalite:'🇺🇸 Américain',age:31,classement_mondial:29,palmares_majeurs:3,turned_pro:2012,meilleur_resultat_masters:'Vainqueur 2015',bio:"Le prodige texan qui a dominé le golf en 2015. Vainqueur de 3 Majeurs avant 24 ans, il cherche à retrouver son meilleur niveau avec un putting et une gestion mentale toujours exceptionnels.",statistiques:{driving_distance:'291 yards',fairways:'60%',gir:'68%',putts_par_trou:'1.73'},palmares_liste:['Masters 2015','US Open 2015','The Open 2017']},
-  'Justin Rose':{espn_id:'569',nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',age:44,classement_mondial:55,palmares_majeurs:1,turned_pro:1998,meilleur_resultat_masters:'2ème 2017',bio:"Légende du golf européen, Justin Rose continue de compétitionner au plus haut niveau à 44 ans. Vainqueur de l'US Open 2013 et médaillé d'or olympique en 2016.",statistiques:{driving_distance:'289 yards',fairways:'63%',gir:'67%',putts_par_trou:'1.77'},palmares_liste:['US Open 2013','Médaille d\'Or JO 2016','FedEx Cup 2018']},
-  'Russell Henley':{espn_id:'6047',nationalite:'🇺🇸 Américain',age:35,classement_mondial:30,palmares_majeurs:0,turned_pro:2012,meilleur_resultat_masters:'T5 2023',bio:"Joueur solide et régulier, Russell Henley a failli s'imposer dans plusieurs Majeurs. Sa précision lui permet de compétitionner au plus haut niveau.",statistiques:{driving_distance:'295 yards',fairways:'63%',gir:'70%',putts_par_trou:'1.75'},palmares_liste:['Sony Open 2013, 2019','Houston Open 2014']},
-  'Matt Fitzpatrick':{espn_id:'9131',nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',age:30,classement_mondial:19,palmares_majeurs:1,turned_pro:2014,meilleur_resultat_masters:'T14 2022',bio:"Le précis de Sheffield. Vainqueur de l'US Open 2022, il excelle sur les parcours demandant de la rigueur. Sa gestion mentale en fait un candidat sérieux à Augusta.",statistiques:{driving_distance:'293 yards',fairways:'65%',gir:'71%',putts_par_trou:'1.74'},palmares_liste:['US Open 2022','DP World Tour Championship 2020']},
-  'Patrick Cantlay':{espn_id:'9036',nationalite:'🇺🇸 Américain',age:32,classement_mondial:15,palmares_majeurs:0,turned_pro:2012,meilleur_resultat_masters:'T5 2021',bio:"Surnommé 'Patty Ice' pour son sang-froid légendaire, Cantlay est l'un des joueurs les plus redoutables sous pression du circuit américain.",statistiques:{driving_distance:'298 yards',fairways:'61%',gir:'71%',putts_par_trou:'1.72'},palmares_liste:['Tour Championship 2021','FedEx Cup 2021','BMW Championship 2021, 2022']},
-  'Sepp Straka':{espn_id:'8961',nationalite:'🇦🇹 Autrichien',age:31,classement_mondial:28,palmares_majeurs:0,turned_pro:2016,meilleur_resultat_masters:'T24 2023',bio:"Premier grand champion autrichien du golf moderne. Vainqueur du John Deere Classic 2022 et du Honda Classic 2024, il représente l'Autriche avec fierté.",statistiques:{driving_distance:'296 yards',fairways:'60%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['John Deere Classic 2022','Honda Classic 2024']},
-  'Cameron Young':{espn_id:'11408',nationalite:'🇺🇸 Américain',age:27,classement_mondial:33,palmares_majeurs:0,turned_pro:2021,meilleur_resultat_masters:'T11 2022',bio:"L'une des plus belles révélations récentes. Frappeur exceptionnel, il a failli remporter The Open en 2022 dès sa première participation. Son potentiel est énorme.",statistiques:{driving_distance:'318 yards',fairways:'52%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['Fortinet Championship 2024']},
-  'Hideki Matsuyama':{espn_id:'5860',nationalite:'🇯🇵 Japonais',age:32,classement_mondial:14,palmares_majeurs:1,turned_pro:2013,meilleur_resultat_masters:'Vainqueur 2021',bio:"Icône du golf japonais, sa victoire au Masters 2021 a déclenché une ferveur nationale. Son iron game remarquable et sa précision en font une menace constante à Augusta.",statistiques:{driving_distance:'296 yards',fairways:'56%',gir:'69%',putts_par_trou:'1.76'},palmares_liste:['Masters 2021','WGC-HSBC Champions 2016, 2017']},
-  'Adam Scott':{espn_id:'1225',nationalite:'🇦🇺 Australien',age:44,classement_mondial:35,palmares_majeurs:1,turned_pro:2000,meilleur_resultat_masters:'Vainqueur 2013',bio:"Légende australienne au swing le plus élégant du circuit. Vainqueur du Masters 2013, il continue de compétitionner au plus haut niveau à 44 ans avec une longévité remarquable.",statistiques:{driving_distance:'291 yards',fairways:'63%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['Masters 2013','Players Championship 2004']},
-  'Ryan Fox':{espn_id:'9327',nationalite:'🇳🇿 Néo-Zélandais',age:36,classement_mondial:40,palmares_majeurs:0,turned_pro:2012,meilleur_resultat_masters:'T30 2023',bio:"Meilleur joueur de Nouvelle-Zélande, Ryan Fox s'est imposé sur le DP World Tour et continue sa progression vers l'élite mondiale.",statistiques:{driving_distance:'307 yards',fairways:'57%',gir:'66%',putts_par_trou:'1.77'},palmares_liste:['Alfred Dunhill Links 2021','DP World Tour Championship 2022']},
-  'Jason Day':{espn_id:'3467',nationalite:'🇦🇺 Australien',age:37,classement_mondial:27,palmares_majeurs:1,turned_pro:2006,meilleur_resultat_masters:'2ème 2011',bio:"Ancien numéro 1 mondial australien, vainqueur du PGA Championship 2015. Après des blessures au dos difficiles, il a retrouvé un très bon niveau ces dernières années.",statistiques:{driving_distance:'298 yards',fairways:'58%',gir:'67%',putts_par_trou:'1.74'},palmares_liste:['PGA Championship 2015','Tour Championship 2016','FedEx Cup 2016']},
-  'J.J. Spaun':{espn_id:'10166',nationalite:'🇺🇸 Américain',age:33,classement_mondial:50,palmares_majeurs:0,turned_pro:2014,meilleur_resultat_masters:'T40 2022',bio:"Joueur solide et régulier du PGA Tour, vainqueur du Valero Texas Open 2022. Il se distingue par sa capacité à performer sous pression.",statistiques:{driving_distance:'293 yards',fairways:'60%',gir:'67%',putts_par_trou:'1.77'},palmares_liste:['Valero Texas Open 2022']},
-  'Ben Griffin':{espn_id:'11332',nationalite:'🇺🇸 Américain',age:28,classement_mondial:60,palmares_majeurs:0,turned_pro:2019,meilleur_resultat_masters:'Première participation',bio:"Jeune promesse du PGA Tour, vainqueur du Corales Puntacana Championship 2023. Il continue sa progression et pourrait créer la surprise à Augusta.",statistiques:{driving_distance:'298 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.77'},palmares_liste:['Corales Puntacana Championship 2023']},
-  'Patrick Reed':{espn_id:'5759',nationalite:'🇺🇸 Américain',age:34,classement_mondial:45,palmares_majeurs:1,turned_pro:2011,meilleur_resultat_masters:'Vainqueur 2018',bio:"Le controversé 'Captain America'. Vainqueur du Masters 2018, ses performances dans les Majeurs restent impressionnantes malgré les polémiques.",statistiques:{driving_distance:'292 yards',fairways:'58%',gir:'66%',putts_par_trou:'1.75'},palmares_liste:['Masters 2018']},
-  'Corey Conners':{espn_id:'9126',nationalite:'🇨🇦 Canadien',age:33,classement_mondial:38,palmares_majeurs:0,turned_pro:2015,meilleur_resultat_masters:'T8 2021',bio:"Meilleur joueur canadien de sa génération, reconnu comme l'un des plus précis en termes de coups d'approche. Son GIR exceptionnel lui offre de nombreuses opportunités.",statistiques:{driving_distance:'294 yards',fairways:'66%',gir:'73%',putts_par_trou:'1.78'},palmares_liste:['Valero Texas Open 2019']},
-  'Min Woo Lee':{espn_id:'11122',nationalite:'🇦🇺 Australien',age:26,classement_mondial:26,palmares_majeurs:0,turned_pro:2019,meilleur_resultat_masters:'T16 2023',bio:"L'électrisant Australien au swing spectaculaire. Frère de Minjee Lee, il impressionne par ses performances régulières sur les deux grands circuits mondiaux.",statistiques:{driving_distance:'306 yards',fairways:'55%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['Scottish Open 2021','Ras Al Khaimah Championship 2024']},
-  'Aaron Rai':{espn_id:'10906',nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',age:29,classement_mondial:42,palmares_majeurs:0,turned_pro:2015,meilleur_resultat_masters:'T20 2024',bio:"Belle surprise du golf anglais, vainqueur du Wyndham Championship 2024. Sa carte sur le PGA Tour lui ouvre de nouvelles perspectives.",statistiques:{driving_distance:'291 yards',fairways:'64%',gir:'69%',putts_par_trou:'1.76'},palmares_liste:['Wyndham Championship 2024','Hong Kong Open 2019']},
-  'Brian Harman':{espn_id:'1225',nationalite:'🇺🇸 Américain',age:37,classement_mondial:22,palmares_majeurs:1,turned_pro:2010,meilleur_resultat_masters:'T20 2021',bio:"La sensation de The Open 2023 à Hoylake. Ce Géorgien discret a remporté le Claret Jug de façon dominante, prouvant sa capacité à performer dans les grands moments.",statistiques:{driving_distance:'282 yards',fairways:'65%',gir:'68%',putts_par_trou:'1.73'},palmares_liste:['The Open Championship 2023']},
-  'Carlos Ortiz':{espn_id:'9403',nationalite:'🇲🇽 Mexicain',age:33,classement_mondial:80,palmares_majeurs:0,turned_pro:2012,meilleur_resultat_masters:'T17 2021',bio:"Meilleur joueur mexicain de l'histoire du golf. Passé chez LIV Golf, il représente fièrement son pays et reste capable de belles performances.",statistiques:{driving_distance:'294 yards',fairways:'60%',gir:'66%',putts_par_trou:'1.77'},palmares_liste:['Houston Open 2020']},
-  'Sam Burns':{espn_id:'9938',nationalite:'🇺🇸 Américain',age:28,classement_mondial:21,palmares_majeurs:0,turned_pro:2018,meilleur_resultat_masters:'T24 2022',bio:"L'un des joueurs les plus réguliers avec plusieurs victoires consécutives au même tournoi. Son iron long exceptionnel lui permet de dominer sur les grands parcours.",statistiques:{driving_distance:'302 yards',fairways:'59%',gir:'70%',putts_par_trou:'1.74'},palmares_liste:['Valspar Championship 2021, 2022, 2023']},
-  'Thomas Detry':{espn_id:'9791',nationalite:'🇧🇪 Belge',age:31,classement_mondial:48,palmares_majeurs:0,turned_pro:2015,meilleur_resultat_masters:'Première participation',bio:"La fierté du golf belge. Vainqueur de l'Arnold Palmer Invitational 2024, il s'est imposé sur le PGA Tour et représente l'Europe avec talent.",statistiques:{driving_distance:'300 yards',fairways:'59%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['Arnold Palmer Invitational 2024']},
-  'Cameron Smith':{espn_id:'9131',nationalite:'🇦🇺 Australien',age:31,classement_mondial:24,palmares_majeurs:1,turned_pro:2013,meilleur_resultat_masters:'2ème 2022',bio:"Champion de The Open 2022 et l'un des meilleurs putteurs du monde. Passé chez LIV Golf, il y domine régulièrement avec son équipe Ripper GC.",statistiques:{driving_distance:'295 yards',fairways:'58%',gir:'67%',putts_par_trou:'1.70'},palmares_liste:['The Open Championship 2022','Players Championship 2022']},
-  'Tony Finau':{espn_id:'6456',nationalite:'🇺🇸 Américain',age:35,classement_mondial:36,palmares_majeurs:0,turned_pro:2007,meilleur_resultat_masters:'T5 2019',bio:"Le géant américain d'origine tongienne. Longtemps le meilleur joueur sans victoire, il a enchaîné les succès depuis 2021 grâce à l'un des meilleurs services du circuit.",statistiques:{driving_distance:'313 yards',fairways:'56%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['3M Open 2021, 2022','Houston Open 2021']},
-  'Sungjae Im':{espn_id:'10220',nationalite:'🇰🇷 Sud-Coréen',age:26,classement_mondial:32,palmares_majeurs:0,turned_pro:2018,meilleur_resultat_masters:'2ème 2020',bio:"Étoile montante du golf coréen. Finaliste au Masters 2020, il est reconnu pour son volume de jeu extraordinaire et sa régularité impressionnante.",statistiques:{driving_distance:'295 yards',fairways:'62%',gir:'70%',putts_par_trou:'1.75'},palmares_liste:['Honda Classic 2020','AT&T Pebble Beach 2023']},
-  'Wyndham Clark':{espn_id:'11119',nationalite:'🇺🇸 Américain',age:31,classement_mondial:17,palmares_majeurs:1,turned_pro:2017,meilleur_resultat_masters:'T15 2023',bio:"La surprise de l'US Open 2023. Longtemps passé sous les radars, Clark s'est révélé au plus haut niveau et cherche à confirmer son statut.",statistiques:{driving_distance:'308 yards',fairways:'57%',gir:'68%',putts_par_trou:'1.75'},palmares_liste:['US Open 2023','Wells Fargo Championship 2023']},
-  'Rickie Fowler':{espn_id:'4848',nationalite:'🇺🇸 Américain',age:36,classement_mondial:44,palmares_majeurs:0,turned_pro:2009,meilleur_resultat_masters:'T5 2018',bio:"L'un des joueurs les plus populaires malgré l'absence de Major. Sa tenue orange est devenue iconique et son talent indéniable le maintient parmi les prétendants.",statistiques:{driving_distance:'298 yards',fairways:'59%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['Players Championship 2015']},
-  'Keegan Bradley':{espn_id:'4513',nationalite:'🇺🇸 Américain',age:38,classement_mondial:53,palmares_majeurs:1,turned_pro:2008,meilleur_resultat_masters:'T16 2012',bio:"Capitaine de la Ryder Cup américaine et vainqueur du PGA Championship 2011. Son enthousiasme communicatif et son expérience en font un leader naturel.",statistiques:{driving_distance:'295 yards',fairways:'60%',gir:'66%',putts_par_trou:'1.76'},palmares_liste:['PGA Championship 2011']},
-  'Si Woo Kim':{espn_id:'9561',nationalite:'🇰🇷 Sud-Coréen',age:29,classement_mondial:56,palmares_majeurs:0,turned_pro:2014,meilleur_resultat_masters:'T10 2021',bio:"Vainqueur du Players Championship 2017, l'un des tournois les plus prestigieux. Le Coréen est capable de grandes performances dans les rendez-vous majeurs.",statistiques:{driving_distance:'294 yards',fairways:'59%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['Players Championship 2017']},
-  'Akshay Bhatia':{espn_id:'11535',nationalite:'🇺🇸 Américain',age:22,classement_mondial:31,palmares_majeurs:0,turned_pro:2021,meilleur_resultat_masters:'Première participation',bio:"La grande sensation américaine d'origine indienne. À 22 ans, plusieurs victoires sur le PGA Tour et un talent qui le place parmi les grandes futures stars du golf.",statistiques:{driving_distance:'311 yards',fairways:'54%',gir:'66%',putts_par_trou:'1.75'},palmares_liste:['Barracuda Championship 2023','Valero Texas Open 2024']},
-  'Taylor Pendrith':{espn_id:'10630',nationalite:'🇨🇦 Canadien',age:33,classement_mondial:43,palmares_majeurs:0,turned_pro:2015,meilleur_resultat_masters:'Première participation',bio:"L'un des longs frappeurs les plus impressionnants du circuit. Le Canadien a décroché ses premières victoires et continue de s'affirmer au plus haut niveau.",statistiques:{driving_distance:'321 yards',fairways:'51%',gir:'65%',putts_par_trou:'1.77'},palmares_liste:['CJ Cup Byron Nelson 2024']},
-  'Marc Leishman':{espn_id:'3836',nationalite:'🇦🇺 Australien',age:41,classement_mondial:90,palmares_majeurs:0,turned_pro:2007,meilleur_resultat_masters:'T4 2017',bio:"Le vétéran australien connu pour sa régularité et son calme. Il a failli s'imposer dans plusieurs Majeurs et continue de compétitionner chez LIV Golf.",statistiques:{driving_distance:'295 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.77'},palmares_liste:['Arnold Palmer Invitational 2018']},
-  'Daniel Berger':{espn_id:'9564',nationalite:'🇺🇸 Américain',age:31,classement_mondial:70,palmares_majeurs:0,turned_pro:2014,meilleur_resultat_masters:'T13 2021',bio:"Joueur talentueux qui revient en force après des blessures. Vainqueur de 4 titres sur le PGA Tour, il cherche à retrouver son meilleur niveau.",statistiques:{driving_distance:'302 yards',fairways:'59%',gir:'67%',putts_par_trou:'1.75'},palmares_liste:['AT&T Pebble Beach 2021']},
-  'Lucas Herbert':{espn_id:'10484',nationalite:'🇦🇺 Australien',age:29,classement_mondial:65,palmares_majeurs:0,turned_pro:2016,meilleur_resultat_masters:'T30 2022',bio:"Belle promesse du golf australien, vainqueur du British Masters et du Dubai Desert Classic. Il cherche à confirmer au niveau mondial.",statistiques:{driving_distance:'296 yards',fairways:'60%',gir:'66%',putts_par_trou:'1.77'},palmares_liste:['British Masters 2021','Dubai Desert Classic 2021']},
-  'Harry Hall':{espn_id:'11216',nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',age:27,classement_mondial:85,palmares_majeurs:0,turned_pro:2019,meilleur_resultat_masters:'Première participation',bio:"Jeune promesse anglaise du golf, représentant la nouvelle génération du golf britannique avec un jeu prometteur et une belle régularité.",statistiques:{driving_distance:'291 yards',fairways:'62%',gir:'66%',putts_par_trou:'1.76'},palmares_liste:['Corales Puntacana Championship 2022']},
-  'Aldrich Potgieter':{espn_id:'11922',nationalite:'🇿🇦 Sud-Africain',age:19,classement_mondial:75,palmares_majeurs:0,turned_pro:2023,meilleur_resultat_masters:'Première participation',bio:"À 19 ans, ce phénomène sud-africain frappe la balle à des distances extraordinaires. Considéré comme l'un des plus grands talents de sa génération.",statistiques:{driving_distance:'340 yards',fairways:'47%',gir:'63%',putts_par_trou:'1.77'},palmares_liste:['Isuzu Championship 2023']},
-  'Tom Kim':{espn_id:'11193',nationalite:'🇰🇷 Sud-Coréen',age:22,classement_mondial:37,palmares_majeurs:0,turned_pro:2022,meilleur_resultat_masters:'T19 2023',bio:"La sensation coréenne du PGA Tour. Deux victoires dès sa première saison complète et un sang-froid impressionnant pour son jeune âge.",statistiques:{driving_distance:'295 yards',fairways:'60%',gir:'68%',putts_par_trou:'1.74'},palmares_liste:['Shriners Children\'s Open 2022','Wyndham Championship 2022']},
-  'Rasmus Hojgaard':{espn_id:'11421',nationalite:'🇩🇰 Danois',age:23,classement_mondial:34,palmares_majeurs:0,turned_pro:2019,meilleur_resultat_masters:'Première participation',bio:"Le jumeau danois qui s'impose progressivement parmi l'élite mondiale. Vainqueur sur le DP World Tour, il représente la nouvelle génération du golf européen.",statistiques:{driving_distance:'301 yards',fairways:'58%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['Estrella Damm N.A. Andalucía Masters 2024']},
-  'Tom McKibbin':{espn_id:'11850',nationalite:'🇮🇪 Irlandais',age:22,classement_mondial:62,palmares_majeurs:0,turned_pro:2022,meilleur_resultat_masters:'Première participation',bio:"Protégé de Rory McIlroy, cette jeune étoile irlandaise impressionne sur le DP World Tour et cherche à s'imposer au niveau mondial.",statistiques:{driving_distance:'295 yards',fairways:'60%',gir:'66%',putts_par_trou:'1.77'},palmares_liste:['Abu Dhabi HSBC Championship 2024']},
-  'Dean Burmester':{espn_id:'9685',nationalite:'🇿🇦 Sud-Africain',age:34,classement_mondial:68,palmares_majeurs:0,turned_pro:2013,meilleur_resultat_masters:'T35 2023',bio:"L'un des meilleurs Sud-Africains de sa génération. Long frappeur et joueur agressif, vainqueur de plusieurs titres sur le DP World Tour.",statistiques:{driving_distance:'313 yards',fairways:'54%',gir:'65%',putts_par_trou:'1.77'},palmares_liste:['Joburg Open 2019','Magical Kenya Open 2022']},
-  'Nicolai Hojgaard':{espn_id:'11422',nationalite:'🇩🇰 Danois',age:23,classement_mondial:39,palmares_majeurs:0,turned_pro:2019,meilleur_resultat_masters:'T12 2024',bio:"Le jumeau de Rasmus, joueur élégant et complet. Sa belle performance au Masters 2024 confirme son potentiel parmi l'élite mondiale.",statistiques:{driving_distance:'299 yards',fairways:'60%',gir:'68%',putts_par_trou:'1.75'},palmares_liste:['Italian Open 2021']},
-  'Sergio Garcia':{espn_id:'1120',nationalite:'🇪🇸 Espagnol',age:45,classement_mondial:95,palmares_majeurs:1,turned_pro:1999,meilleur_resultat_masters:'Vainqueur 2017',bio:"Légende espagnole du golf avec plus de 35 ans de carrière. El Niño a remporté le Masters 2017 après des années de tentatives. Une figure emblématique du golf mondial.",statistiques:{driving_distance:'291 yards',fairways:'61%',gir:'66%',putts_par_trou:'1.76'},palmares_liste:['Masters 2017','Players Championship 2008']},
-  'Sahith Theegala':{espn_id:'11088',nationalite:'🇺🇸 Américain',age:27,classement_mondial:46,palmares_majeurs:0,turned_pro:2021,meilleur_resultat_masters:'T20 2023',bio:"L'une des plus belles révélations récentes. D'origine indienne, ce Californien impressionne par son jeu explosif et ses remontées spectaculaires.",statistiques:{driving_distance:'307 yards',fairways:'56%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['Fortinet Championship 2023']},
-  'Thriston Lawrence':{espn_id:'11219',nationalite:'🇿🇦 Sud-Africain',age:27,classement_mondial:72,palmares_majeurs:0,turned_pro:2018,meilleur_resultat_masters:'Première participation',bio:"Belle promesse sud-africaine, vainqueur sur le DP World Tour. Il cherche à s'imposer au niveau mondial après sa qualification pour Augusta.",statistiques:{driving_distance:'292 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['Joburg Open 2022']},
-  'Harris English':{espn_id:'5408',nationalite:'🇺🇸 Américain',age:35,classement_mondial:49,palmares_majeurs:0,turned_pro:2011,meilleur_resultat_masters:'T10 2013',bio:"Joueur solide connu pour sa régularité. Sa victoire mémorable au Travelers Championship 2021 en prolongations illustre sa capacité à performer sous pression.",statistiques:{driving_distance:'297 yards',fairways:'61%',gir:'68%',putts_par_trou:'1.75'},palmares_liste:['Travelers Championship 2021','Sony Open 2014, 2021']},
-  'Louis Oosthuizen':{espn_id:'3836',nationalite:'🇿🇦 Sud-Africain',age:41,classement_mondial:58,palmares_majeurs:1,turned_pro:2002,meilleur_resultat_masters:'2ème 2012',bio:"Champion élégant de The Open 2010. Ce Sud-Africain a été finaliste dans plusieurs Majeurs, témoignant de sa capacité à jouer son meilleur golf dans les grands moments.",statistiques:{driving_distance:'293 yards',fairways:'62%',gir:'68%',putts_par_trou:'1.75'},palmares_liste:['The Open Championship 2010']},
-  'Byeong Hun An':{espn_id:'8854',nationalite:'🇰🇷 Sud-Coréen',age:32,classement_mondial:55,palmares_majeurs:0,turned_pro:2012,meilleur_resultat_masters:'T28 2022',bio:"Champion du monde amateur en 2009, il a poursuivi une belle carrière professionnelle avec une régularité exemplaire sur le circuit international.",statistiques:{driving_distance:'291 yards',fairways:'62%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['BMW PGA Championship 2015']},
-  'Davis Thompson':{espn_id:'11626',nationalite:'🇺🇸 Américain',age:24,classement_mondial:64,palmares_majeurs:0,turned_pro:2022,meilleur_resultat_masters:'Première participation',bio:"Jeune promesse américaine, vainqueur du John Deere Classic 2023. Ce Géorgien poursuit sa progression vers les sommets du golf mondial.",statistiques:{driving_distance:'299 yards',fairways:'60%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['John Deere Classic 2023']},
-  'Dustin Johnson':{espn_id:'3843',nationalite:'🇺🇸 Américain',age:40,classement_mondial:20,palmares_majeurs:2,turned_pro:2007,meilleur_resultat_masters:'Vainqueur 2020',bio:"Ancien numéro 1 mondial, vainqueur du Masters 2020 et de l'US Open 2016. Passé chez LIV Golf, son talent naturel exceptionnel en fait toujours un candidat sérieux.",statistiques:{driving_distance:'314 yards',fairways:'56%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['Masters 2020','US Open 2016','FedEx Cup 2020']},
-  'Maverick McNealy':{espn_id:'10471',nationalite:'🇺🇸 Américain',age:29,classement_mondial:52,palmares_majeurs:0,turned_pro:2018,meilleur_resultat_masters:'Première participation',bio:"Issu de Stanford, Maverick McNealy allie intelligence et talent sportif. Vainqueur sur le PGA Tour, il s'impose progressivement parmi les meilleurs Américains.",statistiques:{driving_distance:'291 yards',fairways:'63%',gir:'69%',putts_par_trou:'1.75'},palmares_liste:['Rocket Classic 2023']},
-  'Thorbjorn Olesen':{espn_id:'6542',nationalite:'🇩🇰 Danois',age:34,classement_mondial:66,palmares_majeurs:0,turned_pro:2011,meilleur_resultat_masters:'T20 2018',bio:"Le vétéran danois du golf européen. Membre de la Ryder Cup européenne, il retrouve son meilleur niveau après des années difficiles.",statistiques:{driving_distance:'295 yards',fairways:'60%',gir:'66%',putts_par_trou:'1.77'},palmares_liste:['Turkish Airlines Open 2017']},
-  'Matt Wallace':{espn_id:'10364',nationalite:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglais',age:34,classement_mondial:78,palmares_majeurs:0,turned_pro:2013,meilleur_resultat_masters:'Première participation',bio:"Joueur anglais compétitif sur le DP World Tour. Vainqueur de plusieurs titres en Europe, il cherche à s'imposer définitivement au niveau mondial.",statistiques:{driving_distance:'296 yards',fairways:'60%',gir:'65%',putts_par_trou:'1.77'},palmares_liste:['Hero Indian Open 2018']},
-  'Christiaan Bezuidenhout':{espn_id:'10823',nationalite:'🇿🇦 Sud-Africain',age:30,classement_mondial:57,palmares_majeurs:0,turned_pro:2016,meilleur_resultat_masters:'T35 2022',bio:"L'un des meilleurs Sud-Africains de sa génération. Vainqueur à plusieurs reprises sur le DP World Tour, notamment du South African Open.",statistiques:{driving_distance:'293 yards',fairways:'63%',gir:'68%',putts_par_trou:'1.75'},palmares_liste:['South African Open 2020, 2021']},
-  'Emiliano Grillo':{espn_id:'9573',nationalite:'🇦🇷 Argentin',age:31,classement_mondial:61,palmares_majeurs:0,turned_pro:2014,meilleur_resultat_masters:'T24 2016',bio:"La fierté du golf argentin. Régulier sur le PGA Tour depuis plusieurs années, il apporte une touche de classe avec son jeu élégant et précis.",statistiques:{driving_distance:'289 yards',fairways:'64%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['Frys.com Open 2015']},
-  'Nick Taylor':{espn_id:'5486',nationalite:'🇨🇦 Canadien',age:36,classement_mondial:41,palmares_majeurs:0,turned_pro:2012,meilleur_resultat_masters:'T28 2023',bio:"Sa victoire spectaculaire au Canadian Open 2023, avec un eagle mémorable au playoff, reste l'un des moments les plus forts du golf canadien.",statistiques:{driving_distance:'295 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.75'},palmares_liste:['Canadian Open 2023','AT&T Pebble Beach 2014']},
-  'Denny McCarthy':{espn_id:'9156',nationalite:'🇺🇸 Américain',age:31,classement_mondial:47,palmares_majeurs:0,turned_pro:2015,meilleur_resultat_masters:'T30 2023',bio:"Reconnu comme l'un des meilleurs putteurs du PGA Tour. Sa précision légendaire sur les greens compense un jeu long moins explosif.",statistiques:{driving_distance:'287 yards',fairways:'64%',gir:'67%',putts_par_trou:'1.70'},palmares_liste:['RBC Heritage 2024']},
-  'J.T. Poston':{espn_id:'10162',nationalite:'🇺🇸 Américain',age:30,classement_mondial:54,palmares_majeurs:0,turned_pro:2016,meilleur_resultat_masters:'T30 2022',bio:"Joueur solide et régulier du PGA Tour. Vainqueur du Wyndham Championship et du John Deere Classic, il continue sa progression.",statistiques:{driving_distance:'289 yards',fairways:'65%',gir:'68%',putts_par_trou:'1.74'},palmares_liste:['Wyndham Championship 2019','John Deere Classic 2023']},
-  'Tom Hoge':{espn_id:'9116',nationalite:'🇺🇸 Américain',age:34,classement_mondial:67,palmares_majeurs:0,turned_pro:2013,meilleur_resultat_masters:'T35 2022',bio:"Joueur précis et régulier du PGA Tour. Vainqueur de l'AT&T Pebble Beach 2022, il est reconnu pour sa constance sur les grands parcours.",statistiques:{driving_distance:'290 yards',fairways:'64%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['AT&T Pebble Beach Pro-Am 2022']},
-  'Chris Kirk':{espn_id:'4394',nationalite:'🇺🇸 Américain',age:38,classement_mondial:71,palmares_majeurs:0,turned_pro:2008,meilleur_resultat_masters:'T20 2024',bio:"Une belle histoire de comeback. Après sa lutte contre l'addiction, Kirk est revenu au plus haut niveau pour remporter le Honda Classic 2023.",statistiques:{driving_distance:'288 yards',fairways:'63%',gir:'67%',putts_par_trou:'1.75'},palmares_liste:['Honda Classic 2023']},
-  'Martin Couvra':{espn_id:'11901',nationalite:'🇫🇷 Français',age:25,classement_mondial:88,palmares_majeurs:0,turned_pro:2021,meilleur_resultat_masters:'Première participation',bio:"La révélation du golf français. Ce jeune talent hexagonal a décroché sa qualification pour les Masters et représente fièrement la France à Augusta.",statistiques:{driving_distance:'293 yards',fairways:'60%',gir:'65%',putts_par_trou:'1.77'},palmares_liste:['Open de France 2024']},
-  'Nick Dunlap':{espn_id:'11923',nationalite:'🇺🇸 Américain',age:20,classement_mondial:59,palmares_majeurs:0,turned_pro:2024,meilleur_resultat_masters:'Première participation',bio:"À 20 ans, ce phénomène a remporté l'American Express en amateur avant de passer professionnel. Champion amateur en titre, il est l'un des plus grands espoirs du golf mondial.",statistiques:{driving_distance:'299 yards',fairways:'59%',gir:'68%',putts_par_trou:'1.74'},palmares_liste:['The American Express 2024','US Amateur 2023']},
-  'Jason Kokrak':{espn_id:'6229',nationalite:'🇺🇸 Américain',age:39,classement_mondial:100,palmares_majeurs:0,turned_pro:2008,meilleur_resultat_masters:'T15 2021',bio:"Long frappeur américain passé chez LIV Golf. Vainqueur de 3 titres sur le PGA Tour, il apporte son expérience et sa puissance de frappe.",statistiques:{driving_distance:'314 yards',fairways:'53%',gir:'65%',putts_par_trou:'1.77'},palmares_liste:['CJ Cup 2020','Houston Open 2020']},
-  'Matthieu Pavon':{espn_id:'11214',nationalite:'🇫🇷 Français',age:31,classement_mondial:45,palmares_majeurs:0,turned_pro:2015,meilleur_resultat_masters:'T28 2024',bio:"Premier Français à remporter un tournoi du PGA Tour depuis 1999. Sa victoire au Farmers Insurance Open 2024 a fait sensation et il porte les couleurs françaises avec fierté.",statistiques:{driving_distance:'299 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['Farmers Insurance Open 2024']},
-  'Stephan Jaeger':{espn_id:'9410',nationalite:'🇩🇪 Allemand',age:36,classement_mondial:63,palmares_majeurs:0,turned_pro:2012,meilleur_resultat_masters:'Première participation',bio:"Meilleur joueur allemand de sa génération. Après des années sur les circuits mineurs, il s'est imposé sur le PGA Tour et représente l'Allemagne avec fierté.",statistiques:{driving_distance:'292 yards',fairways:'62%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['Fortinet Championship 2022','Houston Open 2023']},
-  'Phil Mickelson':{espn_id:'1003',nationalite:'🇺🇸 Américain',age:54,classement_mondial:150,palmares_majeurs:6,turned_pro:1992,meilleur_resultat_masters:'Vainqueur 2004, 2006, 2010',bio:"Légende vivante avec 6 Majeurs. Ce gaucher spectaculaire a remporté le PGA Championship 2021 à 50 ans, devenant le plus vieux vainqueur d'un Major de l'histoire.",statistiques:{driving_distance:'295 yards',fairways:'54%',gir:'65%',putts_par_trou:'1.77'},palmares_liste:['Masters 2004, 2006, 2010','PGA Championship 2005, 2021','The Open 2013']},
-  'Adrien Saddier':{espn_id:'9285',nationalite:'🇫🇷 Français',age:33,classement_mondial:92,palmares_majeurs:0,turned_pro:2013,meilleur_resultat_masters:'Première participation',bio:"Représentant du golf français sur la scène internationale. Actif sur le DP World Tour, il a décroché sa qualification pour les Masters et représente l'Hexagone avec fierté.",statistiques:{driving_distance:'288 yards',fairways:'62%',gir:'65%',putts_par_trou:'1.77'},palmares_liste:['Open de Bretagne 2019']}
+  'Scottie Scheffler':{espn_id:'9478',nationalite:'🇺🇸 Américain',age:27,classement_mondial:1,palmares_majeurs:2,turned_pro:2018,meilleur_resultat_masters:'Vainqueur 2022, 2024',bio:"Numéro 1 mondial incontesté, Scottie Scheffler a dominé la saison 2024 de manière écrasante.",statistiques:{driving_distance:'318 yards',fairways:'57%',gir:'72%',putts_par_trou:'1.71'},palmares_liste:['Masters 2022, 2024','Players Championship 2024','Médaille d\'Or JO 2024']},
+  'Rory McIlroy':{espn_id:'3470',nationalite:'🇮🇪 Irlandais',age:35,classement_mondial:3,palmares_majeurs:4,turned_pro:2007,meilleur_resultat_masters:'2ème 2022',bio:"Le Masters reste le seul Major qui manque à Rory McIlroy pour compléter le Grand Chelem.",statistiques:{driving_distance:'320 yards',fairways:'54%',gir:'70%',putts_par_trou:'1.73'},palmares_liste:['US Open 2011','The Open 2014','PGA Championship 2012, 2014']},
+  'Jon Rahm':{espn_id:'9780',nationalite:'🇪🇸 Espagnol',age:30,classement_mondial:4,palmares_majeurs:2,turned_pro:2016,meilleur_resultat_masters:'Vainqueur 2023',bio:"Le géant basque a remporté Augusta en 2023 de façon magistrale.",statistiques:{driving_distance:'308 yards',fairways:'58%',gir:'71%',putts_par_trou:'1.74'},palmares_liste:['Masters 2023','US Open 2021']},
+  'Xander Schauffele':{espn_id:'9003',nationalite:'🇺🇸 Américain',age:30,classement_mondial:2,palmares_majeurs:2,turned_pro:2015,meilleur_resultat_masters:'2ème 2019',bio:"Longtemps le meilleur joueur sans Major, Schauffele a tout raflé en 2024.",statistiques:{driving_distance:'305 yards',fairways:'60%',gir:'72%',putts_par_trou:'1.72'},palmares_liste:['PGA Championship 2024','The Open 2024','Médaille d\'Or JO 2020']},
+  'Ludvig Aberg':{espn_id:'11813',nationalite:'🇸🇪 Suédois',age:24,classement_mondial:6,palmares_majeurs:0,turned_pro:2023,meilleur_resultat_masters:'2ème 2024',bio:"La sensation suédoise. Passé professionnel en 2023, il a frôlé la victoire au Masters 2024.",statistiques:{driving_distance:'312 yards',fairways:'61%',gir:'71%',putts_par_trou:'1.74'},palmares_liste:['RSM Classic 2023','Hero World Challenge 2024']},
+  'Hideki Matsuyama':{espn_id:'5860',nationalite:'🇯🇵 Japonais',age:32,classement_mondial:14,palmares_majeurs:1,turned_pro:2013,meilleur_resultat_masters:'Vainqueur 2021',bio:"Icône du golf japonais, sa victoire au Masters 2021 a déclenché une ferveur nationale.",statistiques:{driving_distance:'296 yards',fairways:'56%',gir:'69%',putts_par_trou:'1.76'},palmares_liste:['Masters 2021']},
+  'Dustin Johnson':{espn_id:'3843',nationalite:'🇺🇸 Américain',age:40,classement_mondial:20,palmares_majeurs:2,turned_pro:2007,meilleur_resultat_masters:'Vainqueur 2020',bio:"Ancien numéro 1 mondial, vainqueur du Masters 2020 et de l'US Open 2016.",statistiques:{driving_distance:'314 yards',fairways:'56%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['Masters 2020','US Open 2016']},
+  'Brooks Koepka':{espn_id:'5765',nationalite:'🇺🇸 Américain',age:34,classement_mondial:25,palmares_majeurs:5,turned_pro:2012,meilleur_resultat_masters:'2ème 2019, 2023',bio:"Le spécialiste des Majeurs par excellence. Avec 5 titres en Grand Chelem.",statistiques:{driving_distance:'313 yards',fairways:'55%',gir:'68%',putts_par_trou:'1.76'},palmares_liste:['US Open 2017, 2018','PGA Championship 2018, 2019']},
+  'Phil Mickelson':{espn_id:'1003',nationalite:'🇺🇸 Américain',age:54,classement_mondial:150,palmares_majeurs:6,turned_pro:1992,meilleur_resultat_masters:'Vainqueur 2004, 2006, 2010',bio:"Légende vivante avec 6 Majeurs. Vainqueur du PGA Championship 2021 à 50 ans.",statistiques:{driving_distance:'295 yards',fairways:'54%',gir:'65%',putts_par_trou:'1.77'},palmares_liste:['Masters 2004, 2006, 2010','PGA Championship 2005, 2021','The Open 2013']},
+  'Sergio Garcia':{espn_id:'1120',nationalite:'🇪🇸 Espagnol',age:45,classement_mondial:95,palmares_majeurs:1,turned_pro:1999,meilleur_resultat_masters:'Vainqueur 2017',bio:"Légende espagnole du golf avec plus de 35 ans de carrière.",statistiques:{driving_distance:'291 yards',fairways:'61%',gir:'66%',putts_par_trou:'1.76'},palmares_liste:['Masters 2017','Players Championship 2008']},
+  'Matthieu Pavon':{espn_id:'11214',nationalite:'🇫🇷 Français',age:31,classement_mondial:45,palmares_majeurs:0,turned_pro:2015,meilleur_resultat_masters:'T28 2024',bio:"Premier Français à remporter un tournoi du PGA Tour depuis 1999.",statistiques:{driving_distance:'299 yards',fairways:'61%',gir:'67%',putts_par_trou:'1.76'},palmares_liste:['Farmers Insurance Open 2024']}
 };
 
-// ---- PLAYER CARD ----
 function openPlayerCard(nom){
   const modal=document.createElement('div');
-  modal.className='player-modal';
-  modal.id='player-modal';
+  modal.className='player-modal';modal.id='player-modal';
   document.body.appendChild(modal);
   modal.addEventListener('click',e=>{if(e.target===modal) closePlayerCard();});
   const score=getScore(nom);
@@ -981,39 +625,19 @@ function openPlayerCard(nom){
   if(info) info.photo_url=`https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${info.espn_id}.png&w=200&h=146`;
   renderPlayerCard(info,nom,score,chapeau);
 }
-
 function renderPlayerCard(info,nom,score,chapeau){
-  const modal=document.getElementById('player-modal');
-  if(!modal) return;
+  const modal=document.getElementById('player-modal');if(!modal) return;
   const sc=fmtScore(score),cls=scoreClass(score);
   if(!info){
-    modal.innerHTML=`<div class="player-sheet" style="position:relative">
-      <button class="player-close" onclick="closePlayerCard()">✕</button>
-      <div class="player-header">
-        <div class="player-photo-placeholder">🏌️</div>
-        <div><div class="player-name-h">${nom}</div><div class="player-name-sub">Chapeau ${chapeau}</div></div>
-      </div>
-      <div class="player-stats-grid">
-        <div class="pstat"><div class="pstat-val ${cls}">${sc}</div><div class="pstat-lbl">Score Masters</div></div>
-        <div class="pstat"><div class="pstat-val">C${chapeau}</div><div class="pstat-lbl">Chapeau</div></div>
-      </div></div>`;
+    modal.innerHTML=`<div class="player-sheet" style="position:relative"><button class="player-close" onclick="closePlayerCard()">✕</button><div class="player-header"><div class="player-photo-placeholder">🏌️</div><div><div class="player-name-h">${nom}</div><div class="player-name-sub">Chapeau ${chapeau}</div></div></div><div class="player-stats-grid"><div class="pstat"><div class="pstat-val ${cls}">${sc}</div><div class="pstat-lbl">Score Masters</div></div><div class="pstat"><div class="pstat-val">C${chapeau}</div><div class="pstat-lbl">Chapeau</div></div></div></div>`;
     return;
   }
-  const photoHtml=info.photo_url
-    ?`<img class="player-photo" src="${info.photo_url}" onerror="this.outerHTML='<div class=\\'player-photo-placeholder\\'>🏌️</div>'" alt="${nom}">`
-    :`<div class="player-photo-placeholder">🏌️</div>`;
+  const photoHtml=info.photo_url?`<img class="player-photo" src="${info.photo_url}" onerror="this.outerHTML='<div class=\\'player-photo-placeholder\\'>🏌️</div>'" alt="${nom}">`:`<div class="player-photo-placeholder">🏌️</div>`;
   const s=info.statistiques||{};
   const palmares=(info.palmares_liste||[]).slice(0,5).map(p=>`<div class="palmares-item">🏆 ${p}</div>`).join('');
   modal.innerHTML=`<div class="player-sheet" style="position:relative">
     <button class="player-close" onclick="closePlayerCard()">✕</button>
-    <div class="player-header">
-      ${photoHtml}
-      <div>
-        <div class="player-name-h">${nom}</div>
-        <div class="player-name-sub">${info.nationalite||''} · ${info.age?info.age+' ans':''}</div>
-        <div style="font-size:12px;color:var(--gold);margin-top:3px;letter-spacing:1px">Chapeau ${chapeau}</div>
-      </div>
-    </div>
+    <div class="player-header">${photoHtml}<div><div class="player-name-h">${nom}</div><div class="player-name-sub">${info.nationalite||''} · ${info.age?info.age+' ans':''}</div><div style="font-size:12px;color:var(--gold);margin-top:3px;letter-spacing:1px">Chapeau ${chapeau}</div></div></div>
     <div class="player-stats-grid">
       <div class="pstat"><div class="pstat-val ${cls}">${sc}</div><div class="pstat-lbl">Score Masters</div></div>
       <div class="pstat"><div class="pstat-val">#${info.classement_mondial||'?'}</div><div class="pstat-lbl">Classement</div></div>
@@ -1022,12 +646,7 @@ function renderPlayerCard(info,nom,score,chapeau){
     </div>
     ${info.meilleur_resultat_masters?`<div style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:2px;padding:10px;margin-bottom:14px;font-size:13px;text-align:center;font-style:italic">⛳ Masters : <strong style="color:var(--gold)">${info.meilleur_resultat_masters}</strong></div>`:''}
     <p class="player-bio">${info.bio||''}</p>
-    ${s.driving_distance?`<div class="player-stats-grid" style="margin-bottom:14px">
-      <div class="pstat"><div class="pstat-val" style="font-size:15px">${s.driving_distance}</div><div class="pstat-lbl">Drive</div></div>
-      <div class="pstat"><div class="pstat-val" style="font-size:15px">${s.fairways||'?'}</div><div class="pstat-lbl">Fairways</div></div>
-      <div class="pstat"><div class="pstat-val" style="font-size:15px">${s.gir||'?'}</div><div class="pstat-lbl">GIR</div></div>
-      <div class="pstat"><div class="pstat-val" style="font-size:15px">${s.putts_par_trou||'?'}</div><div class="pstat-lbl">Putts/trou</div></div>
-    </div>`:''}
+    ${s.driving_distance?`<div class="player-stats-grid" style="margin-bottom:14px"><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.driving_distance}</div><div class="pstat-lbl">Drive</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.fairways||'?'}</div><div class="pstat-lbl">Fairways</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.gir||'?'}</div><div class="pstat-lbl">GIR</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.putts_par_trou||'?'}</div><div class="pstat-lbl">Putts/trou</div></div></div>`:''}
     ${palmares?`<div style="margin-top:4px"><div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Palmarès</div>${palmares}</div>`:''}
   </div>`;
 }
@@ -1037,10 +656,7 @@ function closePlayerCard(){const m=document.getElementById('player-modal');if(m)
 async function loadNews(){
   newsLoaded=true;
   const el=document.getElementById('tab-news');
-  el.innerHTML=`<div style="text-align:center;padding:40px 20px">
-    <div class="typing-dots"><span>●</span><span>●</span><span>●</span></div>
-    <p style="color:var(--text-muted);font-size:14px;font-style:italic;margin-top:14px">Recherche des dernières actualités golf...</p>
-  </div>`;
+  el.innerHTML=`<div style="text-align:center;padding:40px 20px"><div class="typing-dots"><span>●</span><span>●</span><span>●</span></div><p style="color:var(--text-muted);font-size:14px;font-style:italic;margin-top:14px">Recherche des dernières actualités golf...</p></div>`;
   const joueursList=ALL_JOUEURS.join(', ');
   const prompt=`Tu es journaliste golf expert. Recherche les dernières actualités du golf mondial. Couvre : Masters 2025 (Augusta, favoris), PGA Tour (résultats récents), LIV Golf, Rumeurs/transferts, Stats/performances. Joueurs à mentionner si possible : ${joueursList}. Retourne UNIQUEMENT JSON sans markdown : {"sections":[{"titre":"Masters 2025","type":"masters","articles":[{"titre":"Titre en français","contenu":"3-4 phrases détaillées","tags":["Masters"]}]}]}. 5 sections, 2 articles chacune.`;
   try{
@@ -1050,15 +666,13 @@ async function loadNews(){
     const clean=txt.replace(/```json|```/g,'').trim();
     renderNews(JSON.parse(clean).sections||[]);
   }catch(e){
-    console.error(e);
     renderNews([
-      {titre:'Masters 2025',type:'masters',articles:[{titre:'Augusta se prépare pour son tournoi le plus attendu',contenu:"Le Masters Tournament 2025 se déroulera du 10 au 13 avril à Augusta National. Scottie Scheffler arrive en grand favori après une saison 2024 écrasante. Rory McIlroy tentera une nouvelle fois de compléter son Grand Chelem en carrière.",tags:['Masters','Scheffler','McIlroy']},{titre:'Les favoris 2025 : qui peut remporter la Veste Verte ?',contenu:"Scheffler, McIlroy, Schauffele et Åberg sont les grands favoris cette année. Jon Rahm, vainqueur sortant, revient défendre son titre après une année chez LIV Golf.",tags:['Masters','Favoris']}]},
-      {titre:'PGA Tour',type:'pga',articles:[{titre:'La saison 2025 offre déjà son lot de surprises',contenu:"Plusieurs joueurs de premier rang peinent à confirmer tandis que de jeunes talents s'affirment. La course aux FedEx Cup points s'annonce serrée.",tags:['PGA Tour']},{titre:'Les Français brillent sur le circuit américain',contenu:"Matthieu Pavon, vainqueur du Farmers Insurance Open 2024, continue de représenter fièrement le golf français. Adrien Saddier et Martin Couvra poursuivent leur progression.",tags:['PGA Tour','Pavon']}]},
-      {titre:'LIV Golf',type:'liv',articles:[{titre:'LIV Golf maintient la pression sur le golf mondial',contenu:"La ligue dissidente continue d'attirer l'attention avec ses formats innovants. Dustin Johnson, Jon Rahm et Phil Mickelson restent des figures emblématiques.",tags:['LIV Golf']},{titre:'L\'avenir du golf mondial en question',contenu:"Les négociations entre PGA Tour et LIV Golf semblent stagner. L'incertitude persiste quant à une éventuelle réunification du golf professionnel mondial.",tags:['LIV Golf','PGA Tour']}]}
+      {titre:'Masters 2025',type:'masters',articles:[{titre:'Augusta se prépare pour son tournoi le plus attendu',contenu:"Le Masters Tournament 2025 se déroulera du 10 au 13 avril à Augusta National. Scottie Scheffler arrive en grand favori après une saison 2024 écrasante.",tags:['Masters']},{titre:'Les favoris 2025',contenu:"Scheffler, McIlroy, Schauffele et Åberg sont les grands favoris cette année.",tags:['Masters','Favoris']}]},
+      {titre:'PGA Tour',type:'pga',articles:[{titre:'La saison 2025 bat son plein',contenu:"Plusieurs jeunes talents s'affirment sur le circuit américain cette saison.",tags:['PGA Tour']},{titre:'Les Français brillent',contenu:"Matthieu Pavon continue de représenter fièrement le golf français sur le PGA Tour.",tags:['PGA Tour','Pavon']}]},
+      {titre:'LIV Golf',type:'liv',articles:[{titre:'LIV Golf maintient la pression',contenu:"La ligue continue d'attirer l'attention avec ses formats innovants.",tags:['LIV Golf']},{titre:'L\'avenir du golf mondial',contenu:"Les négociations entre PGA Tour et LIV Golf semblent stagner.",tags:['LIV Golf']}]}
     ]);
   }
 }
-
 function renderNews(sections){
   const el=document.getElementById('tab-news');
   if(!sections||!sections.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Aucune actualité disponible</div>';return;}
@@ -1070,9 +684,7 @@ function renderNews(sections){
       html+=`<div class="news-card">${tags}<h4>${a.titre}</h4><p>${a.contenu}</p></div>`;
     });
   });
-  html+=`<div style="text-align:center;margin-top:16px">
-    <button class="btn btn-outline" onclick="newsLoaded=false;loadNews()" style="font-size:13px;letter-spacing:1px">Rafraîchir les actualités</button>
-  </div>`;
+  html+=`<div style="text-align:center;margin-top:16px"><button class="btn btn-outline" onclick="newsLoaded=false;loadNews()" style="font-size:13px;letter-spacing:1px">Rafraîchir les actualités</button></div>`;
   el.innerHTML=html;
 }
 
@@ -1098,25 +710,32 @@ async function loadAdminCodes(){
     const el=document.getElementById('admin-codes-list');
     if(!codes||!codes.length){el.innerHTML='<p style="font-size:13px;font-style:italic;color:var(--text-muted)">Aucun participant enregistré.</p>';return;}
     el.innerHTML=codes.map(c=>`<div class="admin-code-row">
-      <span style="font-style:italic">${c.nom}</span>
+      <div style="flex:1">
+        <div style="font-style:italic;font-size:14px">${c.nom}</div>
+        ${c.prenom_reel||c.nom_reel?`<div style="font-size:12px;color:var(--text-muted);margin-top:2px">${[c.prenom_reel,c.nom_reel].filter(Boolean).join(' ')}</div>`:''}
+      </div>
       <span class="code-badge">${c.code}</span>
       <button onclick="deleteCode('${c.nom.replace(/'/g,"\\'")}','${c.code}')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">✕</button>
     </div>`).join('');
   }catch(e){document.getElementById('admin-codes-list').innerHTML='<p style="font-size:13px;color:#e09090">Erreur de chargement</p>';}
 }
 async function addParticipantCode(){
-  const nom=document.getElementById('new-participant-nom').value.trim();
+  const prenom=document.getElementById('new-prenom').value.trim();
+  const nom=document.getElementById('new-nom').value.trim();
+  const pseudo=document.getElementById('new-participant-nom').value.trim();
   const code=document.getElementById('new-participant-code').value.trim();
-  if(!nom||!code){showMsg('admin-codes-msg','Prénom et code requis','error');return;}
+  if(!pseudo||!code){showMsg('admin-codes-msg','Pseudo et code requis','error');return;}
   try{
-    await sbFetch('codes_acces',{method:'POST',body:JSON.stringify({nom,code}),prefer:'return=minimal'});
+    await sbFetch('codes_acces',{method:'POST',body:JSON.stringify({nom:pseudo,code,prenom_reel:prenom||null,nom_reel:nom||null}),prefer:'return=minimal'});
+    document.getElementById('new-prenom').value='';
+    document.getElementById('new-nom').value='';
     document.getElementById('new-participant-nom').value='';
     document.getElementById('new-participant-code').value='';
-    showMsg('admin-codes-msg',`✓ ${nom} ajouté avec le code ${code}`,'success');
+    showMsg('admin-codes-msg',`✓ ${pseudo} ajouté`,'success');
     loadAdminCodes();
-  }catch(e){showMsg('admin-codes-msg','Erreur — ce participant existe peut-être déjà','error');console.error(e);}
+  }catch(e){showMsg('admin-codes-msg','Erreur — ce pseudo existe peut-être déjà','error');console.error(e);}
 }
-async function deleteCode(nom,code){
+async function deleteCode(nom){
   if(!confirm(`Supprimer ${nom} ?`)) return;
   try{
     await sbFetch(`codes_acces?nom=eq.${encodeURIComponent(nom)}`,{method:'DELETE',prefer:'return=minimal'});
@@ -1129,10 +748,7 @@ async function syncESPN(){
   showMsg('sync-msg',ok?`✓ ${Object.keys(espnScores).length} joueurs synchronisés`:'Erreur de synchronisation',ok?'success':'error');
 }
 
-// Init
-document.addEventListener('DOMContentLoaded',()=>{
-  showScreen('screen-accueil');
-});
+document.addEventListener('DOMContentLoaded',()=>{showScreen('screen-accueil');});
 </script>
 </body>
 </html>
