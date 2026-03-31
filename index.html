@@ -587,9 +587,10 @@ async function goClassement(){
   if(refreshTimer) clearInterval(refreshTimer);
   try{
     const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');
-    const isOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
-    renderMainTabs(isOpen);
-    if(isOpen){
+    const selectionsOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
+    const tournamentStarted=!selectionsOpen;
+    renderMainTabs(tournamentStarted);
+    if(tournamentStarted){
       refreshTimer=setInterval(async()=>{await fetchESPNScores();await loadClassement();},REFRESH_INTERVAL);
       await loadClassement();
       switchTab('classement');
