@@ -193,6 +193,7 @@ input::placeholder { color:rgba(168,196,168,0.4); }
       </div>
       <button class="btn btn-gold mt" onclick="handleAccueil()">Accéder · Mes sélections</button>
       <button class="toggle-link" onclick="toggleForm()">Première visite ? Créer un compte</button>
+      <button class="toggle-link" style="color:var(--text-muted);font-size:13px;margin-top:4px" onclick="showForgotForm(true)">Code oublié ?</button>
     </div>
 
     <!-- INSCRIPTION -->
@@ -213,8 +214,23 @@ input::placeholder { color:rgba(168,196,168,0.4); }
         <label class="input-label">Code d'accès personnel</label>
         <input type="text" id="reg-code" placeholder="Ex : Pierre2025" maxlength="20">
       </div>
+      <div class="input-group">
+        <label class="input-label">Email (pour récupérer votre code)</label>
+        <input type="email" id="reg-email" placeholder="Ex : pierre@email.com" maxlength="100">
+      </div>
       <button class="btn btn-gold mt" onclick="handleInscription()">Créer mon compte</button>
       <button class="toggle-link" onclick="toggleForm()">Déjà inscrit ? Se connecter</button>
+    </div>
+
+    <!-- CODE OUBLIÉ -->
+    <div id="form-forgot" style="display:none">
+      <p style="text-align:center;font-style:italic;color:var(--text-muted);margin-bottom:16px;font-size:15px">Entrez votre email pour retrouver votre code d'accès.</p>
+      <div class="input-group">
+        <label class="input-label">Votre adresse email</label>
+        <input type="email" id="forgot-email" placeholder="Ex : pierre@email.com" maxlength="100">
+      </div>
+      <button class="btn btn-gold mt" onclick="handleForgotCode()">Retrouver mon code</button>
+      <button class="toggle-link" onclick="showForgotForm(false)">← Retour à la connexion</button>
     </div>
 
     <div class="divider"></div>
@@ -397,7 +413,15 @@ function toggleForm(){
   showingInscription=!showingInscription;
   document.getElementById('form-connexion').style.display=showingInscription?'none':'block';
   document.getElementById('form-inscription').style.display=showingInscription?'block':'none';
+  document.getElementById('form-forgot').style.display='none';
   document.getElementById('msg-accueil').innerHTML='';
+}
+function showForgotForm(show){
+  document.getElementById('form-connexion').style.display=show?'none':'block';
+  document.getElementById('form-inscription').style.display='none';
+  document.getElementById('form-forgot').style.display=show?'block':'none';
+  document.getElementById('msg-accueil').innerHTML='';
+  showingInscription=false;
 }
 
 // ---- ESPN ----
@@ -411,19 +435,34 @@ async function fetchESPNScores(){
   }catch(e){console.error(e);return false;}
 }
 
+// ---- CODE OUBLIÉ ----
+async function handleForgotCode(){
+  const email=document.getElementById('forgot-email').value.trim();
+  if(!email){showMsg('msg-accueil','Veuillez entrer votre adresse email.','error');return;}
+  showMsg('msg-accueil','Recherche en cours...','info');
+  try{
+    const res=await sbFetch(`codes_acces?email=eq.${encodeURIComponent(email)}&select=nom,code,prenom_reel`);
+    if(!res||res.length===0){showMsg('msg-accueil','Aucun compte trouvé avec cet email.','error');return;}
+    const u=res[0];
+    showMsg('msg-accueil',`✓ Compte trouvé !<br>Pseudo : <strong>${u.nom}</strong><br>Code d'accès : <strong>${u.code}</strong>`,'success');
+  }catch(e){showMsg('msg-accueil','Erreur lors de la recherche. Réessayez.','error');console.error(e);}
+}
+
 // ---- INSCRIPTION ----
 async function handleInscription(){
   const prenom=document.getElementById('reg-prenom').value.trim();
   const nom=document.getElementById('reg-nom').value.trim();
   const pseudo=document.getElementById('reg-pseudo').value.trim();
   const code=document.getElementById('reg-code').value.trim();
-  if(!prenom||!nom||!pseudo||!code){showMsg('msg-accueil','Tous les champs sont requis.','error');return;}
+  const email=document.getElementById('reg-email').value.trim();
+  if(!prenom||!nom||!pseudo||!code||!email){showMsg('msg-accueil','Tous les champs sont requis.','error');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showMsg('msg-accueil','Adresse email invalide.','error');return;}
   showMsg('msg-accueil','Création du compte...','info');
   try{
     // Vérifier que le pseudo n'existe pas déjà
     const existing=await sbFetch(`codes_acces?nom=eq.${encodeURIComponent(pseudo)}&select=id`);
     if(existing&&existing.length>0){showMsg('msg-accueil','Ce pseudo est déjà pris. Choisissez-en un autre.','error');return;}
-    await sbFetch('codes_acces',{method:'POST',body:JSON.stringify({nom:pseudo,code,prenom_reel:prenom,nom_reel:nom}),prefer:'return=minimal'});
+    await sbFetch('codes_acces',{method:'POST',body:JSON.stringify({nom:pseudo,code,prenom_reel:prenom,nom_reel:nom,email}),prefer:'return=minimal'});
     showMsg('msg-accueil',`✓ Compte créé ! Bienvenue ${pseudo}.`,'success');
     // Auto-connexion
     currentUser=pseudo;currentCode=code;
