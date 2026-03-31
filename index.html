@@ -690,9 +690,54 @@ function openPlayerCard(nom){
   const score=getScore(nom);
   const chapeau=Object.entries(JOUEURS).find(([c,js])=>js.includes(nom))?.[0]||'?';
   const info=PLAYER_DATA[nom]||null;
-  if(info) info.photo_url=`https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${info.espn_id}.png&w=200&h=146`;
-  renderPlayerCard(info,nom,score,chapeau);
-  loadPlayerNews(nom);
+  if(info){
+    info.photo_url=`https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${info.espn_id}.png&w=200&h=146`;
+    renderPlayerCard(info,nom,score,chapeau);
+    loadPlayerNews(nom);
+  } else {
+    const sc=fmtScore(score),cls=scoreClass(score);
+    modal.innerHTML=`<div class="player-sheet" style="position:relative">
+      <button class="player-close" onclick="closePlayerCard()">✕</button>
+      <div class="player-header"><div class="player-photo-placeholder">🏌️</div>
+        <div><div class="player-name-h">${nom}</div><div class="player-name-sub">Chapeau ${chapeau}</div></div>
+      </div>
+      <div class="player-stats-grid">
+        <div class="pstat"><div class="pstat-val ${cls}">${sc}</div><div class="pstat-lbl">Score Masters</div></div>
+        <div class="pstat"><div class="pstat-val">C${chapeau}</div><div class="pstat-lbl">Chapeau</div></div>
+      </div>
+      <div id="player-dynamic-info" style="text-align:center;padding:16px;color:var(--text-muted);font-style:italic;font-size:13px">Chargement des informations...</div>
+    </div>`;
+    loadDynamicPlayerInfo(nom);
+  }
+}
+async function loadDynamicPlayerInfo(nom){
+  const modal=document.getElementById('player-modal');
+  if(!modal) return;
+  const target=document.getElementById('player-dynamic-info');
+  if(!target) return;
+  const prompt=`Recherche des informations sur le golfeur professionnel ${nom}. Retourne UNIQUEMENT ce JSON sans markdown: {"nationalite":"ex: 🇺🇸 Américain","age":30,"classement_mondial":50,"palmares_majeurs":0,"turned_pro":2015,"meilleur_resultat_masters":"ex: T30 2024","bio":"2-3 phrases en français sur ce joueur","palmares_liste":["Titre 1"],"news":["Actualité récente 1","Actualité récente 2"]}`;
+  try{
+    const response=await fetch(ESPN_PROXY+'claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]})});
+    const data=await response.json();
+    const txt=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    const d=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    const palmares=(d.palmares_liste||[]).slice(0,4).map(p=>`<div class="palmares-item">🏆 ${p}</div>`).join('');
+    const news=(d.news||[]).map(n=>`<div style="font-size:14px;color:var(--text);padding:8px 0;border-bottom:1px solid rgba(201,168,76,0.1);line-height:1.5">• ${n}</div>`).join('');
+    target.outerHTML=`
+      <div class="player-stats-grid">
+        <div class="pstat"><div class="pstat-val">${d.nationalite||'?'}</div><div class="pstat-lbl">Nationalité</div></div>
+        <div class="pstat"><div class="pstat-val">#${d.classement_mondial||'?'}</div><div class="pstat-lbl">Classement</div></div>
+        <div class="pstat"><div class="pstat-val">${d.palmares_majeurs||0}</div><div class="pstat-lbl">Majeurs</div></div>
+        <div class="pstat"><div class="pstat-val">${d.turned_pro||'?'}</div><div class="pstat-lbl">Pro depuis</div></div>
+      </div>
+      ${d.meilleur_resultat_masters?`<div style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:2px;padding:10px;margin-bottom:14px;font-size:13px;text-align:center;font-style:italic">⛳ Masters : <strong style="color:var(--gold)">${d.meilleur_resultat_masters}</strong></div>`:''}
+      <p class="player-bio">${d.bio||''}</p>
+      ${palmares?`<div style="margin-bottom:14px"><div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Palmarès</div>${palmares}</div>`:''}
+      ${news?`<div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-top:16px;margin-bottom:10px">Dernières actualités</div>${news}`:''}
+    `;
+  }catch(e){
+    if(target) target.innerHTML='<div style="color:var(--text-muted);font-style:italic;font-size:13px">Informations non disponibles</div>';
+  }
 }
 async function loadPlayerNews(nom){
   const modal=document.getElementById('player-modal');
@@ -821,11 +866,11 @@ async function loadNews(){
   el.innerHTML=`<div style="text-align:center;padding:40px 20px"><div class="typing-dots"><span>●</span><span>●</span><span>●</span></div><p style="color:var(--text-muted);font-size:14px;font-style:italic;margin-top:14px">Chargement des vidéos golf...</p></div>`;
   const prompt=`Recherche sur YouTube les 5 meilleures vidéos récentes (2025-2026) sur le Masters Augusta ou le golf : highlights, meilleurs coups, moments forts, shots incroyables. Retourne UNIQUEMENT ce JSON valide sans markdown ni explication: {"videos":[{"id":"YOUTUBE_VIDEO_ID","titre":"Titre de la vidéo"}]}`;
   const fallbackVideos=[
-    {id:'vOkBFbDuNQE',titre:'Masters 2024 - Final Round Highlights'},
-    {id:'NxBQHbKbGTc',titre:'Best Shots of The Masters 2024'},
-    {id:'cspwHr1rNUQ',titre:'Masters 2023 - Jon Rahm Champion'},
-    {id:'mV3a1IgIJjQ',titre:'Top 10 Shots at Augusta National'},
-    {id:'FU2-uSQFiWQ',titre:'Golf Greatest Moments at The Masters'}
+    {id:'u7rJfDRQ11E',titre:'Masters 2024 - Scottie Scheffler Wins'},
+    {id:'UCTtHCgfVKI',titre:'Masters 2023 - Jon Rahm Final Round'},
+    {id:'9_xBMIkT9AM',titre:'Masters 2022 - Scottie Scheffler Champion'},
+    {id:'PvB0G2GQUIM',titre:'Masters 2021 - Hideki Matsuyama'},
+    {id:'6JMDRiCrNc4',titre:'Greatest Masters Moments Ever'}
   ];
   try{
     const response=await fetch(ESPN_PROXY+'claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]})});
@@ -844,11 +889,12 @@ function renderYoutubeVideos(videos){
   }
   let html=`<div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Vidéos & Highlights</div>`;
   videos.forEach(v=>{
-    html+=`<div style="margin-bottom:24px">
+    html+=`<div style="margin-bottom:24px" id="vid-${v.id}">
       <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:2px;border:1px solid rgba(201,168,76,0.2)">
-        <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/${v.id}?rel=0" title="${v.titre}" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+        <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube-nocookie.com/embed/${v.id}?rel=0" title="${v.titre}" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
       </div>
       <div style="font-size:14px;color:var(--text-muted);margin-top:8px;font-style:italic;line-height:1.4">${v.titre}</div>
+      <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" style="font-size:12px;color:var(--gold);text-decoration:none;letter-spacing:1px">▶ Voir sur YouTube</a>
     </div>`;
   });
   html+=`<div style="text-align:center;margin-top:8px"><button class="btn btn-outline" onclick="newsLoaded=false;loadNews()" style="font-size:13px;letter-spacing:1px">Rafraîchir</button></div>`;
