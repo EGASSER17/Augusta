@@ -664,6 +664,7 @@ function switchTab(tab){
   allTabs.forEach(t=>{const el=document.getElementById('tab-'+t);if(el) el.style.display=t===tab?'block':'none';});
   if(tab==='news'&&!newsLoaded) loadNews();
   if(tab==='selection'&&!selectionTabLoaded) loadMaSelection();
+  if(tab==='scores'&&!document.getElementById('tab-scores').innerHTML.trim()) loadJoueursList();
 }
 
 // ---- PLAYER DATA ----
@@ -791,19 +792,40 @@ async function loadMaSelection(){
   }catch(e){el.innerHTML='<div class="msg error">Erreur de chargement</div>';console.error(e);}
 }
 
+// ---- JOUEURS LIST (pré-tournoi) ----
+function loadJoueursList(){
+  let html='<div class="card">';
+  ALL_JOUEURS.forEach(n=>{
+    html+=`<div class="score-item" onclick="openPlayerCard('${n.replace(/'/g,"\\'")}')">
+      <span style="font-size:14px;font-style:italic">⛳ ${n}</span>
+      <span style="color:var(--text-muted);font-size:18px">›</span>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('tab-scores').innerHTML=html;
+}
+
 // ---- NEWS (YOUTUBE) ----
 async function loadNews(){
   newsLoaded=true;
   const el=document.getElementById('tab-news');
   el.innerHTML=`<div style="text-align:center;padding:40px 20px"><div class="typing-dots"><span>●</span><span>●</span><span>●</span></div><p style="color:var(--text-muted);font-size:14px;font-style:italic;margin-top:14px">Chargement des vidéos golf...</p></div>`;
   const prompt=`Recherche sur YouTube les 5 meilleures vidéos récentes (2025-2026) sur le Masters Augusta ou le golf : highlights, meilleurs coups, moments forts, shots incroyables. Retourne UNIQUEMENT ce JSON valide sans markdown ni explication: {"videos":[{"id":"YOUTUBE_VIDEO_ID","titre":"Titre de la vidéo"}]}`;
+  const fallbackVideos=[
+    {id:'vOkBFbDuNQE',titre:'Masters 2024 - Final Round Highlights'},
+    {id:'NxBQHbKbGTc',titre:'Best Shots of The Masters 2024'},
+    {id:'cspwHr1rNUQ',titre:'Masters 2023 - Jon Rahm Champion'},
+    {id:'mV3a1IgIJjQ',titre:'Top 10 Shots at Augusta National'},
+    {id:'FU2-uSQFiWQ',titre:'Golf Greatest Moments at The Masters'}
+  ];
   try{
     const response=await fetch(ESPN_PROXY+'claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]})});
     const data=await response.json();
     const txt=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
     const clean=txt.replace(/```json|```/g,'').trim();
-    renderYoutubeVideos(JSON.parse(clean).videos||[]);
-  }catch(e){renderYoutubeVideos([]);}
+    const videos=JSON.parse(clean).videos||[];
+    renderYoutubeVideos(videos.length?videos:fallbackVideos);
+  }catch(e){renderYoutubeVideos(fallbackVideos);}
 }
 function renderYoutubeVideos(videos){
   const el=document.getElementById('tab-news');
