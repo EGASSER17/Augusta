@@ -270,13 +270,14 @@ input::placeholder { color:rgba(168,196,168,0.4); }
     <div class="header-divider"></div>
   </div>
   <div class="content">
-    <div class="tabs">
+    <div class="tabs" id="main-tabs">
       <div class="tab active" onclick="switchTab('classement')">Classement</div>
       <div class="tab" onclick="switchTab('scores')">Joueurs</div>
       <div class="tab" onclick="switchTab('news')">Actualités</div>
     </div>
     <div id="refresh-info" class="refresh-info"></div>
     <div id="tab-classement"></div>
+    <div id="tab-selection" style="display:none"></div>
     <div id="tab-scores" style="display:none"></div>
     <div id="tab-news" style="display:none"></div>
     <div class="divider"></div>
@@ -379,7 +380,7 @@ const NB_CHAPEAUX=4;
 
 let currentUser='',currentCode='',currentChapeau=1,isEditMode=false;
 let selections={1:[],2:[],3:[],4:[]};
-let espnScores={},refreshTimer=null,lastUpdated=null,newsLoaded=false;
+let espnScores={},refreshTimer=null,lastUpdated=null,newsLoaded=false,selectionTabLoaded=false,tournamentIsOpen=false;
 let showingInscription=false;
 
 // ---- SUPABASE ----
@@ -571,11 +572,34 @@ async function submitSelections(){
 }
 
 // ---- CLASSEMENT ----
+function renderMainTabs(isOpen){
+  tournamentIsOpen=isOpen;
+  const el=document.getElementById('main-tabs');
+  if(isOpen){
+    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div>`;
+  } else {
+    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('news')">Actualités</div>`;
+  }
+}
 async function goClassement(){
-  showScreen('screen-classement');switchTab('classement');newsLoaded=false;
+  showScreen('screen-classement');
+  newsLoaded=false;selectionTabLoaded=false;
   if(refreshTimer) clearInterval(refreshTimer);
-  refreshTimer=setInterval(async()=>{await fetchESPNScores();await loadClassement();},REFRESH_INTERVAL);
-  await loadClassement();
+  try{
+    const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');
+    const isOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
+    renderMainTabs(isOpen);
+    if(isOpen){
+      refreshTimer=setInterval(async()=>{await fetchESPNScores();await loadClassement();},REFRESH_INTERVAL);
+      await loadClassement();
+      switchTab('classement');
+    } else {
+      switchTab('selection');
+    }
+  }catch(e){
+    renderMainTabs(false);
+    switchTab('selection');
+  }
 }
 async function loadClassement(){
   document.getElementById('tab-classement').innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Chargement...</div>';
@@ -632,10 +656,13 @@ async function loadClassement(){
 }
 function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
 function switchTab(tab){
-  const tabs=['classement','scores','news'];
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
-  tabs.forEach(t=>{const el=document.getElementById('tab-'+t);if(el) el.style.display=t===tab?'block':'none';});
+  const allTabs=['classement','selection','scores','news'];
+  document.querySelectorAll('#main-tabs .tab').forEach(el=>{
+    el.classList.toggle('active',el.getAttribute('onclick')===`switchTab('${tab}')`);
+  });
+  allTabs.forEach(t=>{const el=document.getElementById('tab-'+t);if(el) el.style.display=t===tab?'block':'none';});
   if(tab==='news'&&!newsLoaded) loadNews();
+  if(tab==='selection'&&!selectionTabLoaded) loadMaSelection();
 }
 
 // ---- PLAYER DATA ----
@@ -663,6 +690,27 @@ function openPlayerCard(nom){
   const info=PLAYER_DATA[nom]||null;
   if(info) info.photo_url=`https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${info.espn_id}.png&w=200&h=146`;
   renderPlayerCard(info,nom,score,chapeau);
+  loadPlayerNews(nom);
+}
+async function loadPlayerNews(nom){
+  const modal=document.getElementById('player-modal');
+  if(!modal) return;
+  const sheet=modal.querySelector('.player-sheet');
+  if(!sheet) return;
+  const newsDiv=document.createElement('div');
+  newsDiv.innerHTML=`<div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-top:16px;margin-bottom:10px">Dernières actualités</div><div style="text-align:center;padding:12px;color:var(--text-muted);font-style:italic;font-size:13px">Chargement...</div>`;
+  sheet.appendChild(newsDiv);
+  const prompt=`Recherche les 3 dernières actualités récentes (2025-2026) sur le golfeur ${nom}. Performances récentes, forme du moment, objectifs pour le Masters. Retourne UNIQUEMENT ce JSON sans markdown: {"news":["Actualité 1 en 1-2 phrases","Actualité 2","Actualité 3"]}`;
+  try{
+    const response=await fetch(ESPN_PROXY+'claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]})});
+    const data=await response.json();
+    const txt=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    const clean=txt.replace(/```json|```/g,'').trim();
+    const items=(JSON.parse(clean).news||[]).map(n=>`<div style="font-size:14px;color:var(--text);padding:8px 0;border-bottom:1px solid rgba(201,168,76,0.1);line-height:1.5">• ${n}</div>`).join('');
+    newsDiv.innerHTML=`<div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-top:16px;margin-bottom:10px">Dernières actualités</div>${items||'<div style="color:var(--text-muted);font-style:italic;font-size:13px">Aucune actualité disponible</div>'}`;
+  }catch(e){
+    newsDiv.innerHTML=`<div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-top:16px;margin-bottom:10px">Dernières actualités</div><div style="color:var(--text-muted);font-style:italic;font-size:13px">Actualités non disponibles</div>`;
+  }
 }
 function renderPlayerCard(info,nom,score,chapeau){
   const modal=document.getElementById('player-modal');if(!modal) return;
@@ -691,39 +739,87 @@ function renderPlayerCard(info,nom,score,chapeau){
 }
 function closePlayerCard(){const m=document.getElementById('player-modal');if(m) m.remove();}
 
-// ---- NEWS ----
+// ---- MA SÉLECTION ----
+async function loadMaSelection(){
+  selectionTabLoaded=true;
+  const el=document.getElementById('tab-selection');
+  if(!currentUser){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Connectez-vous pour voir vos sélections.</div>';
+    return;
+  }
+  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-style:italic">Chargement...</div>';
+  try{
+    const participant=await sbFetch(`participants?nom=eq.${encodeURIComponent(currentUser)}&select=*`);
+    if(!participant||participant.length===0){
+      el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Aucune sélection trouvée.</div>';
+      return;
+    }
+    const p=participant[0];
+    const joueurs=[p.c1a,p.c1b,p.c2a,p.c2b,p.c3a,p.c3b,p.c4a,p.c4b].filter(Boolean);
+    let html=`<div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px">Mes 8 joueurs</div>`;
+    if(tournamentIsOpen){
+      const scored=joueurs.map(j=>({nom:j,score:getScore(j)??999}));
+      scored.sort((a,b)=>a.score-b.score);
+      const best4Set=new Set(scored.slice(0,4).map(j=>j.nom));
+      scored.forEach(j=>{
+        const isBest=best4Set.has(j.nom);
+        html+=`<div class="rank-item" onclick="openPlayerCard('${j.nom}')">
+          <div class="rank-info">
+            <div class="rank-name">${isBest?'<span style="color:var(--gold);margin-right:6px">✦</span>':''}${j.nom}</div>
+            ${isBest?'<div style="font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase">Meilleur 4</div>':''}
+          </div>
+          <div class="rank-score ${j.score===999?'':scoreClass(j.score)}">${j.score===999?'–':fmtScore(j.score)}</div>
+        </div>`;
+      });
+      const validScores=scored.slice(0,4).filter(j=>j.score!==999);
+      if(validScores.length>0){
+        const total=validScores.reduce((s,j)=>s+j.score,0);
+        html+=`<div style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:2px;padding:12px;margin-top:12px;text-align:center">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)">Score total Best 4</div>
+          <div style="font-size:28px;font-family:'Cormorant Garamond',serif;font-weight:600;color:${total<=0?'#4fc46a':'#e85858'};margin-top:4px">${fmtScore(total)}</div>
+        </div>`;
+      }
+    } else {
+      joueurs.forEach(j=>{
+        html+=`<div class="rank-item" onclick="openPlayerCard('${j}')">
+          <div class="rank-info"><div class="rank-name">${j}</div></div>
+        </div>`;
+      });
+    }
+    el.innerHTML=html;
+  }catch(e){el.innerHTML='<div class="msg error">Erreur de chargement</div>';console.error(e);}
+}
+
+// ---- NEWS (YOUTUBE) ----
 async function loadNews(){
   newsLoaded=true;
   const el=document.getElementById('tab-news');
-  el.innerHTML=`<div style="text-align:center;padding:40px 20px"><div class="typing-dots"><span>●</span><span>●</span><span>●</span></div><p style="color:var(--text-muted);font-size:14px;font-style:italic;margin-top:14px">Recherche des dernières actualités golf...</p></div>`;
-  const joueursList=ALL_JOUEURS.join(', ');
-  const prompt=`Tu es journaliste golf expert. Recherche les dernières actualités du golf mondial. Couvre : Masters 2025 (Augusta, favoris), PGA Tour (résultats récents), LIV Golf, Rumeurs/transferts, Stats/performances. Joueurs à mentionner si possible : ${joueursList}. Retourne UNIQUEMENT JSON sans markdown : {"sections":[{"titre":"Masters 2025","type":"masters","articles":[{"titre":"Titre en français","contenu":"3-4 phrases détaillées","tags":["Masters"]}]}]}. 5 sections, 2 articles chacune.`;
+  el.innerHTML=`<div style="text-align:center;padding:40px 20px"><div class="typing-dots"><span>●</span><span>●</span><span>●</span></div><p style="color:var(--text-muted);font-size:14px;font-style:italic;margin-top:14px">Chargement des vidéos golf...</p></div>`;
+  const prompt=`Recherche sur YouTube les 5 meilleures vidéos récentes (2025-2026) sur le Masters Augusta ou le golf : highlights, meilleurs coups, moments forts, shots incroyables. Retourne UNIQUEMENT ce JSON valide sans markdown ni explication: {"videos":[{"id":"YOUTUBE_VIDEO_ID","titre":"Titre de la vidéo"}]}`;
   try{
-    const response=await fetch(ESPN_PROXY+'claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]})});
+    const response=await fetch(ESPN_PROXY+'claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]})});
     const data=await response.json();
     const txt=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
     const clean=txt.replace(/```json|```/g,'').trim();
-    renderNews(JSON.parse(clean).sections||[]);
-  }catch(e){
-    renderNews([
-      {titre:'Masters 2025',type:'masters',articles:[{titre:'Augusta se prépare pour son tournoi le plus attendu',contenu:"Le Masters Tournament 2025 se déroulera du 10 au 13 avril à Augusta National. Scottie Scheffler arrive en grand favori après une saison 2024 écrasante.",tags:['Masters']},{titre:'Les favoris 2025',contenu:"Scheffler, McIlroy, Schauffele et Åberg sont les grands favoris cette année.",tags:['Masters','Favoris']}]},
-      {titre:'PGA Tour',type:'pga',articles:[{titre:'La saison 2025 bat son plein',contenu:"Plusieurs jeunes talents s'affirment sur le circuit américain cette saison.",tags:['PGA Tour']},{titre:'Les Français brillent',contenu:"Matthieu Pavon continue de représenter fièrement le golf français sur le PGA Tour.",tags:['PGA Tour','Pavon']}]},
-      {titre:'LIV Golf',type:'liv',articles:[{titre:'LIV Golf maintient la pression',contenu:"La ligue continue d'attirer l'attention avec ses formats innovants.",tags:['LIV Golf']},{titre:'L\'avenir du golf mondial',contenu:"Les négociations entre PGA Tour et LIV Golf semblent stagner.",tags:['LIV Golf']}]}
-    ]);
-  }
+    renderYoutubeVideos(JSON.parse(clean).videos||[]);
+  }catch(e){renderYoutubeVideos([]);}
 }
-function renderNews(sections){
+function renderYoutubeVideos(videos){
   const el=document.getElementById('tab-news');
-  if(!sections||!sections.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Aucune actualité disponible</div>';return;}
-  let html='';
-  sections.forEach(s=>{
-    html+=`<div class="news-section-title">${s.titre}</div>`;
-    (s.articles||[]).forEach(a=>{
-      const tags=(a.tags||[]).map(t=>`<span class="news-tag ${s.type||''}">${t}</span>`).join(' ');
-      html+=`<div class="news-card">${tags}<h4>${a.titre}</h4><p>${a.contenu}</p></div>`;
-    });
+  if(!videos.length){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Aucune vidéo disponible</div><div style="text-align:center;margin-top:16px"><button class="btn btn-outline" onclick="newsLoaded=false;loadNews()" style="font-size:13px">Réessayer</button></div>';
+    return;
+  }
+  let html=`<div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Vidéos & Highlights</div>`;
+  videos.forEach(v=>{
+    html+=`<div style="margin-bottom:24px">
+      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:2px;border:1px solid rgba(201,168,76,0.2)">
+        <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/${v.id}?rel=0" title="${v.titre}" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div style="font-size:14px;color:var(--text-muted);margin-top:8px;font-style:italic;line-height:1.4">${v.titre}</div>
+    </div>`;
   });
-  html+=`<div style="text-align:center;margin-top:16px"><button class="btn btn-outline" onclick="newsLoaded=false;loadNews()" style="font-size:13px;letter-spacing:1px">Rafraîchir les actualités</button></div>`;
+  html+=`<div style="text-align:center;margin-top:8px"><button class="btn btn-outline" onclick="newsLoaded=false;loadNews()" style="font-size:13px;letter-spacing:1px">Rafraîchir</button></div>`;
   el.innerHTML=html;
 }
 
