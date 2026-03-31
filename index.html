@@ -492,8 +492,8 @@ async function handleAccueil(){
     const existing=await sbFetch(`participants?nom=eq.${encodeURIComponent(nom)}&select=*`);
     currentUser=nom;currentCode=code;
     if(existing&&existing.length>0){
-      if(isOpen){loadExistingAndEdit(existing[0]);}
-      else{showMsg('msg-accueil','Bienvenue '+nom+' ! Les sélections sont fermées.','info');setTimeout(()=>goClassement(),1500);}
+      showMsg('msg-accueil','Bienvenue '+nom+' !','success');
+      setTimeout(()=>goClassement(),800);
       return;
     }
     if(!isOpen){showMsg('msg-accueil','Les sélections sont fermées. Le tournoi a débuté !','error');return;}
@@ -788,8 +788,17 @@ async function loadMaSelection(){
         </div>`;
       });
     }
+    if(!tournamentIsOpen){
+      html+=`<div class="divider"></div><button class="btn btn-outline" onclick="editSelection()" style="font-size:13px;letter-spacing:1px">✏ Modifier ma sélection</button>`;
+    }
     el.innerHTML=html;
   }catch(e){el.innerHTML='<div class="msg error">Erreur de chargement</div>';console.error(e);}
+}
+async function editSelection(){
+  try{
+    const participant=await sbFetch(`participants?nom=eq.${encodeURIComponent(currentUser)}&select=*`);
+    if(participant&&participant.length>0) loadExistingAndEdit(participant[0]);
+  }catch(e){console.error(e);}
 }
 
 // ---- JOUEURS LIST (pré-tournoi) ----
