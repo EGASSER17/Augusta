@@ -202,7 +202,7 @@ input::placeholder { color:rgba(168,196,168,0.4); }
         <input type="password" id="code-input" placeholder="Votre code personnel" maxlength="20">
       </div>
       <button class="btn btn-gold mt" onclick="handleAccueil()">Accéder · Mes sélections</button>
-      <button class="toggle-link" onclick="toggleForm()">Première visite ? Créer un compte</button>
+      <button class="btn btn-outline mt" onclick="toggleForm()" style="font-size:15px;">Première visite ? Créer un compte</button>
       <button class="toggle-link" style="color:var(--text-muted);font-size:13px;margin-top:4px" onclick="showForgotForm(true)">Code oublié ?</button>
     </div>
 
@@ -247,7 +247,7 @@ input::placeholder { color:rgba(168,196,168,0.4); }
     <button class="btn btn-outline" onclick="goClassement()">Consulter le classement</button>
     <button onclick="showScreen('screen-regles')" class="btn btn-ghost" style="width:100%;margin-top:0.5rem;font-size:0.85rem;">📋 Règles du concours</button>
     <button onclick="registerPush()" class="btn btn-ghost" style="font-size:0.8rem;margin-top:0.5rem;">🔔 Activer les notifications</button>
-    <button class="btn btn-ghost mt" onclick="goAdmin()" style="margin-top:8px;font-size:12px;letter-spacing:1px">Administration</button>
+    <button onclick="goAdmin()" style="background:none;border:none;color:rgba(201,168,76,0.35);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:1px;cursor:pointer;display:block;margin:8px auto 0;padding:4px 8px;">Administration</button>
   </div>
 </div>
 
@@ -282,6 +282,10 @@ input::placeholder { color:rgba(168,196,168,0.4); }
     <div class="header-divider"></div>
   </div>
   <div class="content">
+    <div id="countdown-container-logged" style="text-align:center;margin:0.75rem 0;padding:0.75rem 1rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:10px;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:0.65rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.25rem;">Début du tournoi</div>
+      <div id="countdown-display-logged" style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);font-weight:600;letter-spacing:3px;"></div>
+    </div>
     <div class="tabs" id="main-tabs">
       <div class="tab active" onclick="switchTab('classement')">Classement</div>
       <div class="tab" onclick="switchTab('scores')">Joueurs</div>
@@ -641,12 +645,11 @@ async function submitSelections(){
   if(!Object.values(selections).every(s=>s.length===2)){alert('2 joueurs par chapeau requis');return;}
   const data={nom:currentUser,c1a:selections[1][0],c1b:selections[1][1],c2a:selections[2][0],c2b:selections[2][1],c3a:selections[3][0],c3b:selections[3][1],c4a:selections[4][0],c4b:selections[4][1]};
   try{
+    await sbFetch('participants','POST',data,true);
     if(isEditMode){
-      await sbFetch(`participants?nom=eq.${encodeURIComponent(currentUser)}`,{method:'PATCH',body:JSON.stringify(data),prefer:'return=minimal'});
       document.getElementById('confirm-title').textContent='Modifications sauvegardées';
       document.getElementById('confirm-subtitle').textContent='Vos sélections ont été mises à jour.';
     }else{
-      await sbFetch('participants',{method:'POST',body:JSON.stringify(data),prefer:'return=minimal'});
       document.getElementById('confirm-title').textContent='Sélections enregistrées';
       document.getElementById('confirm-subtitle').textContent='Bonne chance pour les Masters !';
     }
@@ -1072,18 +1075,12 @@ function startCountdown(){
     const now=new Date();
     const diff=target-now;
     const el=document.getElementById('countdown-display');
-    if(!el) return;
-    if(diff<=0){
-      el.textContent='Le tournoi a commencé !';
-      el.style.fontSize='1.2rem';
-      el.style.letterSpacing='1px';
-      return;
-    }
-    const d=Math.floor(diff/86400000);
-    const h=Math.floor((diff%86400000)/3600000).toString().padStart(2,'0');
-    const m=Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
-    const s=Math.floor((diff%60000)/1000).toString().padStart(2,'0');
-    el.textContent=`${d} ${h}:${m}:${s}`;
+    const el2=document.getElementById('countdown-display-logged');
+    const txt=diff<=0?'Le tournoi a commencé !':
+      (()=>{const d=Math.floor(diff/86400000);const h=Math.floor((diff%86400000)/3600000).toString().padStart(2,'0');const m=Math.floor((diff%3600000)/60000).toString().padStart(2,'0');const s=Math.floor((diff%60000)/1000).toString().padStart(2,'0');return `${d} ${h}:${m}:${s}`;})();
+    if(el) el.textContent=txt;
+    if(el2) el2.textContent=txt;
+    if(diff<=0) return;
     setTimeout(update,1000);
   }
   update();
