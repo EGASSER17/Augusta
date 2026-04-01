@@ -1327,7 +1327,7 @@ async function loadTriviaInline(){
     return;
   }
   document.getElementById('tab-trivia').innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-style:italic">Chargement...</div>';
-  const today=getTodayDate();
+  const today=getTodayDate()==='2026-04-01'?'2026-04-02':getTodayDate();
 
   // Vérifier si déjà joué aujourd'hui
   const existing=await sbFetch(`trivia_scores?nom=eq.${encodeURIComponent(currentUser)}&jour=eq.${today}&select=score,temps_total`);
