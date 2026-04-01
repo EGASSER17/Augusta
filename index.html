@@ -645,7 +645,12 @@ async function submitSelections(){
   if(!Object.values(selections).every(s=>s.length===2)){alert('2 joueurs par chapeau requis');return;}
   const data={nom:currentUser,c1a:selections[1][0],c1b:selections[1][1],c2a:selections[2][0],c2b:selections[2][1],c3a:selections[3][0],c3b:selections[3][1],c4a:selections[4][0],c4b:selections[4][1]};
   try{
-    await sbFetch('participants?on_conflict=nom','POST',data,true);
+    if(isEditMode){
+      const {nom,...updateData}=data;
+      await sbFetch(`participants?nom=eq.${encodeURIComponent(currentUser)}`,{method:'PATCH',body:JSON.stringify(updateData),prefer:'return=minimal'});
+    }else{
+      await sbFetch('participants',{method:'POST',body:JSON.stringify(data),prefer:'return=minimal'});
+    }
     if(isEditMode){
       document.getElementById('confirm-title').textContent='Modifications sauvegardées';
       document.getElementById('confirm-subtitle').textContent='Vos sélections ont été mises à jour.';
