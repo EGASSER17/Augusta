@@ -290,7 +290,6 @@ input::placeholder { color:rgba(168,196,168,0.4); }
       <div class="tab active" onclick="switchTab('classement')">Classement</div>
       <div class="tab" onclick="switchTab('scores')">Joueurs</div>
       <div class="tab" onclick="switchTab('trivia')">Trivia</div>
-      <div class="tab" onclick="switchTab('chat')">Chat</div>
     </div>
     <div id="refresh-info" class="refresh-info"></div>
     <div id="tab-classement"></div>
@@ -298,7 +297,6 @@ input::placeholder { color:rgba(168,196,168,0.4); }
     <div id="tab-scores" style="display:none"></div>
     <div id="tab-news" style="display:none"></div>
     <div id="tab-trivia" style="display:none"></div>
-    <div id="tab-chat" style="display:none"></div>
     <div class="divider"></div>
     <button class="btn btn-outline" onclick="showScreen('screen-accueil')" style="font-size:13px">← Retour à l'accueil</button>
   </div>
@@ -329,28 +327,6 @@ input::placeholder { color:rgba(168,196,168,0.4); }
   <div id="trivia-container" style="padding:1rem;max-width:480px;margin:0 auto;"></div>
 </div>
 
-<!-- CHAT -->
-<div id="screen-chat" class="screen">
-  <div class="screen-header" style="display:flex;align-items:center;gap:1rem;padding:1rem;border-bottom:1px solid rgba(201,168,76,0.2);">
-    <button class="btn-back" onclick="leaveChatScreen()" style="background:none;border:none;color:var(--gold);font-size:1.5rem;cursor:pointer;">←</button>
-    <h2 style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:1.4rem;">Chat</h2>
-  </div>
-  <div style="display:flex;flex-direction:column;height:calc(100vh - 70px);max-width:480px;margin:0 auto;">
-    <div id="chat-messages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.5rem;"></div>
-    <div style="padding:0.5rem;border-top:1px solid rgba(201,168,76,0.2);">
-      <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
-        <button onclick="sendChatEmoji('👏')" style="flex:1;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);padding:0.5rem;border-radius:8px;cursor:pointer;font-size:1.2rem;">👏</button>
-        <button onclick="sendChatEmoji('😂')" style="flex:1;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);padding:0.5rem;border-radius:8px;cursor:pointer;font-size:1.2rem;">😂</button>
-        <button onclick="sendChatEmoji('🔥')" style="flex:1;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);padding:0.5rem;border-radius:8px;cursor:pointer;font-size:1.2rem;">🔥</button>
-        <button onclick="sendChatEmoji('⛳')" style="flex:1;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);padding:0.5rem;border-radius:8px;cursor:pointer;font-size:1.2rem;">⛳</button>
-      </div>
-      <div style="display:flex;gap:0.5rem;">
-        <input id="chat-input" type="text" maxlength="200" placeholder="Message..." style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.3);color:var(--cream);padding:0.5rem 0.75rem;border-radius:8px;font-family:'EB Garamond',serif;font-size:1rem;" onkeydown="if(event.key==='Enter')sendChat()">
-        <button onclick="sendChat()" class="btn btn-gold" style="padding:0.5rem 1rem;">Envoyer</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- REGLES -->
 <div id="screen-regles" class="screen">
@@ -464,6 +440,31 @@ const CHAPEAU_TITRES={
 };
 const ALL_JOUEURS=Object.values(JOUEURS).flat();
 const NB_CHAPEAUX=4;
+
+const PLAYER_ESPN_IDS = {
+  'Scottie Scheffler':'9478','Rory McIlroy':'3470','Bryson DeChambeau':'9885',
+  'Jon Rahm':'9780','Ludvig Åberg':'11813','Xander Schauffele':'9003',
+  'Matt Fitzpatrick':'9025','Cameron Young':'11104','Tommy Fleetwood':'9384',
+  'Justin Rose':'2294','Collin Morikawa':'10676','Patrick Reed':'6284',
+  'Brooks Koepka':'5765','Jordan Spieth':'3741','Hideki Matsuyama':'5860',
+  'Min Woo Lee':'11122','Robert MacIntyre':'11203','Viktor Hovland':'10817',
+  'Shane Lowry':'6825','Chris Gotterup':'11610','Tyrrell Hatton':'9026',
+  'Russell Henley':'5771','Patrick Cantlay':'9817','Akshay Bhatia':'11524',
+  'Si Woo Kim':'9999','Sepp Straka':'10555','Jason Day':'3698',
+  'Sam Burns':'11120','Justin Thomas':'4848','Corey Conners':'10220',
+  'Adam Scott':'1678','Sungjae Im':'11145','Marco Penge':'12345',
+  'Jacob Bridgeman':'11602','Gary Woodland':'5709','J.J. Spaun':'9590',
+  'Nicolai Hojgaard':'11536','Cameron Smith':'9131','Sahith Theegala':'11311',
+  'Harris English':'5744','Daniel Berger':'9026','Brian Harman':'5790',
+  'Tony Finau':'6806','Max Homa':'9039','Ben Griffin':'11405',
+  'Dustin Johnson':'3843','Casey Jarvis':'12400','Wyndham Clark':'10940',
+  'Ryan Fox':'10466','Sergio Garcia':'1120','Aldrich Potgieter':'12100',
+  'Rasmus Hojgaard':'11537','Keegan Bradley':'3988','Aaron Rai':'10611',
+  'Anthony Kim':'1989','Phil Mickelson':'1003','Bubba Watson':'1694',
+  'Danny Willett':'8455','Charl Schwartzel':'2699','Zach Johnson':'1646',
+  'Angel Cabrera':'1014','Fred Couples':'333','Vijay Singh':'385',
+  'Nick Taylor':'7340','Matt McCarty':'11611'
+};
 
 let currentUser='',currentCode='',currentChapeau=1,isEditMode=false;
 let selections={1:[],2:[],3:[],4:[]};
@@ -663,14 +664,6 @@ async function submitSelections(){
       html+=`<div class="card" style="margin-bottom:8px"><div class="card-title">${CHAPEAU_TITRES[c]}</div><p style="font-size:15px;font-style:italic">⛳ ${selections[c][0]}</p><p style="font-size:15px;font-style:italic;margin-top:4px">⛳ ${selections[c][1]}</p></div>`;
     }
     document.getElementById('confirm-recap').innerHTML=html;
-    // Bouton WhatsApp partage
-    const wabtn=document.createElement('button');
-    wabtn.className='btn btn-outline';
-    wabtn.style.width='100%';
-    wabtn.style.marginTop='0.75rem';
-    wabtn.textContent='📱 Partager sur WhatsApp';
-    wabtn.onclick=()=>shareWhatsApp(selections);
-    document.getElementById('confirm-recap').after(wabtn);
     showScreen('screen-confirm');
   }catch(e){alert('Erreur lors de la sauvegarde. Réessayez.');console.error(e);}
 }
@@ -680,9 +673,9 @@ function renderMainTabs(isOpen){
   tournamentIsOpen=isOpen;
   const el=document.getElementById('main-tabs');
   if(isOpen){
-    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('chat')">Chat</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div>`;
   } else {
-    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('chat')">Chat</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div>`;
   }
 }
 async function goClassement(){
@@ -745,8 +738,16 @@ async function loadClassement(){
     const scoresTab=ALL_JOUEURS.map(n=>({nom:n,score:getScore(n)})).filter(j=>j.score!==null).sort((a,b)=>a.score-b.score);
     let shtml='<div class="card">';
     if(scoresTab.length) scoresTab.forEach(j=>{
+      const eid = PLAYER_ESPN_IDS[j.nom];
+      const photoUrl = eid ? `https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${eid}.png&w=60&h=44&scale=crop&location=origin&transparent=true` : null;
+      const photoEl = photoUrl
+        ? `<img src="${photoUrl}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(201,168,76,0.4);flex-shrink:0;" onerror="this.style.display='none'">`
+        : `<div style="width:36px;height:36px;border-radius:50%;background:rgba(42,90,58,0.5);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🏌️</div>`;
       shtml+=`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
-        <span style="font-size:14px;font-style:italic">⛳ ${j.nom}</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          ${photoEl}
+          <span style="font-size:14px;font-style:italic">${j.nom}</span>
+        </div>
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600" class="${scoreClass(j.score)}">${fmtScore(j.score)}</span>
           <span style="color:var(--text-muted);font-size:14px">›</span>
@@ -756,7 +757,15 @@ async function loadClassement(){
     else{
       shtml+='<div style="padding:16px 0;font-style:italic;color:var(--text-muted);font-size:14px;text-align:center">Les scores ne sont pas encore disponibles</div>';
       ALL_JOUEURS.forEach(n=>{
-        shtml+=`<div class="score-item" onclick="openPlayerCard('${n.replace(/'/g,"\\'")}')"><span style="font-size:14px;font-style:italic">⛳ ${n}</span><span style="color:var(--text-muted);font-size:14px">›</span></div>`;
+        const eid = PLAYER_ESPN_IDS[n];
+        const photoUrl = eid ? `https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${eid}.png&w=60&h=44&scale=crop&location=origin&transparent=true` : null;
+        const photoEl = photoUrl
+          ? `<img src="${photoUrl}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(201,168,76,0.4);flex-shrink:0;" onerror="this.style.display='none'">`
+          : `<div style="width:36px;height:36px;border-radius:50%;background:rgba(42,90,58,0.5);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🏌️</div>`;
+        shtml+=`<div class="score-item" onclick="openPlayerCard('${n.replace(/'/g,"\\'")}')">
+          <div style="display:flex;align-items:center;gap:10px;">${photoEl}<span style="font-size:14px;font-style:italic">${n}</span></div>
+          <span style="color:var(--text-muted);font-size:14px">›</span>
+        </div>`;
       });
     }
     shtml+='</div>';
@@ -765,7 +774,7 @@ async function loadClassement(){
 }
 function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
 function switchTab(tab){
-  const allTabs=['classement','selection','scores','news','trivia','chat'];
+  const allTabs=['classement','selection','scores','news','trivia'];
   document.querySelectorAll('#main-tabs .tab').forEach(el=>{
     el.classList.toggle('active',el.getAttribute('onclick')===`switchTab('${tab}')`);
   });
@@ -773,12 +782,13 @@ function switchTab(tab){
   if(tab==='news'&&!newsLoaded) loadNews();
   if(tab==='selection'&&!selectionTabLoaded) loadMaSelection();
   if(tab==='scores'&&!document.getElementById('tab-scores').innerHTML.trim()) loadJoueursList();
-  if(tab==='trivia') { document.getElementById('tab-trivia').innerHTML=''; showScreen('screen-trivia'); loadTrivia(); }
-  if(tab==='chat') { document.getElementById('tab-chat').innerHTML=''; showScreen('screen-chat'); loadChat(); }
+  if(tab==='trivia') { loadTriviaInline(); }
 }
-function leaveChatScreen(){
-  if(chatInterval){ clearInterval(chatInterval); chatInterval=null; }
-  showScreen('screen-classement');
+
+function loadTriviaInline(){
+  const container=document.getElementById('tab-trivia');
+  if(!container) return;
+  loadTrivia();
 }
 
 // ---- PLAYER DATA ----
@@ -807,6 +817,7 @@ function openPlayerCard(nom){
   if(info){
     info.photo_url=`https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${info.espn_id}.png&w=200&h=146`;
     renderPlayerCard(info,nom,score,chapeau);
+    loadPlayerScorecard(nom);
     loadPlayerNews(nom);
   } else {
     const sc=fmtScore(score),cls=scoreClass(score);
@@ -820,8 +831,10 @@ function openPlayerCard(nom){
         <div class="pstat"><div class="pstat-val">C${chapeau}</div><div class="pstat-lbl">Chapeau</div></div>
       </div>
       <div id="player-dynamic-info" style="text-align:center;padding:16px;color:var(--text-muted);font-style:italic;font-size:13px">Chargement des informations...</div>
+      <div id="player-scorecard-live"></div>
     </div>`;
     loadDynamicPlayerInfo(nom);
+    loadPlayerScorecard(nom);
   }
 }
 async function loadDynamicPlayerInfo(nom){
@@ -896,10 +909,121 @@ function renderPlayerCard(info,nom,score,chapeau){
     <p class="player-bio">${info.bio||''}</p>
     ${s.driving_distance?`<div class="player-stats-grid" style="margin-bottom:14px"><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.driving_distance}</div><div class="pstat-lbl">Drive</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.fairways||'?'}</div><div class="pstat-lbl">Fairways</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.gir||'?'}</div><div class="pstat-lbl">GIR</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.putts_par_trou||'?'}</div><div class="pstat-lbl">Putts/trou</div></div></div>`:''}
     ${palmares?`<div style="margin-top:4px"><div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Palmarès</div>${palmares}</div>`:''}
-    ${renderScorecard()}
+    <div id="player-scorecard-live"></div>
   </div>`;
 }
-function closePlayerCard(){const m=document.getElementById('player-modal');if(m) m.remove();}
+let scorecardInterval = null;
+
+async function loadPlayerScorecard(nom) {
+  const container = document.getElementById('player-scorecard-live');
+  if (!container) return;
+  container.innerHTML = `<div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:1rem;margin-top:1rem;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Carte de score du jour</div>
+    <div style="text-align:center;color:var(--text-muted);font-size:13px;font-style:italic;padding:8px;">Chargement...</div>
+  </div>`;
+
+  try {
+    const espnId = PLAYER_ESPN_IDS[nom];
+    if (!espnId) { renderScorecardParOnly(container); return; }
+
+    const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?event=401703511`);
+    const data = await res.json();
+    const competitors = (data.events?.[0]?.competitions?.[0]?.competitors) || [];
+    const player = competitors.find(c => c.id === espnId || String(c.athlete?.id) === String(espnId));
+
+    if (!player || !player.linescores?.length) {
+      renderScorecardParOnly(container);
+      return;
+    }
+
+    const linescores = player.linescores;
+    const AUGUSTA_PAR = [4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4];
+    let html = `<div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:1rem;margin-top:1rem;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Carte de score · Round ${player.status?.period||1}</div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+        <table style="border-collapse:collapse;font-size:0.72rem;font-family:'EB Garamond',serif;min-width:320px;">`;
+
+    const holes = linescores.slice(0,18);
+    const front = holes.slice(0,9);
+    const back = holes.slice(9);
+
+    function scoreStyle(val, par) {
+      if (val === undefined || val === null) return 'color:rgba(245,240,232,0.3)';
+      const diff = val - par;
+      if (diff <= -2) return 'background:#1a6b2a;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;';
+      if (diff === -1) return 'background:#c9a84c;color:#0d2818;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;';
+      if (diff === 0) return 'color:var(--cream)';
+      if (diff === 1) return 'border:1px solid #e05;border-radius:2px;padding:1px 3px;color:#e05';
+      return 'border:2px solid #e05;border-radius:2px;padding:1px 3px;color:#e05';
+    }
+
+    function renderRow(holesArr, offset) {
+      const parRow = holesArr.map((h,i) => `<td style="text-align:center;padding:4px 3px;color:rgba(245,240,232,0.5);">${AUGUSTA_PAR[i+offset]}</td>`).join('');
+      const numRow = holesArr.map((h,i) => `<td style="text-align:center;padding:4px 3px;color:rgba(245,240,232,0.5);">${i+offset+1}</td>`).join('');
+      const scoreRow = holesArr.map((h,i) => {
+        const val = h.value !== undefined ? parseInt(h.value) : null;
+        const par = AUGUSTA_PAR[i+offset];
+        const style = val !== null ? scoreStyle(val, par) : 'color:rgba(245,240,232,0.3)';
+        const display = val !== null ? val : '·';
+        return `<td style="text-align:center;padding:4px 3px;"><span style="${style}">${display}</span></td>`;
+      }).join('');
+      const total = holesArr.reduce((s,h) => s + (h.value !== undefined ? parseInt(h.value)||0 : 0), 0);
+      const totalPar = holesArr.reduce((s,_,i) => s + AUGUSTA_PAR[i+offset], 0);
+      return { numRow, parRow, scoreRow, total, totalPar };
+    }
+
+    const f = renderRow(front, 0);
+    const b = renderRow(back, 9);
+
+    html += `<tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;white-space:nowrap;">Trou</td>${f.numRow}<td style="padding:4px 3px;color:rgba(201,168,76,0.5);font-size:0.65rem;">Out</td></tr>`;
+    html += `<tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;">Par</td>${f.parRow}<td style="text-align:center;padding:4px 3px;color:rgba(201,168,76,0.5);">${f.totalPar}</td></tr>`;
+    html += `<tr><td style="padding:4px 3px;color:var(--gold);font-size:0.65rem;">Score</td>${f.scoreRow}<td style="text-align:center;padding:4px 3px;color:var(--gold);font-weight:600;">${f.total||'·'}</td></tr>`;
+    html += `<tr style="height:6px;"></tr>`;
+    html += `<tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;white-space:nowrap;">Trou</td>${b.numRow}<td style="padding:4px 3px;color:rgba(201,168,76,0.5);font-size:0.65rem;">In</td></tr>`;
+    html += `<tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;">Par</td>${b.parRow}<td style="text-align:center;padding:4px 3px;color:rgba(201,168,76,0.5);">${b.totalPar}</td></tr>`;
+    html += `<tr><td style="padding:4px 3px;color:var(--gold);font-size:0.65rem;">Score</td>${b.scoreRow}<td style="text-align:center;padding:4px 3px;color:var(--gold);font-weight:600;">${b.total||'·'}</td></tr>`;
+    html += `</table></div>`;
+
+    const legend = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:0.65rem;color:rgba(245,240,232,0.5);">
+      <span><span style="background:#1a6b2a;color:#fff;border-radius:50%;padding:1px 4px;">2</span> Eagle+</span>
+      <span><span style="background:#c9a84c;color:#0d2818;border-radius:50%;padding:1px 4px;">3</span> Birdie</span>
+      <span style="border:1px solid #e05;border-radius:2px;padding:1px 4px;color:#e05;">5</span> Bogey
+    </div>`;
+    html += legend + `</div>`;
+    container.innerHTML = html;
+
+    if (scorecardInterval) clearInterval(scorecardInterval);
+    scorecardInterval = setInterval(() => {
+      if (document.getElementById('player-modal')) loadPlayerScorecard(nom);
+      else clearInterval(scorecardInterval);
+    }, 60000);
+
+  } catch(e) {
+    renderScorecardParOnly(container);
+  }
+}
+
+function renderScorecardParOnly(container) {
+  const AUGUSTA_PAR = [4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4];
+  const front = AUGUSTA_PAR.slice(0,9);
+  const back = AUGUSTA_PAR.slice(9);
+  container.innerHTML = `<div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:1rem;margin-top:1rem;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Par Augusta</div>
+    <div style="overflow-x:auto;">
+      <table style="border-collapse:collapse;font-size:0.72rem;font-family:'EB Garamond',serif;min-width:320px;">
+        <tr><td style="padding:3px 4px;color:rgba(245,240,232,0.4);font-size:0.65rem;">Trou</td>${front.map((_,i)=>`<td style="text-align:center;padding:3px 4px;color:rgba(245,240,232,0.5);">${i+1}</td>`).join('')}<td style="padding:3px 4px;color:rgba(201,168,76,0.5);font-size:0.65rem;">Out</td></tr>
+        <tr><td style="padding:3px 4px;color:rgba(245,240,232,0.4);font-size:0.65rem;">Par</td>${front.map(p=>`<td style="text-align:center;padding:3px 4px;color:var(--cream);">${p}</td>`).join('')}<td style="text-align:center;padding:3px 4px;color:rgba(201,168,76,0.5);">36</td></tr>
+        <tr><td style="padding:3px 4px;color:rgba(245,240,232,0.4);font-size:0.65rem;">Trou</td>${back.map((_,i)=>`<td style="text-align:center;padding:3px 4px;color:rgba(245,240,232,0.5);">${i+10}</td>`).join('')}<td style="padding:3px 4px;color:rgba(201,168,76,0.5);font-size:0.65rem;">In</td></tr>
+        <tr><td style="padding:3px 4px;color:rgba(245,240,232,0.4);font-size:0.65rem;">Par</td>${back.map(p=>`<td style="text-align:center;padding:3px 4px;color:var(--cream);">${p}</td>`).join('')}<td style="text-align:center;padding:3px 4px;color:rgba(201,168,76,0.5);">36</td></tr>
+      </table>
+    </div>
+  </div>`;
+}
+
+function closePlayerCard(){
+  if(scorecardInterval){clearInterval(scorecardInterval);scorecardInterval=null;}
+  const m=document.getElementById('player-modal');if(m) m.remove();
+}
 
 // ---- MA SÉLECTION ----
 async function loadMaSelection(){
@@ -948,7 +1072,6 @@ async function loadMaSelection(){
     const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');
     const isOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
     if(isOpen) html+=`<button onclick="loadExistingAndEdit(window._currentParticipant)" class="btn btn-outline" style="width:100%;margin-top:0.5rem;">Modifier mes sélections</button>`;
-    html+=`<button onclick="shareWhatsApp({1:['${selMap[1][0]}','${selMap[1][1]}'],2:['${selMap[2][0]}','${selMap[2][1]}'],3:['${selMap[3][0]}','${selMap[3][1]}'],4:['${selMap[4][0]}','${selMap[4][1]}']})" class="btn btn-outline" style="width:100%;margin-top:0.5rem;">📱 Partager sur WhatsApp</button>`;
     el.innerHTML=html;
   }catch(e){el.innerHTML='<div class="msg error">Erreur de chargement</div>';console.error(e);}
 }
@@ -1115,7 +1238,7 @@ const TRIVIA_QUESTIONS=[
 let triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null};
 
 async function loadTrivia(){
-  const container=document.getElementById('trivia-container');
+  const container=document.getElementById('tab-trivia');
   if(!container) return;
   if(!currentUser){container.innerHTML='<p style="color:var(--gold);text-align:center;">Connectez-vous pour jouer.</p>';return;}
   try{
@@ -1127,7 +1250,7 @@ async function loadTrivia(){
 }
 function showTriviaQuestion(){
   const q=TRIVIA_QUESTIONS[triviaState.idx];
-  const container=document.getElementById('trivia-container');
+  const container=document.getElementById('tab-trivia');
   if(!container) return;
   triviaState.startTime=Date.now();
   let timeLeft=15;
@@ -1166,13 +1289,13 @@ function answerTrivia(chosen){
     else pts=200;
     triviaState.score+=pts;
   }
-  const btns=document.querySelectorAll('#trivia-container button');
+  const btns=document.querySelectorAll('#tab-trivia button');
   btns.forEach((b,i)=>{
     b.disabled=true;
     if(i===q.answer) b.style.background='rgba(0,200,100,0.3)';
     else if(i===chosen) b.style.background='rgba(200,0,0,0.3)';
   });
-  const container=document.getElementById('trivia-container');
+  const container=document.getElementById('tab-trivia');
   const feedback=document.createElement('div');
   feedback.style.cssText='text-align:center;padding:0.75rem;font-family:Cormorant Garamond,serif;font-size:1rem;color:var(--cream);margin-top:0.5rem;';
   if(chosen===q.answer) feedback.innerHTML=`✓ Correct ! +${pts} pts`;
@@ -1194,7 +1317,7 @@ async function showTriviaResult(score,temps,alreadyPlayed){
   let scores=[];
   try{scores=await sbFetch('trivia_scores?select=nom,score,temps_total&order=score.desc,temps_total.asc')||[];}catch(e){}
   const rank=scores.findIndex(s=>s.nom===currentUser)+1||'?';
-  const container=document.getElementById('trivia-container');
+  const container=document.getElementById('tab-trivia');
   if(!container) return;
   container.innerHTML=`
     <div style="text-align:center;padding:1rem;">
@@ -1210,43 +1333,6 @@ async function showTriviaResult(score,temps,alreadyPlayed){
     </div>`;
 }
 
-// ---- CHAT ----
-let chatInterval=null;
-async function loadChat(){
-  if(!currentUser) return;
-  await refreshChat();
-  if(chatInterval) clearInterval(chatInterval);
-  chatInterval=setInterval(refreshChat,10000);
-}
-async function refreshChat(){
-  let msgs=[];
-  try{msgs=await sbFetch('chat_messages?select=nom,message,created_at&order=created_at.asc&limit=50')||[];}catch(e){}
-  const container=document.getElementById('chat-messages');
-  if(!container) return;
-  container.innerHTML=msgs.map(m=>{
-    const isMe=m.nom===currentUser;
-    const time=new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-    return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};">
-      <div style="font-size:0.65rem;color:rgba(245,240,232,0.5);margin-bottom:2px;">${isMe?'':m.nom+' · '}${time}</div>
-      <div style="background:${isMe?'rgba(201,168,76,0.25)':'rgba(13,40,24,0.8)'};border:1px solid ${isMe?'rgba(201,168,76,0.4)':'rgba(201,168,76,0.15)'};border-radius:${isMe?'12px 12px 4px 12px':'12px 12px 12px 4px'};padding:0.5rem 0.75rem;max-width:80%;font-family:'EB Garamond',serif;font-size:0.95rem;color:var(--cream);word-break:break-word;">${m.message}</div>
-    </div>`;
-  }).join('');
-  container.scrollTop=container.scrollHeight;
-}
-async function sendChat(){
-  if(!currentUser) return;
-  const input=document.getElementById('chat-input');
-  const msg=input.value.trim().slice(0,200);
-  if(!msg) return;
-  input.value='';
-  try{await sbFetch('chat_messages','POST',{nom:currentUser,message:msg});}catch(e){}
-  await refreshChat();
-}
-async function sendChatEmoji(emoji){
-  if(!currentUser) return;
-  try{await sbFetch('chat_messages','POST',{nom:currentUser,message:emoji});}catch(e){}
-  await refreshChat();
-}
 
 // ---- ÉVOLUTIONS CLASSEMENT ----
 async function saveAndGetEvolutions(classement){
@@ -1308,11 +1394,6 @@ function renderScorecard(){
   </div>`;
 }
 
-// ---- WHATSAPP ----
-function shareWhatsApp(sel){
-  const text=`🏌️ Masters Augusta 2026 - GDF\nMes sélections :\n🎩 Favoris : ${sel[1][0]} & ${sel[1][1]}\n🎩 Contendants : ${sel[2][0]} & ${sel[2][1]}\n🎩 Outsiders : ${sel[3][0]} & ${sel[3][1]}\n🎩 Légendes : ${sel[4][0]} & ${sel[4][1]}\nRejoins le concours : https://egasser17.github.io/Augusta/`;
-  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
-}
 
 // ---- GRAPHIQUE ÉVOLUTION ----
 function renderEvolutionChart(historyData){
