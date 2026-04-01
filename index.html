@@ -1411,7 +1411,9 @@ async function showTriviaResult(scoreDuJour,tempsDuJour,alreadyPlayed){
   const container=document.getElementById('tab-trivia');
   container.innerHTML=`
     <div style="padding:1rem;">
-      ${alreadyPlayed?'<p style="text-align:center;color:rgba(201,168,76,0.6);font-size:0.85rem;margin-bottom:1rem;font-style:italic;">Vous avez déjà joué aujourd\'hui. Revenez demain !</p>':''}
+      ${alreadyPlayed
+        ?'<p style="text-align:center;color:rgba(201,168,76,0.6);font-size:0.85rem;margin-bottom:1rem;font-style:italic;">Vous avez déjà joué aujourd\'hui. À demain pour de nouvelles questions !</p>'
+        :'<p style="text-align:center;color:rgba(201,168,76,0.6);font-size:0.85rem;margin-bottom:1rem;font-style:italic;">Bien joué ! À demain pour de nouvelles questions !</p>'}
       <div style="text-align:center;padding:1rem 0;border-bottom:1px solid rgba(201,168,76,0.2);margin-bottom:1rem;">
         <div style="font-family:'Cormorant Garamond',serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;">Score du jour</div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--gold);font-weight:700;">${scoreDuJour}</div>
