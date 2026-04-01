@@ -1393,12 +1393,19 @@ async function finishTrivia(){
 }
 
 async function showTriviaResult(scoreDuJour,tempsDuJour,alreadyPlayed){
-  // Calcul du score cumulatif
-  const allScores=await sbFetch(`trivia_scores?nom=eq.${encodeURIComponent(currentUser)}&select=score,temps_total`);
+  // Déterminer la phase selon la date du jour
+  const today=getTodayDate();
+  const isPhase2=today>='2026-04-09';
+  const dateMin=isPhase2?'2026-04-09':'2026-04-02';
+  const dateMax=isPhase2?'2026-04-12':'2026-04-08';
+  const phaseLabel=isPhase2?'Phase Tournoi':'Phase Pré-tournoi';
+
+  // Calcul du score cumulatif de l'utilisateur sur la phase en cours
+  const allScores=await sbFetch(`trivia_scores?nom=eq.${encodeURIComponent(currentUser)}&jour=gte.${dateMin}&jour=lte.${dateMax}&select=score,temps_total`);
   const cumul=(allScores||[]).reduce((s,r)=>s+r.score,0);
 
-  // Classement général (somme par participant)
-  const tous=await sbFetch('trivia_scores?select=nom,score,temps_total&order=score.desc');
+  // Classement de la phase en cours
+  const tous=await sbFetch(`trivia_scores?jour=gte.${dateMin}&jour=lte.${dateMax}&select=nom,score,temps_total`);
   const cumMap={};
   (tous||[]).forEach(r=>{
     if(!cumMap[r.nom]) cumMap[r.nom]={total:0,temps:0};
@@ -1421,7 +1428,7 @@ async function showTriviaResult(scoreDuJour,tempsDuJour,alreadyPlayed){
         <div style="margin-top:0.5rem;font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:var(--cream);">Total cumulé : <strong style="color:var(--gold);">${cumul} pts</strong></div>
         <div style="font-size:0.9rem;color:var(--gold);margin-top:0.25rem;">🏆 Classement général : ${rank}ème</div>
       </div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Classement Trivia</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Classement Trivia · ${phaseLabel}</div>
       ${classement.slice(0,10).map((r,i)=>`
         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0.5rem;border-radius:6px;margin-bottom:0.25rem;background:${r.nom===currentUser?'rgba(201,168,76,0.1)':'transparent'};border:1px solid ${r.nom===currentUser?'rgba(201,168,76,0.25)':'transparent'};">
           <span style="font-size:0.85rem;color:${r.nom===currentUser?'var(--gold)':'var(--cream)'};">${i+1}. ${r.nom}</span>
