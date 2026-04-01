@@ -1418,6 +1418,7 @@ async function loadTriviaInline(){
     return;
   }
 
+  if(triviaState.timerInterval) clearInterval(triviaState.timerInterval);
   triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null,questions};
   showTriviaQuestion();
 }
