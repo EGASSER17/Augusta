@@ -1434,7 +1434,7 @@ async function showTriviaResult(scoreDuJour,tempsDuJour,alreadyPlayed){
   // Déterminer la phase selon la date du jour
   const today=getTodayDate();
   const isPhase2=today>='2026-04-09';
-  const dateMin=isPhase2?'2026-04-09':'2026-04-02';
+  const dateMin=isPhase2?'2026-04-09':'2026-04-01';
   const dateMax=isPhase2?'2026-04-12':'2026-04-08';
   const phaseLabel=isPhase2?'Phase Tournoi':'Phase Pré-tournoi';
 
