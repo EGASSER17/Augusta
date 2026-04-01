@@ -667,6 +667,7 @@ async function submitSelections(){
     for(let c=1;c<=NB_CHAPEAUX;c++){
       html+=`<div class="card" style="margin-bottom:8px"><div class="card-title">${CHAPEAU_TITRES[c]}</div><p style="font-size:15px;font-style:italic">⛳ ${selections[c][0]}</p><p style="font-size:15px;font-style:italic;margin-top:4px">⛳ ${selections[c][1]}</p></div>`;
     }
+    if(!isEditMode) html+=`<div style="margin-top:1rem;padding:1rem;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.4);border-radius:10px;text-align:center;font-family:'EB Garamond',serif;font-size:0.95rem;color:var(--cream);line-height:1.6;">💰 Pour valider définitivement votre inscription, pensez à remettre <strong style="color:var(--gold);">20€ à Alexandre</strong>.</div>`;
     document.getElementById('confirm-recap').innerHTML=html;
     showScreen('screen-confirm');
   }catch(e){alert('Erreur lors de la sauvegarde. Réessayez.');console.error(e);}
