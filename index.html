@@ -478,7 +478,7 @@ const PLAYER_ESPN_IDS = {
 
 let currentUser='',currentCode='',currentChapeau=1,isEditMode=false;
 let selections={1:[],2:[],3:[],4:[]};
-let espnScores={},espnAllPlayers=[],refreshTimer=null,lastUpdated=null,newsLoaded=false,selectionTabLoaded=false,tournamentIsOpen=false;
+let espnScores={},espnAllPlayers=[],espnStatuses={},refreshTimer=null,lastUpdated=null,newsLoaded=false,selectionTabLoaded=false,tournamentIsOpen=false;
 let showingInscription=false;
 
 // ---- SUPABASE ----
@@ -501,6 +501,7 @@ async function sbFetch(path,optsOrMethod,body,upsert){
 function parseScore(s){if(!s||s==='E') return 0;return parseInt(s)||0;}
 function normalizeName(n){return n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z\s]/g,'').trim();}
 function getScore(nom){const k=normalizeName(nom);return espnScores[k]!==undefined?espnScores[k]:null;}
+function hasMadeCut(nom){const k=normalizeName(nom);const s=espnStatuses[k];return !s||(!s.includes('CUT')&&s!=='MC'&&s!=='WD');}
 function fmtScore(s){if(s===null||s===undefined) return 'N/A';if(s===0) return 'E';return(s>0?'+':'')+s;}
 function scoreClass(s){if(s===null) return '';return s<0?'neg':s>0?'pos':'even';}
 function showScreen(id){
@@ -533,11 +534,16 @@ async function fetchESPNScores(){
   try{
     const res=await fetch(ESPN_PROXY);
     const data=await res.json();
-    const map={};
+    const map={},statMap={};
     espnAllPlayers=[];
-    (data.scores||[]).forEach(j=>{map[normalizeName(j.nom)]=parseScore(j.score);espnAllPlayers.push({nom:j.nom,score:parseScore(j.score)});});
+    (data.scores||[]).forEach(j=>{
+      const k=normalizeName(j.nom);
+      map[k]=parseScore(j.score);
+      if(j.status) statMap[k]=j.status.toUpperCase();
+      espnAllPlayers.push({nom:j.nom,score:parseScore(j.score),status:j.status||null});
+    });
     espnAllPlayers.sort((a,b)=>a.score-b.score);
-    espnScores=map;lastUpdated=new Date();return true;
+    espnScores=map;espnStatuses=statMap;lastUpdated=new Date();return true;
   }catch(e){console.error(e);return false;}
 }
 
@@ -717,18 +723,22 @@ async function loadClassement(){
   try{
     const [_,participants]=await Promise.all([fetchESPNScores(),sbFetch('participants?select=*&order=nom')]);
     if(lastUpdated) document.getElementById('refresh-info').textContent=`Scores ESPN mis à jour à ${lastUpdated.toLocaleTimeString('fr-FR')} · Actualisation automatique`;
+    const cutActive=!tournamentIsOpen&&Object.keys(espnStatuses).length>0;
     const results=(participants||[]).map(p=>{
       const myJ=[p.c1a,p.c1b,p.c2a,p.c2b,p.c3a,p.c3b,p.c4a,p.c4b].filter(Boolean);
-      const scores=myJ.map(j=>({nom:j,score:getScore(j)??0}));
+      const scores=myJ.map(j=>({nom:j,score:getScore(j)??0,cut:cutActive&&!hasMadeCut(j)}));
       scores.sort((a,b)=>a.score-b.score);
       const best4=scores.slice(0,4);
       const total=best4.reduce((s,j)=>s+j.score,0);
-      return{nom:p.nom,total,best4,allJoueurs:scores};
+      const joueursPasses=cutActive?myJ.filter(j=>hasMadeCut(j)).length:myJ.length;
+      const elimine=cutActive&&joueursPasses<4;
+      return{nom:p.nom,total,best4,allJoueurs:scores,elimine,joueursPasses};
     });
-    results.sort((a,b)=>a.total-b.total);
-    const histMap=await saveAndGetEvolutions(results);
+    const qualifies=results.filter(r=>!r.elimine).sort((a,b)=>a.total-b.total);
+    const elimines=results.filter(r=>r.elimine);
+    const histMap=await saveAndGetEvolutions(qualifies);
     let html='';
-    results.forEach((r,i)=>{
+    qualifies.forEach((r,i)=>{
       const nc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
       const b4=r.best4.map(j=>j.nom.split(' ').pop()).join(', ');
       const arrow=getArrow(i+1,histMap[r.nom]);
@@ -740,12 +750,23 @@ async function loadClassement(){
       </div>
       <div class="participant-detail" id="d${i}">
         ${r.allJoueurs.map((j,idx)=>`<div class="detail-row">
-          <span class="${idx<4?'best4-name':''}"><span class="best4-star">${idx<4?'✦':''}</span>${j.nom}</span>
+          <span class="${idx<4?'best4-name':''}${j.cut?' cut-player':''}"><span class="best4-star">${idx<4?'✦':''}</span>${j.nom}${j.cut?' ✂️':''}</span>
           <span class="${scoreClass(j.score)}" style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600">${fmtScore(j.score)}</span>
         </div>`).join('')}
         ${renderEvolutionChart([])}
       </div>`;
     });
+    if(elimines.length){
+      html+=`<div style="margin-top:1rem;padding:0.5rem 0.75rem;font-family:'Cormorant Garamond',serif;font-size:0.7rem;color:rgba(201,168,76,0.5);letter-spacing:2px;text-transform:uppercase;border-top:1px solid rgba(201,168,76,0.15);">Éliminés du concours</div>`;
+      elimines.forEach(r=>{
+        html+=`<div class="rank-item" style="opacity:0.45;">
+          <div class="rank-num" style="color:#888;">✂</div>
+          <div style="width:20px;"></div>
+          <div class="rank-info"><div class="rank-name" style="text-decoration:line-through;">${r.nom}</div><div class="rank-joueurs">${r.joueursPasses}/4 joueurs WE</div></div>
+          <div style="font-size:12px;color:#888;">Éliminé</div>
+        </div>`;
+      });
+    }
     if(!html) html='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Aucun participant pour l\'instant</div>';
     document.getElementById('tab-classement').innerHTML=html;
     const isTournament=!tournamentIsOpen&&espnAllPlayers.length>0;
