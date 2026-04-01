@@ -418,12 +418,6 @@ input::placeholder { color:rgba(168,196,168,0.4); }
         <p style="font-size:13px;font-style:italic;color:var(--text-muted);margin-bottom:12px">Scores mis à jour automatiquement toutes les 5 minutes.</p>
         <button class="btn btn-outline" onclick="syncESPN()">Synchroniser maintenant</button>
         <div id="sync-msg" style="margin-top:10px"></div>
-        <div style="margin-top:1.5rem;border-top:1px solid rgba(201,168,76,0.2);padding-top:1rem;">
-          <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Questions Trivia du jour</div>
-          <div id="admin-trivia-status" style="font-size:0.8rem;color:rgba(245,240,232,0.5);margin-bottom:0.5rem;font-style:italic;"></div>
-          <textarea id="admin-trivia-json" placeholder='[{"q":"Question ?","opts":["A","B","C","D"],"answer":0},...]' style="width:100%;height:140px;background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.3);color:var(--cream);padding:0.5rem;border-radius:8px;font-size:0.75rem;font-family:monospace;resize:vertical;"></textarea>
-          <button onclick="adminPostTriviaQuestions()" class="btn btn-gold" style="width:100%;margin-top:0.5rem;">Publier les questions du jour</button>
-        </div>
       </div>
     </div>
   </div>
@@ -794,6 +788,12 @@ function switchTab(tab){
   if(tab==='selection'&&!selectionTabLoaded) loadMaSelection();
   if(tab==='scores'&&!document.getElementById('tab-scores').innerHTML.trim()) loadJoueursList();
   if(tab==='trivia') { loadTriviaInline(); }
+}
+
+function loadTriviaInline(){
+  const container=document.getElementById('tab-trivia');
+  if(!container) return;
+  loadTrivia();
 }
 
 // ---- PLAYER DATA ----
@@ -1221,139 +1221,70 @@ function startCountdown(){
 }
 
 // ---- TRIVIA ----
-const TRIVIA_PHASE1 = {
-  '2026-04-02': [
-    {q:"En quelle année le premier Masters Tournament a-t-il été disputé ?",opts:["1927","1934","1939","1946"],answer:1},
-    {q:"Quel surnom porte la zone stratégique des trous 11, 12 et 13 à Augusta ?",opts:["Death Valley","Amen Corner","The Triangle","Hell's Gate"],answer:1},
-    {q:"Qui co-fonda Augusta National avec Bobby Jones en 1931 ?",opts:["Clifford Roberts","Walter Hagen","Alister MacKenzie","Francis Ouimet"],answer:0},
-    {q:"En quelle année le Golf de Fontainebleau a-t-il été inauguré ?",opts:["1895","1901","1909","1920"],answer:2},
-    {q:"Quel architecte anglais a redessiné le parcours de Fontainebleau en 1920 ?",opts:["Alister MacKenzie","Harry Colt","Tom Simpson","Donald Ross"],answer:2}
-  ],
-  '2026-04-03': [
-    {q:"Qui a réalisé le légendaire double eagle au trou 15 d'Augusta en 1935 ?",opts:["Bobby Jones","Ben Hogan","Gene Sarazen","Sam Snead"],answer:2},
-    {q:"Quel est le nom du pont emblématique sur le trou 12 d'Augusta ?",opts:["Sarazen Bridge","Hogan Bridge","Nelson Bridge","Palmer Bridge"],answer:1},
-    {q:"Quel est le score record pour une édition du Masters, réalisé par Tiger Woods en 1997 ?",opts:["-16","-17","-18","-20"],answer:2},
-    {q:"Sur quel ancien terrain royal le Golf de Fontainebleau est-il implanté ?",opts:["Ancien vignoble impérial","Parquet des chasses impériales","Domaine de la couronne","Forêt des chasses royales"],answer:1},
-    {q:"Combien de bunkers compte approximativement le parcours de Fontainebleau ?",opts:["42","67","103","128"],answer:2}
-  ],
-  '2026-04-04': [
-    {q:"Combien de fois Tiger Woods a-t-il remporté le Masters ?",opts:["3","4","5","6"],answer:2},
-    {q:"Quel joueur a porté la Veste Verte le plus de fois dans l'histoire du Masters ?",opts:["Arnold Palmer","Jack Nicklaus","Tiger Woods","Phil Mickelson"],answer:1},
-    {q:"Qui a remporté le Masters 2025, complétant ainsi son Grand Chelem en carrière ?",opts:["Scottie Scheffler","Jon Rahm","Rory McIlroy","Ludvig Åberg"],answer:2},
-    {q:"Combien de fois le Golf de Fontainebleau a-t-il été élu 1er golf de France par le magazine Fairways ?",opts:["1 fois","2 fois","3 fois","4 fois"],answer:1},
-    {q:"Quel architecte français a tracé le parcours original de Fontainebleau avant Tom Simpson ?",opts:["Pierre Harmon","Julien Chantepie","Georges Carré","Henri Duval"],answer:1}
-  ],
-  '2026-04-05': [
-    {q:"Quel est le montant de la dotation totale du Masters 2026 ?",opts:["15 millions $","18 millions $","21 millions $","25 millions $"],answer:2},
-    {q:"Quel Français a participé au Masters 2024 après être devenu le premier Français vainqueur d'un PGA Tour depuis 1999 ?",opts:["Adrien Saddier","Victor Perez","Matthieu Pavon","Romain Langasque"],answer:2},
-    {q:"Comment s'appelle le ruisseau qui serpente devant les greens des trous 11, 12 et 13 à Augusta ?",opts:["Magnolia Creek","Rae's Creek","Butler Cabin Creek","Augusta Creek"],answer:1},
-    {q:"Quelle est la longueur totale du parcours de Fontainebleau depuis les départs arrière ?",opts:["5 450 m","5 800 m","6 030 m","6 450 m"],answer:2},
-    {q:"Le 15 juillet 1953, Ben Hogan joue à Fontainebleau. Quel titre majeur allait-il remporter quelques jours plus tard ?",opts:["US Open","The Open Championship","Masters Tournament","PGA Championship"],answer:1}
-  ],
-  '2026-04-06': [
-    {q:"Quelle est la longueur du parcours d'Augusta National en yards ?",opts:["7 175 yards","7 435 yards","7 555 yards","7 800 yards"],answer:2},
-    {q:"Qui détient le record du score le plus bas sur un seul tour au Masters (63) ?",opts:["Tiger Woods","Phil Mickelson","Nick Price et Greg Norman","Seve Ballesteros"],answer:2},
-    {q:"Quel trou d'Augusta est statistiquement le plus difficile, réputé pour ses conditions de vent imprévisibles au-dessus de Rae's Creek ?",opts:["Trou 11","Trou 12","Trou 15","Trou 18"],answer:1},
-    {q:"Quel type de sol particulier rend le Golf de Fontainebleau jouable par tous les temps ?",opts:["Sol argileux drainé","Sol sablonneux","Sol calcaire traité","Sol tourbeux"],answer:1},
-    {q:"Quel pays a remporté le plus de Ryder Cups depuis 1927 ?",opts:["États-Unis","Grande-Bretagne","Europe","Égalité parfaite"],answer:0}
-  ],
-  '2026-04-07': [
-    {q:"Quel joueur européen a remporté le Masters en 1988 ?",opts:["Nick Faldo","Sandy Lyle","Seve Ballesteros","Bernhard Langer"],answer:1},
-    {q:"En 1986, à 46 ans, Jack Nicklaus remporte son dernier Masters. Quel était son score final ?",opts:["-7","-9","-11","-13"],answer:1},
-    {q:"Quel est le surnom du trou 13 d'Augusta, un par 5 légendaire ?",opts:["Magnolia","Golden Bell","Azalea","White Dogwood"],answer:2},
-    {q:"Quel club européen a également été dessiné par Tom Simpson en 1913 ?",opts:["Sunningdale","Morfontaine","Muirfield","Royal Birkdale"],answer:1},
-    {q:"En quelle décennie Frederick Hawtree a-t-il modifié le parcours de Fontainebleau ?",opts:["Années 1940","Années 1950","Années 1960","Années 1970"],answer:2}
-  ],
-  '2026-04-08': [
-    {q:"Quel joueur a remporté les 4 tournois Majeurs consécutivement entre 2000 et 2001 ?",opts:["Jack Nicklaus","Tiger Woods","Ben Hogan","Phil Mickelson"],answer:1},
-    {q:"Comment s'appelle la cérémonie traditionnelle qui précède le Masters chaque mercredi soir ?",opts:["Champions Gala","Champions Dinner","Masters Banquet","Green Jacket Ceremony"],answer:1},
-    {q:"Quel est le seul joueur à avoir remporté le tout premier Masters en 1934 ?",opts:["Bobby Jones","Horton Smith","Gene Sarazen","Craig Wood"],answer:1},
-    {q:"Quel élément naturel de la forêt de Fontainebleau peut perturber la balle au trou n°12 ?",opts:["Des ornières de sangliers","Des souches de chênes centenaires","Des rochers de grès","Des terriers de lapins"],answer:2},
-    {q:"Quel fils de Frederick Hawtree a ajouté des bunkers à Fontainebleau dans les années 1980 ?",opts:["Robert Hawtree","Martin Hawtree","James Hawtree","William Hawtree"],answer:1}
-  ]
-};
+const TRIVIA_QUESTIONS=[
+  {q:"En quelle année le premier Masters Tournament a-t-il été disputé ?",opts:["1927","1934","1939","1946"],answer:1},
+  {q:"Quel surnom porte la zone des trous 11, 12 et 13 à Augusta ?",opts:["Death Valley","Amen Corner","The Triangle","Hell's Gate"],answer:1},
+  {q:"Qui a réalisé le double eagle au trou 15 d'Augusta en 1935 (\"Shot Heard Round the World\") ?",opts:["Bobby Jones","Ben Hogan","Gene Sarazen","Sam Snead"],answer:2},
+  {q:"Qui a remporté le Masters 2025, complétant ainsi son Grand Chelem en carrière ?",opts:["Scottie Scheffler","Jon Rahm","Rory McIlroy","Ludvig Åberg"],answer:2},
+  {q:"Qui co-fonda Augusta National avec Bobby Jones en 1931 ?",opts:["Clifford Roberts","Walter Hagen","Alister MacKenzie","Francis Ouimet"],answer:0},
+  {q:"Combien de fois Tiger Woods a-t-il remporté le Masters ?",opts:["3","4","5","6"],answer:2},
+  {q:"Quel est le nom du pont enjambant Rae's Creek au trou 12 d'Augusta ?",opts:["Sarazen Bridge","Hogan Bridge","Nelson Bridge","Palmer Bridge"],answer:1},
+  {q:"Quel Français a participé au Masters 2024 après être devenu le premier Français vainqueur d'un tournoi PGA Tour depuis 1999 ?",opts:["Adrien Saddier","Victor Perez","Matthieu Pavon","Romain Langasque"],answer:2},
+  {q:"Quel est le montant de la dotation totale du Masters 2026 ?",opts:["15 millions $","18 millions $","21 millions $","25 millions $"],answer:2},
+  {q:"En quelle année le Golf de Fontainebleau a-t-il été inauguré ?",opts:["1895","1901","1909","1920"],answer:2},
+  {q:"Quel architecte anglais a redessiné le parcours de Fontainebleau en 1920 ?",opts:["Alister MacKenzie","Harry Colt","Tom Simpson","Donald Ross"],answer:2},
+  {q:"Sur quel ancien terrain royal le Golf de Fontainebleau est-il implanté ?",opts:["Ancien vignoble impérial","Parquet des chasses impériales","Domaine de la couronne","Forêt des chasses royales"],answer:1},
+  {q:"Combien de bunkers compte approximativement le parcours de Fontainebleau ?",opts:["42","67","103","128"],answer:2},
+  {q:"Combien de fois le Golf de Fontainebleau a-t-il été élu 1er golf de France par le magazine Fairways ?",opts:["1 fois","2 fois","3 fois","4 fois"],answer:1},
+  {q:"Quel architecte français a tracé le parcours original de Fontainebleau avant Tom Simpson ?",opts:["Pierre Harmon","Julien Chantepie","Georges Carré","Henri Duval"],answer:1},
+  {q:"Le 15 juillet 1953, Ben Hogan joue à Fontainebleau avant de s'envoler pour un tournoi majeur qu'il remportera. Lequel ?",opts:["US Open","The Open Championship","PGA Championship","Augusta Masters"],answer:1},
+  {q:"Quel pays a remporté le plus de Ryder Cups depuis 1927 ?",opts:["États-Unis","Grande-Bretagne","Europe","Égalité parfaite"],answer:0}
+];
+let triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null};
 
-let triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null,questions:[]};
-
-function getTodayDate(){
-  return new Date().toISOString().split('T')[0];
-}
-
-async function loadTriviaInline(){
-  if(!currentUser){
-    document.getElementById('tab-trivia').innerHTML='<p style="text-align:center;color:rgba(245,240,232,0.5);padding:2rem;">Connectez-vous pour jouer.</p>';
-    return;
-  }
-  document.getElementById('tab-trivia').innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-style:italic">Chargement...</div>';
-  const today=getTodayDate();
-
-  // Vérifier si déjà joué aujourd'hui
-  const existing=await sbFetch(`trivia_scores?nom=eq.${encodeURIComponent(currentUser)}&jour=eq.${today}&select=score,temps_total`);
-  if(existing&&existing[0]){
-    await showTriviaResult(existing[0].score,existing[0].temps_total,true);
-    return;
-  }
-
-  // Déterminer les questions du jour
-  let questions=null;
-  if(TRIVIA_PHASE1[today]){
-    questions=TRIVIA_PHASE1[today];
-  } else {
-    // Phase 2 : charger depuis la DB
-    const dbq=await sbFetch(`trivia_questions?jour=eq.${today}&select=questions`);
-    if(dbq&&dbq[0]&&dbq[0].questions){
-      questions=dbq[0].questions;
-    }
-  }
-
-  if(!questions){
-    document.getElementById('tab-trivia').innerHTML=`
-      <div style="text-align:center;padding:2rem;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);margin-bottom:0.5rem;">⏳</div>
-        <p style="color:var(--cream);font-style:italic;">Les questions du jour ne sont pas encore disponibles.<br>Revenez ce soir !</p>
-      </div>`;
-    return;
-  }
-
-  triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null,questions};
+async function loadTrivia(){
+  const container=document.getElementById('tab-trivia');
+  if(!container) return;
+  if(!currentUser){container.innerHTML='<p style="color:var(--gold);text-align:center;">Connectez-vous pour jouer.</p>';return;}
+  try{
+    const existing=await sbFetch('trivia_scores?nom=eq.'+encodeURIComponent(currentUser)+'&select=score,temps_total');
+    if(existing&&existing[0]){showTriviaResult(existing[0].score,existing[0].temps_total,true);return;}
+  }catch(e){}
+  triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null};
   showTriviaQuestion();
 }
-
 function showTriviaQuestion(){
-  const q=triviaState.questions[triviaState.idx];
+  const q=TRIVIA_QUESTIONS[triviaState.idx];
   const container=document.getElementById('tab-trivia');
   if(!container) return;
   triviaState.startTime=Date.now();
   let timeLeft=15;
   container.innerHTML=`
-    <div style="padding:1rem;">
-      <div style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:0.8rem;text-align:center;margin-bottom:0.5rem;">Question ${triviaState.idx+1} / ${triviaState.questions.length}</div>
-      <div style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:1.25rem;">
-        <p style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--cream);line-height:1.4;margin:0 0 1rem;">${q.q}</p>
-        <div id="trivia-timer-bar-wrap" style="background:rgba(201,168,76,0.2);border-radius:4px;height:6px;margin-bottom:0.5rem;">
-          <div id="trivia-timer-bar" style="background:var(--gold);height:6px;border-radius:4px;width:100%;transition:width 1s linear;"></div>
-        </div>
-        <div id="trivia-timer-txt" style="font-size:0.7rem;color:var(--gold);text-align:right;margin-bottom:1rem;">${timeLeft}s</div>
-        <div id="trivia-opts" style="display:flex;flex-direction:column;gap:0.5rem;">
-          ${q.opts.map((opt,i)=>`<button onclick="answerTrivia(${i})" style="background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.3);color:var(--cream);padding:0.75rem 1rem;border-radius:8px;text-align:left;cursor:pointer;font-family:'EB Garamond',serif;font-size:1rem;">${opt}</button>`).join('')}
-        </div>
+    <div style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:0.8rem;text-align:center;margin-bottom:0.5rem;">Question ${triviaState.idx+1} / ${TRIVIA_QUESTIONS.length}</div>
+    <div style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:1.5rem;margin-bottom:1rem;">
+      <p style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--cream);line-height:1.4;margin:0 0 1rem;">${q.q}</p>
+      <div id="timer-bar-container" style="background:rgba(201,168,76,0.2);border-radius:4px;height:6px;margin-bottom:1rem;">
+        <div id="timer-bar" style="background:var(--gold);height:6px;border-radius:4px;width:100%;transition:width 1s linear;"></div>
+      </div>
+      <div id="timer-text" style="font-size:0.75rem;color:var(--gold);text-align:right;margin-bottom:1rem;">${timeLeft}s</div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        ${q.opts.map((opt,i)=>`<button onclick="answerTrivia(${i})" style="background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.3);color:var(--cream);padding:0.75rem 1rem;border-radius:8px;text-align:left;cursor:pointer;font-family:'EB Garamond',serif;font-size:1rem;">${opt}</button>`).join('')}
       </div>
     </div>`;
   triviaState.timerInterval=setInterval(()=>{
     timeLeft--;
-    const bar=document.getElementById('trivia-timer-bar');
-    const txt=document.getElementById('trivia-timer-txt');
+    const bar=document.getElementById('timer-bar');
+    const txt=document.getElementById('timer-text');
     if(bar) bar.style.width=(timeLeft/15*100)+'%';
     if(txt) txt.textContent=timeLeft+'s';
     if(timeLeft<=0){clearInterval(triviaState.timerInterval);answerTrivia(-1);}
   },1000);
 }
-
 function answerTrivia(chosen){
   clearInterval(triviaState.timerInterval);
   const elapsed=(Date.now()-triviaState.startTime)/1000;
   triviaState.temps.push(Math.min(elapsed,15));
-  const q=triviaState.questions[triviaState.idx];
+  const q=TRIVIA_QUESTIONS[triviaState.idx];
   let pts=0;
   if(chosen===q.answer){
     if(elapsed<=3) pts=1000;
@@ -1363,84 +1294,48 @@ function answerTrivia(chosen){
     else pts=200;
     triviaState.score+=pts;
   }
-  const btns=document.querySelectorAll('#trivia-opts button');
+  const btns=document.querySelectorAll('#tab-trivia button');
   btns.forEach((b,i)=>{
     b.disabled=true;
-    if(i===q.answer) b.style.background='rgba(0,180,80,0.3)';
+    if(i===q.answer) b.style.background='rgba(0,200,100,0.3)';
     else if(i===chosen) b.style.background='rgba(200,0,0,0.3)';
   });
-  const wrap=document.querySelector('#tab-trivia .card, #tab-trivia > div > div');
-  if(wrap){
-    const fb=document.createElement('div');
-    fb.style.cssText='text-align:center;padding:0.75rem;font-family:Cormorant Garamond,serif;font-size:1rem;color:var(--cream);margin-top:0.75rem;';
-    if(chosen===q.answer) fb.textContent=`✓ Correct ! +${pts} pts`;
-    else if(chosen===-1) fb.innerHTML=`⏱ Temps écoulé ! Réponse : <strong>${q.opts[q.answer]}</strong>`;
-    else fb.innerHTML=`✗ Incorrect. Réponse : <strong>${q.opts[q.answer]}</strong>`;
-    wrap.appendChild(fb);
-  }
+  const container=document.getElementById('tab-trivia');
+  const feedback=document.createElement('div');
+  feedback.style.cssText='text-align:center;padding:0.75rem;font-family:Cormorant Garamond,serif;font-size:1rem;color:var(--cream);margin-top:0.5rem;';
+  if(chosen===q.answer) feedback.innerHTML=`✓ Correct ! +${pts} pts`;
+  else if(chosen===-1) feedback.innerHTML=`⏱ Temps écoulé ! Réponse : <strong>${q.opts[q.answer]}</strong>`;
+  else feedback.innerHTML=`✗ Incorrect. Réponse : <strong>${q.opts[q.answer]}</strong>`;
+  container.appendChild(feedback);
   setTimeout(()=>{
     triviaState.idx++;
-    if(triviaState.idx<triviaState.questions.length) showTriviaQuestion();
+    if(triviaState.idx<TRIVIA_QUESTIONS.length) showTriviaQuestion();
     else finishTrivia();
   },2000);
 }
-
 async function finishTrivia(){
-  const totalTemps=Math.round(triviaState.temps.reduce((a,b)=>a+b,0));
-  const today=getTodayDate();
-  await sbFetch('trivia_scores','POST',{nom:currentUser,jour:today,score:triviaState.score,temps_total:totalTemps},true);
-  await showTriviaResult(triviaState.score,totalTemps,false);
+  const totalTemps=triviaState.temps.reduce((a,b)=>a+b,0);
+  try{await sbFetch('trivia_scores','POST',{nom:currentUser,score:triviaState.score,temps_total:Math.round(totalTemps)});}catch(e){}
+  showTriviaResult(triviaState.score,Math.round(totalTemps),false);
 }
-
-async function showTriviaResult(scoreDuJour,tempsDuJour,alreadyPlayed){
-  // Calcul du score cumulatif
-  const allScores=await sbFetch(`trivia_scores?nom=eq.${encodeURIComponent(currentUser)}&select=score,temps_total`);
-  const cumul=(allScores||[]).reduce((s,r)=>s+r.score,0);
-
-  // Classement général (somme par participant)
-  const tous=await sbFetch('trivia_scores?select=nom,score,temps_total&order=score.desc');
-  const cumMap={};
-  (tous||[]).forEach(r=>{
-    if(!cumMap[r.nom]) cumMap[r.nom]={total:0,temps:0};
-    cumMap[r.nom].total+=r.score;
-    cumMap[r.nom].temps+=r.temps_total;
-  });
-  const classement=Object.entries(cumMap).map(([nom,d])=>({nom,total:d.total,temps:d.temps})).sort((a,b)=>b.total-a.total||a.temps-b.temps);
-  const rank=classement.findIndex(r=>r.nom===currentUser)+1;
-
+async function showTriviaResult(score,temps,alreadyPlayed){
+  let scores=[];
+  try{scores=await sbFetch('trivia_scores?select=nom,score,temps_total&order=score.desc,temps_total.asc')||[];}catch(e){}
+  const rank=scores.findIndex(s=>s.nom===currentUser)+1||'?';
   const container=document.getElementById('tab-trivia');
+  if(!container) return;
   container.innerHTML=`
-    <div style="padding:1rem;">
-      ${alreadyPlayed?'<p style="text-align:center;color:rgba(201,168,76,0.6);font-size:0.85rem;margin-bottom:1rem;font-style:italic;">Vous avez déjà joué aujourd\'hui. Revenez demain !</p>':''}
-      <div style="text-align:center;padding:1rem 0;border-bottom:1px solid rgba(201,168,76,0.2);margin-bottom:1rem;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;">Score du jour</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--gold);font-weight:700;">${scoreDuJour}</div>
-        <div style="font-size:0.8rem;color:rgba(245,240,232,0.5);">pts · ${tempsDuJour}s</div>
-        <div style="margin-top:0.5rem;font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:var(--cream);">Total cumulé : <strong style="color:var(--gold);">${cumul} pts</strong></div>
-        <div style="font-size:0.9rem;color:var(--gold);margin-top:0.25rem;">🏆 Classement général : ${rank}ème</div>
+    <div style="text-align:center;padding:1rem;">
+      ${alreadyPlayed?'<p style="color:rgba(201,168,76,0.7);font-size:0.85rem;margin-bottom:1rem;">Vous avez déjà participé au Trivia.</p>':''}
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--gold);font-weight:700;">${score}</div>
+      <div style="color:var(--cream);font-size:0.85rem;margin-bottom:0.5rem;">points</div>
+      <div style="color:rgba(245,240,232,0.7);font-size:0.8rem;">Temps total : ${temps}s</div>
+      <div style="color:var(--gold);font-size:1rem;margin:0.75rem 0;">🏆 Classement : ${rank}ème</div>
+      <div style="margin-top:1rem;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);margin-bottom:0.5rem;border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:0.25rem;">Classement Trivia</div>
+        ${scores.slice(0,10).map((s,i)=>`<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.85rem;color:${s.nom===currentUser?'var(--gold)':'var(--cream)'}"><span>${i+1}. ${s.nom}</span><span>${s.score} pts</span></div>`).join('')}
       </div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Classement Trivia</div>
-      ${classement.slice(0,10).map((r,i)=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0.5rem;border-radius:6px;margin-bottom:0.25rem;background:${r.nom===currentUser?'rgba(201,168,76,0.1)':'transparent'};border:1px solid ${r.nom===currentUser?'rgba(201,168,76,0.25)':'transparent'};">
-          <span style="font-size:0.85rem;color:${r.nom===currentUser?'var(--gold)':'var(--cream)'};">${i+1}. ${r.nom}</span>
-          <span style="font-family:'Cormorant Garamond',serif;font-size:0.9rem;color:${r.nom===currentUser?'var(--gold)':'rgba(245,240,232,0.7)'};">${r.total} pts</span>
-        </div>`).join('')}
     </div>`;
-}
-
-async function adminPostTriviaQuestions(){
-  const today=getTodayDate();
-  const raw=document.getElementById('admin-trivia-json').value.trim();
-  const status=document.getElementById('admin-trivia-status');
-  try{
-    const questions=JSON.parse(raw);
-    if(!Array.isArray(questions)||questions.length!==5){status.textContent='⚠ Fournir exactement 5 questions en JSON.';status.style.color='#f44';return;}
-    // Upsert avec on_conflict sur jour
-    await sbFetch('trivia_questions?on_conflict=jour','POST',{jour:today,questions},true);
-    status.textContent=`✓ Questions du ${today} publiées !`;
-    status.style.color='#4c9';
-    document.getElementById('admin-trivia-json').value='';
-  }catch(e){status.textContent='⚠ JSON invalide ou erreur : '+e.message;status.style.color='#f44';}
 }
 
 
