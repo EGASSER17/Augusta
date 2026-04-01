@@ -671,9 +671,9 @@ function renderMainTabs(isOpen){
   tournamentIsOpen=isOpen;
   const el=document.getElementById('main-tabs');
   if(isOpen){
-    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div>`;
   } else {
-    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div>`;
   }
 }
 async function goClassement(){
