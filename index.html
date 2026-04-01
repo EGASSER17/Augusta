@@ -1256,53 +1256,61 @@ function startCountdown(){
 // ---- TRIVIA ----
 const TRIVIA_PHASE1 = {
   '2026-04-02': [
-    {q:"En quelle année le premier Masters Tournament a-t-il été disputé ?",opts:["1927","1934","1939","1946"],answer:1},
-    {q:"Quel surnom porte la zone stratégique des trous 11, 12 et 13 à Augusta ?",opts:["Death Valley","Amen Corner","The Triangle","Hell's Gate"],answer:1},
-    {q:"Qui co-fonda Augusta National avec Bobby Jones en 1931 ?",opts:["Clifford Roberts","Walter Hagen","Alister MacKenzie","Francis Ouimet"],answer:0},
-    {q:"En quelle année le Golf de Fontainebleau a-t-il été inauguré ?",opts:["1895","1901","1909","1920"],answer:2},
-    {q:"Quel architecte anglais a redessiné le parcours de Fontainebleau en 1920 ?",opts:["Alister MacKenzie","Harry Colt","Tom Simpson","Donald Ross"],answer:2}
+    {q:"Quel membre du Golf de Fontainebleau a remporté la Coupe Mouchy en 1983 et est aujourd'hui encore licencié au club ?",opts:["Hervé Frayssineau","Jean-Louis Schneider","Sébastien Branger","Jean-Pierre Hirigoyen"],answer:1,cat:"GDF"},
+    {q:"En quelle année le premier Masters Tournament a-t-il été disputé ?",opts:["1927","1934","1939","1946"],answer:1,cat:"Masters"},
+    {q:"Quel surnom porte la zone stratégique des trous 11, 12 et 13 à Augusta ?",opts:["Death Valley","Amen Corner","The Triangle","Hell's Gate"],answer:1,cat:"Masters"},
+    {q:"Qui co-fonda Augusta National avec Bobby Jones en 1931 ?",opts:["Clifford Roberts","Walter Hagen","Alister MacKenzie","Francis Ouimet"],answer:0,cat:"Masters"},
+    {q:"En quelle année le Golf de Fontainebleau a-t-il été inauguré ?",opts:["1895","1901","1909","1920"],answer:2,cat:"GDF"},
+    {q:"Quel architecte anglais a redessiné le parcours de Fontainebleau en 1920 ?",opts:["Alister MacKenzie","Harry Colt","Tom Simpson","Donald Ross"],answer:2,cat:"GDF"}
   ],
   '2026-04-03': [
-    {q:"Qui a réalisé le légendaire double eagle au trou 15 d'Augusta en 1935 ?",opts:["Bobby Jones","Ben Hogan","Gene Sarazen","Sam Snead"],answer:2},
-    {q:"Quel est le nom du pont emblématique sur le trou 12 d'Augusta ?",opts:["Sarazen Bridge","Hogan Bridge","Nelson Bridge","Palmer Bridge"],answer:1},
-    {q:"Quel est le score record pour une édition du Masters, réalisé par Tiger Woods en 1997 ?",opts:["-16","-17","-18","-20"],answer:2},
-    {q:"Sur quel ancien terrain royal le Golf de Fontainebleau est-il implanté ?",opts:["Ancien vignoble impérial","Parquet des chasses impériales","Domaine de la couronne","Forêt des chasses royales"],answer:1},
-    {q:"Combien de bunkers compte approximativement le parcours de Fontainebleau ?",opts:["42","67","103","128"],answer:2}
+    {q:"Qui a réalisé le légendaire double eagle au trou 15 d'Augusta en 1935, le 'Shot Heard Round the World' ?",opts:["Bobby Jones","Ben Hogan","Gene Sarazen","Sam Snead"],answer:2,cat:"Masters"},
+    {q:"Quel est le nom du pont emblématique sur le trou 12 d'Augusta, qui porte le nom d'un des plus grands champions de l'histoire du golf américain ?",opts:["Sarazen Bridge","Hogan Bridge","Nelson Bridge","Palmer Bridge"],answer:1,cat:"Masters"},
+    {q:"Quel est le score record pour une édition du Masters, réalisé par Tiger Woods en 1997 ?",opts:["-16","-17","-18","-20"],answer:2,cat:"Masters"},
+    {q:"Sur quel ancien terrain royal le Golf de Fontainebleau est-il implanté ?",opts:["Ancien vignoble impérial","Parquet des chasses impériales","Domaine de la couronne","Forêt des chasses royales"],answer:1,cat:"GDF"},
+    {q:"Combien de bunkers compte approximativement le parcours de Fontainebleau ?",opts:["42","67","83","128"],answer:2,cat:"GDF"}
   ],
   '2026-04-04': [
-    {q:"Combien de fois Tiger Woods a-t-il remporté le Masters ?",opts:["3","4","5","6"],answer:2},
-    {q:"Quel joueur a porté la Veste Verte le plus de fois dans l'histoire du Masters ?",opts:["Arnold Palmer","Jack Nicklaus","Tiger Woods","Phil Mickelson"],answer:1},
-    {q:"Qui a remporté le Masters 2025, complétant ainsi son Grand Chelem en carrière ?",opts:["Scottie Scheffler","Jon Rahm","Rory McIlroy","Ludvig Åberg"],answer:2},
-    {q:"Combien de fois le Golf de Fontainebleau a-t-il été élu 1er golf de France par le magazine Fairways ?",opts:["1 fois","2 fois","3 fois","4 fois"],answer:1},
-    {q:"Quel architecte français a tracé le parcours original de Fontainebleau avant Tom Simpson ?",opts:["Pierre Harmon","Julien Chantepie","Georges Carré","Henri Duval"],answer:1}
+    {q:"Combien de fois Tiger Woods a-t-il remporté le Masters ?",opts:["3","4","5","6"],answer:2,cat:"Masters"},
+    {q:"Quel joueur a porté la Veste Verte le plus de fois dans l'histoire du Masters ?",opts:["Arnold Palmer","Jack Nicklaus","Tiger Woods","Phil Mickelson"],answer:1,cat:"Masters"},
+    {q:"Qui a remporté le Masters 2025, complétant ainsi son Grand Chelem en carrière ?",opts:["Scottie Scheffler","Jon Rahm","Rory McIlroy","Ludvig Åberg"],answer:2,cat:"Masters"},
+    {q:"En quelle année la Coupe Mouchy a-t-elle été créée ?",opts:["1909","1920","1927","1934"],answer:2,cat:"GDF"},
+    {q:"Combien de fois le Golf de Fontainebleau a-t-il été élu 1er golf de France par le magazine Fairways ?",opts:["1 fois","2 fois","3 fois","4 fois"],answer:1,cat:"GDF"},
+    {q:"Quel architecte français a tracé le parcours original de Fontainebleau avant Tom Simpson ?",opts:["Pierre Harmon","Julien Chantepie","Georges Carré","Henri Duval"],answer:1,cat:"GDF"}
   ],
   '2026-04-05': [
-    {q:"Quel est le montant de la dotation totale du Masters 2026 ?",opts:["15 millions $","18 millions $","21 millions $","25 millions $"],answer:2},
-    {q:"Quel Français a participé au Masters 2024 après être devenu le premier Français vainqueur d'un PGA Tour depuis 1999 ?",opts:["Adrien Saddier","Victor Perez","Matthieu Pavon","Romain Langasque"],answer:2},
-    {q:"Comment s'appelle le ruisseau qui serpente devant les greens des trous 11, 12 et 13 à Augusta ?",opts:["Magnolia Creek","Rae's Creek","Butler Cabin Creek","Augusta Creek"],answer:1},
-    {q:"Quelle est la longueur totale du parcours de Fontainebleau depuis les départs arrière ?",opts:["5 450 m","5 800 m","6 030 m","6 450 m"],answer:2},
-    {q:"Le 15 juillet 1953, Ben Hogan joue à Fontainebleau. Quel titre majeur allait-il remporter quelques jours plus tard ?",opts:["US Open","The Open Championship","Masters Tournament","PGA Championship"],answer:1}
+    {q:"Quel est le montant de la dotation totale du Masters 2026 ?",opts:["15 millions $","18 millions $","21 millions $","25 millions $"],answer:2,cat:"Masters"},
+    {q:"Quel Français a participé au Masters 2024 après être devenu le premier Français vainqueur d'un tournoi PGA Tour depuis 1999 ?",opts:["Adrien Saddier","Victor Perez","Matthieu Pavon","Romain Langasque"],answer:2,cat:"Masters"},
+    {q:"Comment s'appelle le ruisseau qui serpente devant les greens des trous 11, 12 et 13 à Augusta ?",opts:["Magnolia Creek","Rae's Creek","Butler Cabin Creek","Augusta Creek"],answer:1,cat:"Masters"},
+    {q:"Quelle est la longueur totale du parcours de Fontainebleau depuis les départs arrière ?",opts:["5 450 m","5 800 m","6 030 m","6 450 m"],answer:2,cat:"GDF"},
+    {q:"Le 15 juillet 1953, Ben Hogan joue à Fontainebleau sous la pluie et réalise le par (69 coups). Quel titre majeur allait-il remporter quelques jours plus tard ?",opts:["US Open","The Open Championship","Masters Tournament","PGA Championship"],answer:1,cat:"GDF"}
   ],
   '2026-04-06': [
-    {q:"Quelle est la longueur du parcours d'Augusta National en yards ?",opts:["7 175 yards","7 435 yards","7 555 yards","7 800 yards"],answer:2},
-    {q:"Qui détient le record du score le plus bas sur un seul tour au Masters (63) ?",opts:["Tiger Woods","Phil Mickelson","Nick Price et Greg Norman","Seve Ballesteros"],answer:2},
-    {q:"Quel trou d'Augusta est statistiquement le plus difficile, réputé pour ses conditions de vent imprévisibles au-dessus de Rae's Creek ?",opts:["Trou 11","Trou 12","Trou 15","Trou 18"],answer:1},
-    {q:"Quel type de sol particulier rend le Golf de Fontainebleau jouable par tous les temps ?",opts:["Sol argileux drainé","Sol sablonneux","Sol calcaire traité","Sol tourbeux"],answer:1},
-    {q:"Quel pays a remporté le plus de Ryder Cups depuis 1927 ?",opts:["États-Unis","Grande-Bretagne","Europe","Égalité parfaite"],answer:0}
+    {q:"Quelle est la longueur du parcours d'Augusta National en yards ?",opts:["7 175 yards","7 435 yards","7 555 yards","7 800 yards"],answer:2,cat:"Masters"},
+    {q:"Qui détient le record du score le plus bas sur un seul tour au Masters (63) ?",opts:["Tiger Woods","Phil Mickelson","Nick Price (1986) et Greg Norman (1996)","Seve Ballesteros"],answer:2,cat:"Masters"},
+    {q:"Quel trou d'Augusta est statistiquement le plus difficile, réputé pour sa profondeur de green et ses conditions de vent imprévisibles au-dessus de Rae's Creek ?",opts:["Trou 11","Trou 12","Trou 15","Trou 18"],answer:1,cat:"Masters"},
+    {q:"Quel type de sol particulier rend le Golf de Fontainebleau jouable par tous les temps ?",opts:["Sol argileux drainé","Sol sablonneux","Sol calcaire traité","Sol tourbeux"],answer:1,cat:"GDF"},
+    {q:"Quel pays a remporté le plus de Ryder Cups depuis 1927 ?",opts:["États-Unis","Grande-Bretagne","Europe","Égalité parfaite"],answer:0,cat:"Golf"},
+    {q:"En quelle année l'équipe masculine senior du Golf de Fontainebleau a-t-elle remporté le Championnat de France par équipes Seniors 2, en battant Bussy en finale ?",opts:["2021","2022","2023","2024"],answer:3,cat:"GDF"},
+    {q:"Lequel de ces joueurs a été 5 fois lauréat du championnat du club ?",opts:["Chouchou","Loulou","Doudou","Coucou"],answer:0,cat:"GDF"}
   ],
   '2026-04-07': [
-    {q:"Quel joueur européen a remporté le Masters en 1988 ?",opts:["Nick Faldo","Sandy Lyle","Seve Ballesteros","Bernhard Langer"],answer:1},
-    {q:"En 1986, à 46 ans, Jack Nicklaus remporte son dernier Masters. Quel était son score final ?",opts:["-7","-9","-11","-13"],answer:1},
-    {q:"Quel est le surnom du trou 13 d'Augusta, un par 5 légendaire ?",opts:["Magnolia","Golden Bell","Azalea","White Dogwood"],answer:2},
-    {q:"Quel club européen a également été dessiné par Tom Simpson en 1913 ?",opts:["Sunningdale","Morfontaine","Muirfield","Royal Birkdale"],answer:1},
-    {q:"En quelle décennie Frederick Hawtree a-t-il modifié le parcours de Fontainebleau ?",opts:["Années 1940","Années 1950","Années 1960","Années 1970"],answer:2}
+    {q:"Quel joueur européen a remporté le Masters en 1988, surprenant les favoris américains ?",opts:["Nick Faldo","Sandy Lyle","Seve Ballesteros","Bernhard Langer"],answer:1,cat:"Masters"},
+    {q:"En 1986, à 46 ans, Jack Nicklaus remporte son dernier Masters. Quel était son score final ?",opts:["-7","-9","-11","-13"],answer:1,cat:"Masters"},
+    {q:"Quel est le surnom du trou 13 d'Augusta, un par 5 légendaire ?",opts:["Magnolia","Golden Bell","Azalea","White Dogwood"],answer:2,cat:"Masters"},
+    {q:"Quel grand club de golf européen, réputé pour son exclusivité absolue, a également été dessiné par Tom Simpson en 1913 ?",opts:["Sunningdale","Morfontaine","Muirfield","Royal Birkdale"],answer:1,cat:"GDF"},
+    {q:"En quelle décennie Frederick Hawtree a-t-il allongé et modifié le parcours de Fontainebleau pour la première fois ?",opts:["Années 1940","Années 1950","Années 1960","Années 1970"],answer:2,cat:"GDF"},
+    {q:"En 2019, le Golf de Fontainebleau a accueilli pour la première fois un grand championnat national féminin. Lequel ?",opts:["Championnat de France individuel Dames","Trophée Golfers' Club 1ère division","Championnat Seniors Dames","Coupe de France Dames"],answer:1,cat:"GDF"},
+    {q:"En mars 2025, l'équipe féminine du GDF a remporté pour la première fois de son histoire la Coupe de Paris Dames. Contre quel club en finale sur le score de 5 à 4 ?",opts:["Saint-Cloud","Saint-Nom-la-Bretèche","RCF La Boulie","Fourqueux"],answer:2,cat:"GDF"}
   ],
   '2026-04-08': [
-    {q:"Quel joueur a remporté les 4 tournois Majeurs consécutivement entre 2000 et 2001 ?",opts:["Jack Nicklaus","Tiger Woods","Ben Hogan","Phil Mickelson"],answer:1},
-    {q:"Comment s'appelle la cérémonie traditionnelle qui précède le Masters chaque mercredi soir ?",opts:["Champions Gala","Champions Dinner","Masters Banquet","Green Jacket Ceremony"],answer:1},
-    {q:"Quel est le seul joueur à avoir remporté le tout premier Masters en 1934 ?",opts:["Bobby Jones","Horton Smith","Gene Sarazen","Craig Wood"],answer:1},
-    {q:"Quel élément naturel de la forêt de Fontainebleau peut perturber la balle au trou n°12 ?",opts:["Des ornières de sangliers","Des souches de chênes centenaires","Des rochers de grès","Des terriers de lapins"],answer:2},
-    {q:"Quel fils de Frederick Hawtree a ajouté des bunkers à Fontainebleau dans les années 1980 ?",opts:["Robert Hawtree","Martin Hawtree","James Hawtree","William Hawtree"],answer:1}
+    {q:"Quel joueur a remporté les 4 tournois Majeurs consécutivement entre 2000 et 2001, un exploit inédit dans l'histoire du golf professionnel ?",opts:["Jack Nicklaus","Tiger Woods","Ben Hogan","Phil Mickelson"],answer:1,cat:"Masters"},
+    {q:"Comment s'appelle la cérémonie traditionnelle qui précède le Masters chaque mercredi soir à Augusta ?",opts:["Champions Gala","Champions Dinner","Masters Banquet","Green Jacket Ceremony"],answer:1,cat:"Masters"},
+    {q:"Quel est le seul joueur à avoir remporté le tout premier Masters en 1934 ?",opts:["Bobby Jones","Horton Smith","Gene Sarazen","Craig Wood"],answer:1,cat:"Masters"},
+    {q:"Quel élément naturel caractéristique de la forêt de Fontainebleau peut perturber la balle au trou n°12 du parcours ?",opts:["Des ornières de sangliers","Des souches de chênes centenaires","Des rochers de grès","Des terriers de lapins"],answer:2,cat:"GDF"},
+    {q:"Quel fils de Frederick Hawtree a ajouté des bunkers et trois greens supplémentaires à Fontainebleau dans les années 1980 ?",opts:["Robert Hawtree","Martin Hawtree","James Hawtree","William Hawtree"],answer:1,cat:"GDF"},
+    {q:"Lequel de ces joueurs n'a jamais été joueur de l'équipe masculine de Coupe de Paris ?",opts:["Framboise","Chipo","Yoyo","Titi"],answer:3,cat:"GDF"},
+    {q:"En quelle année et contre quel club le Golf de Fontainebleau a-t-il été finaliste de la Gounouilhou (Championnat de France 1ère division messieurs) ?",opts:["RCF 1988","Chantilly 1974","Chantaco 1997","Palmola 1956"],answer:0,cat:"GDF"}
   ]
 };
 
