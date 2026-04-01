@@ -910,7 +910,6 @@ function openPlayerCard(nom){
   if(info){
     info.photo_url=`https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${info.espn_id}.png&w=200&h=146`;
     renderPlayerCard(info,nom,score,chapeau);
-    loadPlayerScorecard(nom);
     loadPlayerNews(nom);
   } else {
     const sc=fmtScore(score),cls=scoreClass(score);
@@ -924,10 +923,8 @@ function openPlayerCard(nom){
         <div class="pstat"><div class="pstat-val">C${chapeau}</div><div class="pstat-lbl">Chapeau</div></div>
       </div>
       <div id="player-dynamic-info" style="text-align:center;padding:16px;color:var(--text-muted);font-style:italic;font-size:13px">Chargement des informations...</div>
-      <div id="player-scorecard-live"></div>
     </div>`;
     loadDynamicPlayerInfo(nom);
-    loadPlayerScorecard(nom);
   }
 }
 async function loadDynamicPlayerInfo(nom){
@@ -1002,7 +999,6 @@ function renderPlayerCard(info,nom,score,chapeau){
     <p class="player-bio">${info.bio||''}</p>
     ${s.driving_distance?`<div class="player-stats-grid" style="margin-bottom:14px"><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.driving_distance}</div><div class="pstat-lbl">Drive</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.fairways||'?'}</div><div class="pstat-lbl">Fairways</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.gir||'?'}</div><div class="pstat-lbl">GIR</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.putts_par_trou||'?'}</div><div class="pstat-lbl">Putts/trou</div></div></div>`:''}
     ${palmares?`<div style="margin-top:4px"><div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Palmarès</div>${palmares}</div>`:''}
-    <div id="player-scorecard-live"></div>
   </div>`;
 }
 let scorecardInterval = null;
