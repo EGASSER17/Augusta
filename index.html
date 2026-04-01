@@ -246,7 +246,6 @@ input::placeholder { color:rgba(168,196,168,0.4); }
     <div class="divider"></div>
     <button class="btn btn-outline" onclick="goClassement()">Consulter le classement</button>
     <button onclick="showScreen('screen-regles')" class="btn btn-ghost" style="width:100%;margin-top:0.5rem;font-size:0.85rem;">📋 Règles du concours</button>
-    <button onclick="registerPush()" class="btn btn-ghost" style="font-size:0.8rem;margin-top:0.5rem;">🔔 Activer les notifications</button>
     <button onclick="goAdmin()" style="background:none;border:none;color:rgba(201,168,76,0.35);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:1px;cursor:pointer;display:block;margin:8px auto 0;padding:4px 8px;">Administration</button>
   </div>
 </div>
@@ -1416,19 +1415,6 @@ function renderEvolutionChart(historyData){
 }
 
 // ---- PUSH NOTIFICATIONS ----
-async function registerPush(){
-  if(!currentUser) return;
-  if(!('serviceWorker' in navigator)||!('PushManager' in window)){
-    alert('Les notifications push ne sont pas supportées par votre navigateur.');
-    return;
-  }
-  try{
-    const reg=await navigator.serviceWorker.register('/Augusta/sw.js');
-    const permission=await Notification.requestPermission();
-    if(permission!=='granted'){alert('Permission refusée.');return;}
-    alert('Notifications activées ! (Serveur VAPID à configurer)');
-  }catch(e){alert('Erreur lors de l\'enregistrement du service worker.');}
-}
 
 document.addEventListener('DOMContentLoaded',()=>{showScreen('screen-accueil');startCountdown();});
 </script>
