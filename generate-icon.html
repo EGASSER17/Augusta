@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Générer icône</title></head>
+<body style="background:#1a3d28;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:Georgia,serif;gap:20px;">
+<canvas id="c" width="180" height="180" style="border-radius:20px;"></canvas>
+<a id="dl" style="color:#c9a84c;font-size:18px;cursor:pointer;">⬇ Télécharger icon.png</a>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+function draw(logoImg) {
+  // Fond vert
+  ctx.fillStyle = '#0d2818';
+  ctx.fillRect(0, 0, 180, 180);
+
+  // Bordure dorée fine
+  ctx.strokeStyle = 'rgba(201,168,76,0.4)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(4, 4, 172, 172);
+
+  // Logo centré
+  if (logoImg) {
+    const size = 100;
+    const x = (180 - size) / 2;
+    const y = 22;
+    ctx.drawImage(logoImg, x, y, size, size);
+  }
+
+  // Texte "MASTERS" en or
+  ctx.fillStyle = '#c9a84c';
+  ctx.font = '600 16px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = '4px';
+  ctx.fillText('MASTERS', 90, 148);
+
+  // Ligne dorée sous le texte
+  ctx.fillStyle = 'rgba(201,168,76,0.5)';
+  ctx.fillRect(55, 154, 70, 1);
+
+  // Lien téléchargement
+  const dl = document.getElementById('dl');
+  dl.href = canvas.toDataURL('image/png');
+  dl.download = 'icon.png';
+}
+
+const img = new Image();
+img.crossOrigin = 'anonymous';
+img.onload = () => draw(img);
+img.onerror = () => draw(null);
+img.src = 'https://egasser17.github.io/Augusta/logo.png';
+</script>
+</body>
+</html>
