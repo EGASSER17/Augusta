@@ -179,6 +179,16 @@ input::placeholder { color:rgba(168,196,168,0.4); }
   <img src="https://egasser17.github.io/Augusta/banniere.png" style="width:100%;height:160px;object-fit:cover;object-position:center;border-radius:2px;opacity:0.9" onerror="this.style.display='none'" alt="Augusta">
   <p style="font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--text-muted);line-height:1.6;text-align:center;margin-top:14px">Sélectionnez vos joueurs par chapeau<br>et suivez le tournoi en temps réel</p>
 </div>
+    <div id="countdown-container" style="text-align:center;margin:1.5rem 0;padding:1rem;background:rgba(201,168,76,0.1);border:1px solid var(--gold);border-radius:12px;">
+  <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Début du tournoi</div>
+  <div id="countdown-display" style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--gold);font-weight:600;letter-spacing:4px;"></div>
+  <div style="display:flex;justify-content:center;gap:1.5rem;margin-top:0.25rem;">
+    <span style="font-size:0.6rem;color:rgba(201,168,76,0.7);text-transform:uppercase;letter-spacing:1px;">Jours</span>
+    <span style="font-size:0.6rem;color:rgba(201,168,76,0.7);text-transform:uppercase;letter-spacing:1px;">Heures</span>
+    <span style="font-size:0.6rem;color:rgba(201,168,76,0.7);text-transform:uppercase;letter-spacing:1px;">Min</span>
+    <span style="font-size:0.6rem;color:rgba(201,168,76,0.7);text-transform:uppercase;letter-spacing:1px;">Sec</span>
+  </div>
+</div>
     <div id="msg-accueil"></div>
 
     <!-- CONNEXION -->
@@ -235,6 +245,8 @@ input::placeholder { color:rgba(168,196,168,0.4); }
 
     <div class="divider"></div>
     <button class="btn btn-outline" onclick="goClassement()">Consulter le classement</button>
+    <button onclick="showScreen('screen-regles')" class="btn btn-ghost" style="width:100%;margin-top:0.5rem;font-size:0.85rem;">📋 Règles du concours</button>
+    <button onclick="registerPush()" class="btn btn-ghost" style="font-size:0.8rem;margin-top:0.5rem;">🔔 Activer les notifications</button>
     <button class="btn btn-ghost mt" onclick="goAdmin()" style="margin-top:8px;font-size:12px;letter-spacing:1px">Administration</button>
   </div>
 </div>
@@ -273,13 +285,16 @@ input::placeholder { color:rgba(168,196,168,0.4); }
     <div class="tabs" id="main-tabs">
       <div class="tab active" onclick="switchTab('classement')">Classement</div>
       <div class="tab" onclick="switchTab('scores')">Joueurs</div>
-      <div class="tab" onclick="switchTab('news')">Actualités</div>
+      <div class="tab" onclick="switchTab('trivia')">Trivia</div>
+      <div class="tab" onclick="switchTab('chat')">Chat</div>
     </div>
     <div id="refresh-info" class="refresh-info"></div>
     <div id="tab-classement"></div>
     <div id="tab-selection" style="display:none"></div>
     <div id="tab-scores" style="display:none"></div>
     <div id="tab-news" style="display:none"></div>
+    <div id="tab-trivia" style="display:none"></div>
+    <div id="tab-chat" style="display:none"></div>
     <div class="divider"></div>
     <button class="btn btn-outline" onclick="showScreen('screen-accueil')" style="font-size:13px">← Retour à l'accueil</button>
   </div>
@@ -298,6 +313,68 @@ input::placeholder { color:rgba(168,196,168,0.4); }
     <div id="confirm-recap"></div>
     <div class="divider"></div>
     <button class="btn btn-gold" onclick="goClassement()">Voir le classement</button>
+  </div>
+</div>
+
+<!-- TRIVIA -->
+<div id="screen-trivia" class="screen" style="display:none;">
+  <div class="screen-header" style="display:flex;align-items:center;gap:1rem;padding:1rem;border-bottom:1px solid rgba(201,168,76,0.2);">
+    <button class="btn-back" onclick="showScreen('screen-classement')" style="background:none;border:none;color:var(--gold);font-size:1.5rem;cursor:pointer;">←</button>
+    <h2 style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:1.4rem;">Trivia Golf</h2>
+  </div>
+  <div id="trivia-container" style="padding:1rem;max-width:480px;margin:0 auto;"></div>
+</div>
+
+<!-- CHAT -->
+<div id="screen-chat" class="screen" style="display:none;">
+  <div class="screen-header" style="display:flex;align-items:center;gap:1rem;padding:1rem;border-bottom:1px solid rgba(201,168,76,0.2);">
+    <button class="btn-back" onclick="leaveChatScreen()" style="background:none;border:none;color:var(--gold);font-size:1.5rem;cursor:pointer;">←</button>
+    <h2 style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:1.4rem;">Chat</h2>
+  </div>
+  <div style="display:flex;flex-direction:column;height:calc(100vh - 70px);max-width:480px;margin:0 auto;">
+    <div id="chat-messages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.5rem;"></div>
+    <div style="padding:0.5rem;border-top:1px solid rgba(201,168,76,0.2);">
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
+        <button onclick="sendChatEmoji('👏')" style="flex:1;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);padding:0.5rem;border-radius:8px;cursor:pointer;font-size:1.2rem;">👏</button>
+        <button onclick="sendChatEmoji('😂')" style="flex:1;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);padding:0.5rem;border-radius:8px;cursor:pointer;font-size:1.2rem;">😂</button>
+        <button onclick="sendChatEmoji('🔥')" style="flex:1;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);padding:0.5rem;border-radius:8px;cursor:pointer;font-size:1.2rem;">🔥</button>
+        <button onclick="sendChatEmoji('⛳')" style="flex:1;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);padding:0.5rem;border-radius:8px;cursor:pointer;font-size:1.2rem;">⛳</button>
+      </div>
+      <div style="display:flex;gap:0.5rem;">
+        <input id="chat-input" type="text" maxlength="200" placeholder="Message..." style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.3);color:var(--cream);padding:0.5rem 0.75rem;border-radius:8px;font-family:'EB Garamond',serif;font-size:1rem;" onkeydown="if(event.key==='Enter')sendChat()">
+        <button onclick="sendChat()" class="btn btn-gold" style="padding:0.5rem 1rem;">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGLES -->
+<div id="screen-regles" class="screen" style="display:none;">
+  <div class="screen-header" style="display:flex;align-items:center;gap:1rem;padding:1rem;border-bottom:1px solid rgba(201,168,76,0.2);">
+    <button class="btn-back" onclick="showScreen('screen-accueil')" style="background:none;border:none;color:var(--gold);font-size:1.5rem;cursor:pointer;">←</button>
+    <h2 style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:1.4rem;">Règles du concours</h2>
+  </div>
+  <div style="padding:1rem;max-width:480px;margin:0 auto;">
+    <div class="card" style="margin-bottom:1rem;padding:1.25rem;">
+      <h3 style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:1.1rem;margin:0 0 0.75rem;">1. Principe</h3>
+      <p style="font-family:'EB Garamond',serif;color:var(--cream);font-size:0.95rem;line-height:1.6;margin:0;">Les joueurs sont répartis en 4 chapeaux par niveau. Chaque participant choisit 2 joueurs par chapeau, soit 8 joueurs au total.</p>
+    </div>
+    <div class="card" style="margin-bottom:1rem;padding:1.25rem;">
+      <h3 style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:1.1rem;margin:0 0 0.75rem;">2. Scoring</h3>
+      <p style="font-family:'EB Garamond',serif;color:var(--cream);font-size:0.95rem;line-height:1.6;margin:0;">Pendant le tournoi, seuls les 4 meilleurs scores de vos 8 joueurs comptent. Le participant avec le total le plus bas (le moins de coups sous le par) remporte le concours.</p>
+    </div>
+    <div class="card" style="margin-bottom:1rem;padding:1.25rem;">
+      <h3 style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:1.1rem;margin:0 0 0.75rem;">3. Participation</h3>
+      <p style="font-family:'EB Garamond',serif;color:var(--cream);font-size:0.95rem;line-height:1.6;margin:0;">20€ par participant. Les gains sont répartis entre les 10 premiers du classement selon une grille communiquée à l'ouverture.</p>
+    </div>
+    <div class="card" style="margin-bottom:1rem;padding:1.25rem;">
+      <h3 style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:1.1rem;margin:0 0 0.75rem;">4. Calendrier</h3>
+      <p style="font-family:'EB Garamond',serif;color:var(--cream);font-size:0.95rem;line-height:1.6;margin:0;">Sélections ouvertes jusqu'au 9 avril 2026. Tournoi du 9 au 12 avril 2026.</p>
+    </div>
+    <div class="card" style="margin-bottom:1rem;padding:1.25rem;">
+      <h3 style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:1.1rem;margin:0 0 0.75rem;">5. Trivia</h3>
+      <p style="font-family:'EB Garamond',serif;color:var(--cream);font-size:0.95rem;line-height:1.6;margin:0;">Un quiz golf/GDF est disponible avant le tournoi. Une seule tentative autorisée. Le classement du trivia est distinct du classement principal.</p>
+    </div>
   </div>
 </div>
 
@@ -370,10 +447,16 @@ const ADMIN_PWD='masters2025';
 const REFRESH_INTERVAL=5*60*1000;
 
 const JOUEURS={
-  1:['Scottie Scheffler','Rory McIlroy','Jon Rahm','Tommy Fleetwood','Bryson DeChambeau','Tyrrell Hatton','Robert MacIntyre','Shane Lowry','Xander Schauffele','Collin Morikawa','Ludvig Aberg','Viktor Hovland','Joaquin Niemann','Justin Thomas','Brooks Koepka','Jordan Spieth','Justin Rose','Russell Henley','Matt Fitzpatrick','Patrick Cantlay'],
-  2:['Sepp Straka','Cameron Young','Hideki Matsuyama','Adam Scott','Ryan Fox','Jason Day','J.J. Spaun','Ben Griffin','Patrick Reed','Corey Conners','Min Woo Lee','Aaron Rai','Brian Harman','Carlos Ortiz','Sam Burns','Thomas Detry','Cameron Smith','Tony Finau','Sungjae Im','Wyndham Clark'],
-  3:['Rickie Fowler','Keegan Bradley','Si Woo Kim','Akshay Bhatia','Taylor Pendrith','Marc Leishman','Daniel Berger','Lucas Herbert','Harry Hall','Aldrich Potgieter','Tom Kim','Rasmus Hojgaard','Tom McKibbin','Dean Burmester','Nicolai Hojgaard','Sergio Garcia'],
-  4:['Sahith Theegala','Thriston Lawrence','Harris English','Louis Oosthuizen','Byeong Hun An','Davis Thompson','Dustin Johnson','Maverick McNealy','Thorbjorn Olesen','Matt Wallace','Christiaan Bezuidenhout','Emiliano Grillo','Nick Taylor','Denny McCarthy','J.T. Poston','Tom Hoge','Chris Kirk','Martin Couvra','Nick Dunlap','Jason Kokrak','Matthieu Pavon','Stephan Jaeger','Phil Mickelson','Adrien Saddier']
+  1:["Scottie Scheffler","Rory McIlroy","Bryson DeChambeau","Jon Rahm","Ludvig Åberg","Xander Schauffele","Matt Fitzpatrick","Cameron Young","Tommy Fleetwood","Justin Rose","Collin Morikawa","Patrick Reed","Brooks Koepka","Jordan Spieth","Hideki Matsuyama"],
+  2:["Min Woo Lee","Robert MacIntyre","Viktor Hovland","Shane Lowry","Chris Gotterup","Tyrrell Hatton","Russell Henley","Patrick Cantlay","Akshay Bhatia","Si Woo Kim","Sepp Straka","Jason Day","Sam Burns","Justin Thomas","Corey Conners"],
+  3:["Adam Scott","Sungjae Im","Marco Penge","Jacob Bridgeman","Gary Woodland","J.J. Spaun","Nicolai Hojgaard","Cameron Smith","Sahith Theegala","Harris English","Daniel Berger","Brian Harman","Tony Finau","Max Homa","Ben Griffin"],
+  4:["Dustin Johnson","Casey Jarvis","Wyndham Clark","Ryan Fox","Sergio Garcia","Aldrich Potgieter","Rasmus Hojgaard","Keegan Bradley","Aaron Rai","Anthony Kim","Phil Mickelson","Bubba Watson","Danny Willett","Charl Schwartzel","Zach Johnson","Angel Cabrera","Fred Couples","Vijay Singh","Nick Taylor","Matt McCarty"]
+};
+const CHAPEAU_TITRES={
+  1:"Grands Favoris",
+  2:"Contendants",
+  3:"Outsiders",
+  4:"Longshots & Légendes"
 };
 const ALL_JOUEURS=Object.values(JOUEURS).flat();
 const NB_CHAPEAUX=4;
@@ -384,11 +467,16 @@ let espnScores={},refreshTimer=null,lastUpdated=null,newsLoaded=false,selectionT
 let showingInscription=false;
 
 // ---- SUPABASE ----
-async function sbFetch(path,opts={}){
-  const res=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
-    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':opts.prefer||'return=representation',...opts.headers},
-    ...opts
-  });
+async function sbFetch(path,optsOrMethod,body,upsert){
+  let fetchOpts;
+  if(typeof optsOrMethod==='string'){
+    const prefer=upsert?'resolution=merge-duplicates,return=representation':'return=representation';
+    fetchOpts={method:optsOrMethod,headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':prefer},body:body?JSON.stringify(body):undefined};
+  } else {
+    const opts=optsOrMethod||{};
+    fetchOpts={headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':opts.prefer||'return=representation',...opts.headers},...opts};
+  }
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+path,fetchOpts);
   if(!res.ok){const e=await res.text();throw new Error(e);}
   if(res.status===204||res.headers.get('content-length')==='0') return null;
   const t=await res.text();return t?JSON.parse(t):null;
@@ -523,7 +611,7 @@ function renderChapeau(){
   }
   document.getElementById('step-dots').innerHTML=dotsHtml;
   const joueurs=JOUEURS[currentChapeau],sel=selections[currentChapeau];
-  let html=`<div class="card"><div class="chapeau-header"><div class="chapeau-num">${currentChapeau}</div><div class="chapeau-info"><h3>Chapeau ${currentChapeau}</h3><p>${sel.length}/2 joueurs sélectionnés</p></div></div><div class="joueurs-grid">`;
+  let html=`<div class="card"><div class="chapeau-header"><div class="chapeau-num">${currentChapeau}</div><div class="chapeau-info"><h3>${CHAPEAU_TITRES[currentChapeau]}</h3><p>${sel.length}/2 joueurs sélectionnés</p></div></div><div class="joueurs-grid">`;
   joueurs.forEach(j=>{
     const isSel=sel.includes(j),isDisabled=!isSel&&sel.length>=2;
     html+=`<button class="joueur-btn ${isSel?'selected':''} ${isDisabled?'disabled':''}" onclick="toggleJoueur('${j.replace(/'/g,"\\'")}',${currentChapeau})">${j}</button>`;
@@ -564,9 +652,17 @@ async function submitSelections(){
     }
     let html='';
     for(let c=1;c<=NB_CHAPEAUX;c++){
-      html+=`<div class="card" style="margin-bottom:8px"><div class="card-title">Chapeau ${c}</div><p style="font-size:15px;font-style:italic">⛳ ${selections[c][0]}</p><p style="font-size:15px;font-style:italic;margin-top:4px">⛳ ${selections[c][1]}</p></div>`;
+      html+=`<div class="card" style="margin-bottom:8px"><div class="card-title">${CHAPEAU_TITRES[c]}</div><p style="font-size:15px;font-style:italic">⛳ ${selections[c][0]}</p><p style="font-size:15px;font-style:italic;margin-top:4px">⛳ ${selections[c][1]}</p></div>`;
     }
     document.getElementById('confirm-recap').innerHTML=html;
+    // Bouton WhatsApp partage
+    const wabtn=document.createElement('button');
+    wabtn.className='btn btn-outline';
+    wabtn.style.width='100%';
+    wabtn.style.marginTop='0.75rem';
+    wabtn.textContent='📱 Partager sur WhatsApp';
+    wabtn.onclick=()=>shareWhatsApp(selections);
+    document.getElementById('confirm-recap').after(wabtn);
     showScreen('screen-confirm');
   }catch(e){alert('Erreur lors de la sauvegarde. Réessayez.');console.error(e);}
 }
@@ -576,9 +672,9 @@ function renderMainTabs(isOpen){
   tournamentIsOpen=isOpen;
   const el=document.getElementById('main-tabs');
   if(isOpen){
-    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('chat')">Chat</div>`;
   } else {
-    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('news')">Actualités</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Ma sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('chat')">Chat</div>`;
   }
 }
 async function goClassement(){
@@ -616,12 +712,15 @@ async function loadClassement(){
       return{nom:p.nom,total,best4,allJoueurs:scores};
     });
     results.sort((a,b)=>a.total-b.total);
+    const histMap=await saveAndGetEvolutions(results);
     let html='';
     results.forEach((r,i)=>{
       const nc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
       const b4=r.best4.map(j=>j.nom.split(' ').pop()).join(', ');
+      const arrow=getArrow(i+1,histMap[r.nom]);
       html+=`<div class="rank-item" onclick="toggleDetail('d${i}')">
         <div class="rank-num ${nc}">${i+1}</div>
+        <div style="width:20px;text-align:center;flex-shrink:0;">${arrow}</div>
         <div class="rank-info"><div class="rank-name">${r.nom}</div><div class="rank-joueurs">Best 4 : ${b4}</div></div>
         <div class="rank-score ${scoreClass(r.total)}">${fmtScore(r.total)}</div>
       </div>
@@ -630,6 +729,7 @@ async function loadClassement(){
           <span class="${idx<4?'best4-name':''}"><span class="best4-star">${idx<4?'✦':''}</span>${j.nom}</span>
           <span class="${scoreClass(j.score)}" style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600">${fmtScore(j.score)}</span>
         </div>`).join('')}
+        ${renderEvolutionChart([])}
       </div>`;
     });
     if(!html) html='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Aucun participant pour l\'instant</div>';
@@ -657,7 +757,7 @@ async function loadClassement(){
 }
 function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
 function switchTab(tab){
-  const allTabs=['classement','selection','scores','news'];
+  const allTabs=['classement','selection','scores','news','trivia','chat'];
   document.querySelectorAll('#main-tabs .tab').forEach(el=>{
     el.classList.toggle('active',el.getAttribute('onclick')===`switchTab('${tab}')`);
   });
@@ -665,6 +765,12 @@ function switchTab(tab){
   if(tab==='news'&&!newsLoaded) loadNews();
   if(tab==='selection'&&!selectionTabLoaded) loadMaSelection();
   if(tab==='scores'&&!document.getElementById('tab-scores').innerHTML.trim()) loadJoueursList();
+  if(tab==='trivia') { document.getElementById('tab-trivia').innerHTML=''; showScreen('screen-trivia'); loadTrivia(); }
+  if(tab==='chat') { document.getElementById('tab-chat').innerHTML=''; showScreen('screen-chat'); loadChat(); }
+}
+function leaveChatScreen(){
+  if(chatInterval){ clearInterval(chatInterval); chatInterval=null; }
+  showScreen('screen-classement');
 }
 
 // ---- PLAYER DATA ----
@@ -699,7 +805,7 @@ function openPlayerCard(nom){
     modal.innerHTML=`<div class="player-sheet" style="position:relative">
       <button class="player-close" onclick="closePlayerCard()">✕</button>
       <div class="player-header"><div class="player-photo-placeholder">🏌️</div>
-        <div><div class="player-name-h">${nom}</div><div class="player-name-sub">Chapeau ${chapeau}</div></div>
+        <div><div class="player-name-h">${nom}</div><div class="player-name-sub">${CHAPEAU_TITRES[chapeau]||'Chapeau '+chapeau}</div></div>
       </div>
       <div class="player-stats-grid">
         <div class="pstat"><div class="pstat-val ${cls}">${sc}</div><div class="pstat-lbl">Score Masters</div></div>
@@ -771,7 +877,7 @@ function renderPlayerCard(info,nom,score,chapeau){
   const palmares=(info.palmares_liste||[]).slice(0,5).map(p=>`<div class="palmares-item">🏆 ${p}</div>`).join('');
   modal.innerHTML=`<div class="player-sheet" style="position:relative">
     <button class="player-close" onclick="closePlayerCard()">✕</button>
-    <div class="player-header">${photoHtml}<div><div class="player-name-h">${nom}</div><div class="player-name-sub">${info.nationalite||''} · ${info.age?info.age+' ans':''}</div><div style="font-size:12px;color:var(--gold);margin-top:3px;letter-spacing:1px">Chapeau ${chapeau}</div></div></div>
+    <div class="player-header">${photoHtml}<div><div class="player-name-h">${nom}</div><div class="player-name-sub">${info.nationalite||''} · ${info.age?info.age+' ans':''}</div><div style="font-size:12px;color:var(--gold);margin-top:3px;letter-spacing:1px">${CHAPEAU_TITRES[chapeau]||'Chapeau '+chapeau}</div></div></div>
     <div class="player-stats-grid">
       <div class="pstat"><div class="pstat-val ${cls}">${sc}</div><div class="pstat-lbl">Score Masters</div></div>
       <div class="pstat"><div class="pstat-val">#${info.classement_mondial||'?'}</div><div class="pstat-lbl">Classement</div></div>
@@ -782,6 +888,7 @@ function renderPlayerCard(info,nom,score,chapeau){
     <p class="player-bio">${info.bio||''}</p>
     ${s.driving_distance?`<div class="player-stats-grid" style="margin-bottom:14px"><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.driving_distance}</div><div class="pstat-lbl">Drive</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.fairways||'?'}</div><div class="pstat-lbl">Fairways</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.gir||'?'}</div><div class="pstat-lbl">GIR</div></div><div class="pstat"><div class="pstat-val" style="font-size:15px">${s.putts_par_trou||'?'}</div><div class="pstat-lbl">Putts/trou</div></div></div>`:''}
     ${palmares?`<div style="margin-top:4px"><div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Palmarès</div>${palmares}</div>`:''}
+    ${renderScorecard()}
   </div>`;
 }
 function closePlayerCard(){const m=document.getElementById('player-modal');if(m) m.remove();}
@@ -791,51 +898,48 @@ async function loadMaSelection(){
   selectionTabLoaded=true;
   const el=document.getElementById('tab-selection');
   if(!currentUser){
-    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Connectez-vous pour voir vos sélections.</div>';
+    el.innerHTML='<p style="text-align:center;color:rgba(245,240,232,0.5);padding:2rem;">Connectez-vous pour voir vos sélections.</p>';
     return;
   }
   el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-style:italic">Chargement...</div>';
   try{
-    const participant=await sbFetch(`participants?nom=eq.${encodeURIComponent(currentUser)}&select=*`);
-    if(!participant||participant.length===0){
-      el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Aucune sélection trouvée.</div>';
+    const data=await sbFetch(`participants?nom=eq.${encodeURIComponent(currentUser)}&select=*`);
+    if(!data||!data[0]){
+      el.innerHTML='<p style="text-align:center;color:rgba(245,240,232,0.5);padding:2rem;">Aucune sélection trouvée.</p>';
       return;
     }
-    const p=participant[0];
-    const joueurs=[p.c1a,p.c1b,p.c2a,p.c2b,p.c3a,p.c3b,p.c4a,p.c4b].filter(Boolean);
-    let html=`<div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px">Mes 8 joueurs</div>`;
-    if(tournamentIsOpen){
-      const scored=joueurs.map(j=>({nom:j,score:getScore(j)??999}));
-      scored.sort((a,b)=>a.score-b.score);
-      const best4Set=new Set(scored.slice(0,4).map(j=>j.nom));
-      scored.forEach(j=>{
-        const isBest=best4Set.has(j.nom);
-        html+=`<div class="rank-item" onclick="openPlayerCard('${j.nom}')">
-          <div class="rank-info">
-            <div class="rank-name">${isBest?'<span style="color:var(--gold);margin-right:6px">✦</span>':''}${j.nom}</div>
-            ${isBest?'<div style="font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase">Meilleur 4</div>':''}
-          </div>
-          <div class="rank-score ${j.score===999?'':scoreClass(j.score)}">${j.score===999?'–':fmtScore(j.score)}</div>
-        </div>`;
-      });
-      const validScores=scored.slice(0,4).filter(j=>j.score!==999);
-      if(validScores.length>0){
-        const total=validScores.reduce((s,j)=>s+j.score,0);
-        html+=`<div style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:2px;padding:12px;margin-top:12px;text-align:center">
-          <div style="font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)">Score total Best 4</div>
-          <div style="font-size:28px;font-family:'Cormorant Garamond',serif;font-weight:600;color:${total<=0?'#4fc46a':'#e85858'};margin-top:4px">${fmtScore(total)}</div>
+    const p=data[0];
+    const selMap={1:[p.c1a,p.c1b],2:[p.c2a,p.c2b],3:[p.c3a,p.c3b],4:[p.c4a,p.c4b]};
+    const allPlayers=Object.values(selMap).flat().filter(Boolean);
+    const scores=allPlayers.map(name=>{
+      const sc=getScore(name);
+      return{name,toPar:sc};
+    });
+    const validScores=scores.filter(s=>s.toPar!==null).sort((a,b)=>a.toPar-b.toPar);
+    const best4Names=new Set(validScores.slice(0,4).map(s=>s.name));
+    const totalBest4=validScores.slice(0,4).reduce((sum,s)=>sum+s.toPar,0);
+    let html=`<div style="text-align:center;padding:1rem 0;border-bottom:1px solid rgba(201,168,76,0.2);margin-bottom:1rem;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;">Score total (4 meilleurs)</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--gold);font-weight:700;">${validScores.length===0?'–':(totalBest4>0?'+'+totalBest4:(totalBest4===0?'E':totalBest4))}</div>
+    </div>`;
+    for(let c=1;c<=4;c++){
+      html+=`<div style="margin-bottom:1rem;"><div style="font-family:'Cormorant Garamond',serif;font-size:0.8rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">${CHAPEAU_TITRES[c]}</div>`;
+      for(const name of selMap[c].filter(Boolean)){
+        const s=scores.find(x=>x.name===name);
+        const isBest=best4Names.has(name);
+        const tp=s?s.toPar:null;
+        const scoreStr=tp!==null?(tp>0?'+'+tp:(tp===0?'E':tp)):'-';
+        html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.75rem;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,${isBest?'0.3':'0.1'});margin-bottom:0.35rem;">
+          <span style="font-family:'EB Garamond',serif;color:${isBest?'var(--gold)':'var(--cream)'};font-size:0.95rem;">${isBest?'✦ ':''}${name}</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:${isBest?'var(--gold)':'rgba(245,240,232,0.7)'};">${scoreStr}</span>
         </div>`;
       }
-    } else {
-      joueurs.forEach(j=>{
-        html+=`<div class="rank-item" onclick="openPlayerCard('${j}')">
-          <div class="rank-info"><div class="rank-name">${j}</div></div>
-        </div>`;
-      });
+      html+='</div>';
     }
-    if(!tournamentIsOpen){
-      html+=`<div class="divider"></div><button class="btn btn-outline" onclick="editSelection()" style="font-size:13px;letter-spacing:1px">✏ Modifier ma sélection</button>`;
-    }
+    const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');
+    const isOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
+    if(isOpen) html+=`<button onclick="showScreen('screen-selection')" class="btn btn-outline" style="width:100%;margin-top:0.5rem;">Modifier mes sélections</button>`;
+    html+=`<button onclick="shareWhatsApp({1:['${selMap[1][0]}','${selMap[1][1]}'],2:['${selMap[2][0]}','${selMap[2][1]}'],3:['${selMap[3][0]}','${selMap[3][1]}'],4:['${selMap[4][0]}','${selMap[4][1]}']})" class="btn btn-outline" style="width:100%;margin-top:0.5rem;">📱 Partager sur WhatsApp</button>`;
     el.innerHTML=html;
   }catch(e){el.innerHTML='<div class="msg error">Erreur de chargement</div>';console.error(e);}
 }
@@ -961,7 +1065,288 @@ async function syncESPN(){
   showMsg('sync-msg',ok?`✓ ${Object.keys(espnScores).length} joueurs synchronisés`:'Erreur de synchronisation',ok?'success':'error');
 }
 
-document.addEventListener('DOMContentLoaded',()=>{showScreen('screen-accueil');});
+// ---- COUNTDOWN ----
+function startCountdown(){
+  const target=new Date('2026-04-09T15:00:00+02:00');
+  function update(){
+    const now=new Date();
+    const diff=target-now;
+    const el=document.getElementById('countdown-display');
+    if(!el) return;
+    if(diff<=0){
+      el.textContent='Le tournoi a commencé !';
+      el.style.fontSize='1.2rem';
+      el.style.letterSpacing='1px';
+      return;
+    }
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor((diff%86400000)/3600000).toString().padStart(2,'0');
+    const m=Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
+    const s=Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+    el.textContent=`${d} ${h}:${m}:${s}`;
+    setTimeout(update,1000);
+  }
+  update();
+}
+
+// ---- TRIVIA ----
+const TRIVIA_QUESTIONS=[
+  {q:"En quelle année le premier Masters Tournament a-t-il été disputé ?",opts:["1927","1934","1939","1946"],answer:1},
+  {q:"Quel surnom porte la zone des trous 11, 12 et 13 à Augusta ?",opts:["Death Valley","Amen Corner","The Triangle","Hell's Gate"],answer:1},
+  {q:"Qui a réalisé le double eagle au trou 15 d'Augusta en 1935 (\"Shot Heard Round the World\") ?",opts:["Bobby Jones","Ben Hogan","Gene Sarazen","Sam Snead"],answer:2},
+  {q:"Qui a remporté le Masters 2025, complétant ainsi son Grand Chelem en carrière ?",opts:["Scottie Scheffler","Jon Rahm","Rory McIlroy","Ludvig Åberg"],answer:2},
+  {q:"Qui co-fonda Augusta National avec Bobby Jones en 1931 ?",opts:["Clifford Roberts","Walter Hagen","Alister MacKenzie","Francis Ouimet"],answer:0},
+  {q:"Combien de fois Tiger Woods a-t-il remporté le Masters ?",opts:["3","4","5","6"],answer:2},
+  {q:"Quel est le nom du pont sur le trou 12 d'Augusta, rendu célèbre par Ben Hogan ?",opts:["Sarazen Bridge","Hogan Bridge","Nelson Bridge","Palmer Bridge"],answer:1},
+  {q:"Quel Français a participé au Masters 2024 après être devenu le premier Français vainqueur d'un tournoi PGA Tour depuis 1999 ?",opts:["Adrien Saddier","Victor Perez","Matthieu Pavon","Romain Langasque"],answer:2},
+  {q:"Quel est le montant de la dotation totale du Masters 2026 ?",opts:["15 millions $","18 millions $","21 millions $","25 millions $"],answer:2},
+  {q:"En quelle année le Golf de Fontainebleau a-t-il été inauguré ?",opts:["1895","1901","1909","1920"],answer:2},
+  {q:"Quel architecte anglais a redessiné le parcours de Fontainebleau en 1920 ?",opts:["Alister MacKenzie","Harry Colt","Tom Simpson","Donald Ross"],answer:2},
+  {q:"Sur quel ancien terrain royal le Golf de Fontainebleau est-il implanté ?",opts:["Ancien vignoble impérial","Parquet des chasses impériales","Domaine de la couronne","Forêt des chasses royales"],answer:1},
+  {q:"Combien de bunkers compte approximativement le parcours de Fontainebleau ?",opts:["42","67","103","128"],answer:2},
+  {q:"Combien de fois le Golf de Fontainebleau a-t-il été élu 1er golf de France par le magazine Fairways ?",opts:["1 fois","2 fois (2013 et 2017)","3 fois","4 fois"],answer:1},
+  {q:"Quel architecte français a tracé le parcours original de Fontainebleau avant Tom Simpson ?",opts:["Pierre Harmon","Julien Chantepie","Georges Carré","Henri Duval"],answer:1},
+  {q:"Le 15 juillet 1953, Ben Hogan joue à Fontainebleau. Il est en route pour quel tournoi majeur qu'il remportera quelques jours plus tard ?",opts:["US Open","The Open Championship à Carnoustie","PGA Championship","Il revenait d'Europe"],answer:1},
+  {q:"Quel pays a remporté le plus de Ryder Cups depuis 1927 ?",opts:["États-Unis","Grande-Bretagne","Europe","Égalité parfaite"],answer:0}
+];
+let triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null};
+
+async function loadTrivia(){
+  const container=document.getElementById('trivia-container');
+  if(!container) return;
+  if(!currentUser){container.innerHTML='<p style="color:var(--gold);text-align:center;">Connectez-vous pour jouer.</p>';return;}
+  try{
+    const existing=await sbFetch('trivia_scores?nom=eq.'+encodeURIComponent(currentUser)+'&select=score,temps_total');
+    if(existing&&existing[0]){showTriviaResult(existing[0].score,existing[0].temps_total,true);return;}
+  }catch(e){}
+  triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null};
+  showTriviaQuestion();
+}
+function showTriviaQuestion(){
+  const q=TRIVIA_QUESTIONS[triviaState.idx];
+  const container=document.getElementById('trivia-container');
+  if(!container) return;
+  triviaState.startTime=Date.now();
+  let timeLeft=15;
+  container.innerHTML=`
+    <div style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:0.8rem;text-align:center;margin-bottom:0.5rem;">Question ${triviaState.idx+1} / ${TRIVIA_QUESTIONS.length}</div>
+    <div style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:1.5rem;margin-bottom:1rem;">
+      <p style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--cream);line-height:1.4;margin:0 0 1rem;">${q.q}</p>
+      <div id="timer-bar-container" style="background:rgba(201,168,76,0.2);border-radius:4px;height:6px;margin-bottom:1rem;">
+        <div id="timer-bar" style="background:var(--gold);height:6px;border-radius:4px;width:100%;transition:width 1s linear;"></div>
+      </div>
+      <div id="timer-text" style="font-size:0.75rem;color:var(--gold);text-align:right;margin-bottom:1rem;">${timeLeft}s</div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        ${q.opts.map((opt,i)=>`<button onclick="answerTrivia(${i})" style="background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.3);color:var(--cream);padding:0.75rem 1rem;border-radius:8px;text-align:left;cursor:pointer;font-family:'EB Garamond',serif;font-size:1rem;">${opt}</button>`).join('')}
+      </div>
+    </div>`;
+  triviaState.timerInterval=setInterval(()=>{
+    timeLeft--;
+    const bar=document.getElementById('timer-bar');
+    const txt=document.getElementById('timer-text');
+    if(bar) bar.style.width=(timeLeft/15*100)+'%';
+    if(txt) txt.textContent=timeLeft+'s';
+    if(timeLeft<=0){clearInterval(triviaState.timerInterval);answerTrivia(-1);}
+  },1000);
+}
+function answerTrivia(chosen){
+  clearInterval(triviaState.timerInterval);
+  const elapsed=(Date.now()-triviaState.startTime)/1000;
+  triviaState.temps.push(Math.min(elapsed,15));
+  const q=TRIVIA_QUESTIONS[triviaState.idx];
+  let pts=0;
+  if(chosen===q.answer){
+    if(elapsed<=3) pts=1000;
+    else if(elapsed<=6) pts=800;
+    else if(elapsed<=9) pts=600;
+    else if(elapsed<=12) pts=400;
+    else pts=200;
+    triviaState.score+=pts;
+  }
+  const btns=document.querySelectorAll('#trivia-container button');
+  btns.forEach((b,i)=>{
+    b.disabled=true;
+    if(i===q.answer) b.style.background='rgba(0,200,100,0.3)';
+    else if(i===chosen) b.style.background='rgba(200,0,0,0.3)';
+  });
+  const container=document.getElementById('trivia-container');
+  const feedback=document.createElement('div');
+  feedback.style.cssText='text-align:center;padding:0.75rem;font-family:Cormorant Garamond,serif;font-size:1rem;color:var(--cream);margin-top:0.5rem;';
+  if(chosen===q.answer) feedback.innerHTML=`✓ Correct ! +${pts} pts`;
+  else if(chosen===-1) feedback.innerHTML=`⏱ Temps écoulé ! Réponse : <strong>${q.opts[q.answer]}</strong>`;
+  else feedback.innerHTML=`✗ Incorrect. Réponse : <strong>${q.opts[q.answer]}</strong>`;
+  container.appendChild(feedback);
+  setTimeout(()=>{
+    triviaState.idx++;
+    if(triviaState.idx<TRIVIA_QUESTIONS.length) showTriviaQuestion();
+    else finishTrivia();
+  },2000);
+}
+async function finishTrivia(){
+  const totalTemps=triviaState.temps.reduce((a,b)=>a+b,0);
+  try{await sbFetch('trivia_scores','POST',{nom:currentUser,score:triviaState.score,temps_total:Math.round(totalTemps)});}catch(e){}
+  showTriviaResult(triviaState.score,Math.round(totalTemps),false);
+}
+async function showTriviaResult(score,temps,alreadyPlayed){
+  let scores=[];
+  try{scores=await sbFetch('trivia_scores?select=nom,score,temps_total&order=score.desc,temps_total.asc')||[];}catch(e){}
+  const rank=scores.findIndex(s=>s.nom===currentUser)+1||'?';
+  const container=document.getElementById('trivia-container');
+  if(!container) return;
+  container.innerHTML=`
+    <div style="text-align:center;padding:1rem;">
+      ${alreadyPlayed?'<p style="color:rgba(201,168,76,0.7);font-size:0.85rem;margin-bottom:1rem;">Vous avez déjà participé au Trivia.</p>':''}
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--gold);font-weight:700;">${score}</div>
+      <div style="color:var(--cream);font-size:0.85rem;margin-bottom:0.5rem;">points</div>
+      <div style="color:rgba(245,240,232,0.7);font-size:0.8rem;">Temps total : ${temps}s</div>
+      <div style="color:var(--gold);font-size:1rem;margin:0.75rem 0;">🏆 Classement : ${rank}ème</div>
+      <div style="margin-top:1rem;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);margin-bottom:0.5rem;border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:0.25rem;">Classement Trivia</div>
+        ${scores.slice(0,10).map((s,i)=>`<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.85rem;color:${s.nom===currentUser?'var(--gold)':'var(--cream)'}"><span>${i+1}. ${s.nom}</span><span>${s.score} pts</span></div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ---- CHAT ----
+let chatInterval=null;
+async function loadChat(){
+  if(!currentUser) return;
+  await refreshChat();
+  if(chatInterval) clearInterval(chatInterval);
+  chatInterval=setInterval(refreshChat,10000);
+}
+async function refreshChat(){
+  let msgs=[];
+  try{msgs=await sbFetch('chat_messages?select=nom,message,created_at&order=created_at.asc&limit=50')||[];}catch(e){}
+  const container=document.getElementById('chat-messages');
+  if(!container) return;
+  container.innerHTML=msgs.map(m=>{
+    const isMe=m.nom===currentUser;
+    const time=new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};">
+      <div style="font-size:0.65rem;color:rgba(245,240,232,0.5);margin-bottom:2px;">${isMe?'':m.nom+' · '}${time}</div>
+      <div style="background:${isMe?'rgba(201,168,76,0.25)':'rgba(13,40,24,0.8)'};border:1px solid ${isMe?'rgba(201,168,76,0.4)':'rgba(201,168,76,0.15)'};border-radius:${isMe?'12px 12px 4px 12px':'12px 12px 12px 4px'};padding:0.5rem 0.75rem;max-width:80%;font-family:'EB Garamond',serif;font-size:0.95rem;color:var(--cream);word-break:break-word;">${m.message}</div>
+    </div>`;
+  }).join('');
+  container.scrollTop=container.scrollHeight;
+}
+async function sendChat(){
+  if(!currentUser) return;
+  const input=document.getElementById('chat-input');
+  const msg=input.value.trim().slice(0,200);
+  if(!msg) return;
+  input.value='';
+  try{await sbFetch('chat_messages','POST',{nom:currentUser,message:msg});}catch(e){}
+  await refreshChat();
+}
+async function sendChatEmoji(emoji){
+  if(!currentUser) return;
+  try{await sbFetch('chat_messages','POST',{nom:currentUser,message:emoji});}catch(e){}
+  await refreshChat();
+}
+
+// ---- ÉVOLUTIONS CLASSEMENT ----
+async function saveAndGetEvolutions(classement){
+  const today=new Date().toISOString().split('T')[0];
+  for(let i=0;i<classement.length;i++){
+    try{
+      await sbFetch('classement_history',{
+        method:'POST',
+        body:JSON.stringify({nom:classement[i].nom,position:i+1,score:classement[i].total,recorded_at:today}),
+        headers:{'Prefer':'resolution=merge-duplicates,return=minimal'}
+      });
+    }catch(e){}
+  }
+  const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];
+  let hist=[];
+  try{hist=await sbFetch('classement_history?recorded_at=eq.'+yesterday+'&select=nom,position')||[];}catch(e){}
+  const histMap={};
+  hist.forEach(h=>histMap[h.nom]=h.position);
+  return histMap;
+}
+function getArrow(current,previous){
+  if(previous===undefined||previous===null) return '<span style="color:#888;font-size:0.75rem;">—</span>';
+  if(current<previous) return '<span style="color:#4caf50;font-size:0.85rem;">↑</span>';
+  if(current>previous) return '<span style="color:#f44336;font-size:0.85rem;">↓</span>';
+  return '<span style="color:#888;font-size:0.75rem;">=</span>';
+}
+
+// ---- SCORECARD ----
+const AUGUSTA_PAR=[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4];
+function renderScorecard(){
+  const front=AUGUSTA_PAR.slice(0,9);
+  const back=AUGUSTA_PAR.slice(9);
+  return `<div style="margin-top:1rem;border-top:1px solid rgba(201,168,76,0.2);padding-top:1rem;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Par Augusta</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.75rem;font-family:'EB Garamond',serif;">
+        <tr style="color:rgba(245,240,232,0.5);">
+          <td style="padding:3px 4px;">Trou</td>
+          ${front.map((_,i)=>`<td style="text-align:center;padding:3px 4px;">${i+1}</td>`).join('')}
+          <td style="padding:3px 4px;color:rgba(201,168,76,0.7);">Out</td>
+        </tr>
+        <tr style="color:var(--cream);">
+          <td style="padding:3px 4px;color:rgba(245,240,232,0.5);">Par</td>
+          ${front.map(p=>`<td style="text-align:center;padding:3px 4px;">${p}</td>`).join('')}
+          <td style="text-align:center;padding:3px 4px;color:rgba(201,168,76,0.7);">36</td>
+        </tr>
+        <tr style="color:rgba(245,240,232,0.5);">
+          <td style="padding:3px 4px;">Trou</td>
+          ${back.map((_,i)=>`<td style="text-align:center;padding:3px 4px;">${i+10}</td>`).join('')}
+          <td style="padding:3px 4px;color:rgba(201,168,76,0.7);">In</td>
+        </tr>
+        <tr style="color:var(--cream);">
+          <td style="padding:3px 4px;color:rgba(245,240,232,0.5);">Par</td>
+          ${back.map(p=>`<td style="text-align:center;padding:3px 4px;">${p}</td>`).join('')}
+          <td style="text-align:center;padding:3px 4px;color:rgba(201,168,76,0.7);">36</td>
+        </tr>
+      </table>
+    </div>
+  </div>`;
+}
+
+// ---- WHATSAPP ----
+function shareWhatsApp(sel){
+  const text=`🏌️ Masters Augusta 2026 - GDF\nMes sélections :\n🎩 Favoris : ${sel[1][0]} & ${sel[1][1]}\n🎩 Contendants : ${sel[2][0]} & ${sel[2][1]}\n🎩 Outsiders : ${sel[3][0]} & ${sel[3][1]}\n🎩 Légendes : ${sel[4][0]} & ${sel[4][1]}\nRejoins le concours : https://egasser17.github.io/Augusta/`;
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+
+// ---- GRAPHIQUE ÉVOLUTION ----
+function renderEvolutionChart(historyData){
+  if(!historyData||historyData.length<2) return '';
+  const positions=historyData.map(h=>h.position);
+  const maxPos=Math.max(...positions);
+  const minPos=Math.min(...positions);
+  const W=280,H=100,pad=20;
+  const xStep=(W-2*pad)/(positions.length-1);
+  const yScale=pos=>pad+(pos-minPos)/Math.max(maxPos-minPos,1)*(H-2*pad);
+  const points=positions.map((p,i)=>`${pad+i*xStep},${yScale(p)}`).join(' ');
+  return `<div style="margin-top:1rem;border-top:1px solid rgba(201,168,76,0.2);padding-top:1rem;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Évolution</div>
+    <svg width="${W}" height="${H}" style="overflow:visible;">
+      <polyline points="${points}" fill="none" stroke="#c9a84c" stroke-width="2"/>
+      ${positions.map((p,i)=>`<circle cx="${pad+i*xStep}" cy="${yScale(p)}" r="4" fill="#c9a84c"/>
+        <text x="${pad+i*xStep}" y="${yScale(p)-8}" text-anchor="middle" fill="#c9a84c" font-size="10">${p}</text>`).join('')}
+    </svg>
+  </div>`;
+}
+
+// ---- PUSH NOTIFICATIONS ----
+async function registerPush(){
+  if(!currentUser) return;
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){
+    alert('Les notifications push ne sont pas supportées par votre navigateur.');
+    return;
+  }
+  try{
+    const reg=await navigator.serviceWorker.register('/Augusta/sw.js');
+    const permission=await Notification.requestPermission();
+    if(permission!=='granted'){alert('Permission refusée.');return;}
+    alert('Notifications activées ! (Serveur VAPID à configurer)');
+  }catch(e){alert('Erreur lors de l\'enregistrement du service worker.');}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{showScreen('screen-accueil');startCountdown();});
 </script>
 </body>
 </html>
