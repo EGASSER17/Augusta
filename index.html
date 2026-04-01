@@ -1491,8 +1491,10 @@ function answerTrivia(chosen){
 
 async function finishTrivia(){
   const totalTemps=Math.round(triviaState.temps.reduce((a,b)=>a+b,0));
-  const today=getTodayDate();
-  await sbFetch('trivia_scores','POST',{nom:currentUser,jour:today,score:triviaState.score,temps_total:totalTemps},true);
+  const today=getTodayDate()==='2026-04-01'?'2026-04-02':getTodayDate();
+  try{
+    await sbFetch('trivia_scores','POST',{nom:currentUser,jour:today,score:triviaState.score,temps_total:totalTemps},true);
+  }catch(e){}
   await showTriviaResult(triviaState.score,totalTemps,false);
 }
 
