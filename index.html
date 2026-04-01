@@ -912,6 +912,7 @@ async function loadMaSelection(){
       return;
     }
     const p=data[0];
+    window._currentParticipant=p;
     const selMap={1:[p.c1a,p.c1b],2:[p.c2a,p.c2b],3:[p.c3a,p.c3b],4:[p.c4a,p.c4b]};
     const allPlayers=Object.values(selMap).flat().filter(Boolean);
     const scores=allPlayers.map(name=>{
@@ -941,7 +942,7 @@ async function loadMaSelection(){
     }
     const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');
     const isOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
-    if(isOpen) html+=`<button onclick="showScreen('screen-selection')" class="btn btn-outline" style="width:100%;margin-top:0.5rem;">Modifier mes sélections</button>`;
+    if(isOpen) html+=`<button onclick="loadExistingAndEdit(window._currentParticipant)" class="btn btn-outline" style="width:100%;margin-top:0.5rem;">Modifier mes sélections</button>`;
     html+=`<button onclick="shareWhatsApp({1:['${selMap[1][0]}','${selMap[1][1]}'],2:['${selMap[2][0]}','${selMap[2][1]}'],3:['${selMap[3][0]}','${selMap[3][1]}'],4:['${selMap[4][0]}','${selMap[4][1]}']})" class="btn btn-outline" style="width:100%;margin-top:0.5rem;">📱 Partager sur WhatsApp</button>`;
     el.innerHTML=html;
   }catch(e){el.innerHTML='<div class="msg error">Erreur de chargement</div>';console.error(e);}
