@@ -620,7 +620,11 @@ async function handleAccueil(){
       setTimeout(()=>goClassement(),800);
       return;
     }
-    if(!isOpen){showMsg('msg-accueil','Les sélections sont fermées. Le tournoi a débuté !','error');return;}
+    if(!isOpen){
+      showMsg('msg-accueil','Bienvenue '+nom+' ! (sélections fermées)','success');
+      setTimeout(()=>goClassement(),800);
+      return;
+    }
     selections={1:[],2:[],3:[],4:[]};currentChapeau=1;isEditMode=false;
     document.getElementById('selection-user-name').textContent=nom;
     document.getElementById('edit-banner').style.display='none';
@@ -1540,7 +1544,7 @@ async function showTriviaResult(scoreDuJour,tempsDuJour,alreadyPlayed){
         <div style="font-size:0.9rem;color:var(--gold);margin-top:0.25rem;">🏆 Classement général : ${rank}ème</div>
       </div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Classement Trivia · ${phaseLabel}</div>
-      ${classement.slice(0,10).map((r,i)=>`
+      ${classement.map((r,i)=>`
         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0.5rem;border-radius:6px;margin-bottom:0.25rem;background:${r.nom===currentUser?'rgba(201,168,76,0.1)':'transparent'};border:1px solid ${r.nom===currentUser?'rgba(201,168,76,0.25)':'transparent'};">
           <span style="font-size:0.85rem;color:${r.nom===currentUser?'var(--gold)':'var(--cream)'};">${i+1}. ${r.nom}</span>
           <span style="font-family:'Cormorant Garamond',serif;font-size:0.9rem;color:${r.nom===currentUser?'var(--gold)':'rgba(245,240,232,0.7)'};">${r.total} pts</span>
