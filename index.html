@@ -609,12 +609,13 @@ async function handleAccueil(){
   if(!code){showMsg('msg-accueil','Veuillez entrer votre code d\'accès.','error');return;}
   showMsg('msg-accueil','Vérification en cours...','info');
   try{
-    const codeCheck=await sbFetch(`codes_acces?nom=eq.${encodeURIComponent(nom)}&code=eq.${encodeURIComponent(code)}&select=*`);
+    const codeCheck=await sbFetch(`codes_acces?nom=ilike.${encodeURIComponent(nom)}&code=eq.${encodeURIComponent(code)}&select=*`);
     if(!codeCheck||codeCheck.length===0){showMsg('msg-accueil','Pseudo ou code incorrect.','error');return;}
     const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');
     const isOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
-    const existing=await sbFetch(`participants?nom=eq.${encodeURIComponent(nom)}&select=*`);
-    currentUser=nom;currentCode=code;
+    const realNom=codeCheck[0].nom;
+    const existing=await sbFetch(`participants?nom=eq.${encodeURIComponent(realNom)}&select=*`);
+    currentUser=realNom;currentCode=code;
     if(existing&&existing.length>0){
       showMsg('msg-accueil','Bienvenue '+nom+' !','success');
       setTimeout(()=>goClassement(),800);
