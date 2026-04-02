@@ -173,6 +173,13 @@ input::placeholder { color:rgba(168,196,168,0.4); }
 .nav-back:hover { color:var(--gold); }
 .toggle-link { background:none; border:none; color:var(--gold); font-family:'Cormorant Garamond',serif; font-size:14px; font-style:italic; cursor:pointer; text-decoration:underline; text-underline-offset:3px; display:block; text-align:center; margin-top:12px; }
 .toggle-link:hover { color:var(--gold-light); }
+.mystery-photo-frame{display:inline-block;border:2px solid var(--gold);border-radius:4px;overflow:hidden;max-width:280px;width:100%;margin:0 auto;}
+.mystery-photo-frame img{width:100%;display:block;transition:filter 0.5s;}
+.mystery-clue-card{background:rgba(26,61,40,0.4);border:1px solid rgba(201,168,76,0.15);border-radius:2px;padding:14px 16px;margin-bottom:10px;font-size:15px;font-style:italic;line-height:1.6;position:relative;}
+.mystery-clue-card::before{content:'';position:absolute;top:0;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);}
+.mystery-clue-day{display:block;font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;font-style:normal;}
+@keyframes mysteryFadeIn{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:scale(1)}}
+.mystery-photo-fadein{animation:mysteryFadeIn 0.6s ease-out;}
 </style>
 </head>
 <body>
@@ -314,6 +321,7 @@ input::placeholder { color:rgba(168,196,168,0.4); }
     <div id="tab-scores" style="display:none"></div>
     <div id="tab-news" style="display:none"></div>
     <div id="tab-trivia" style="display:none"></div>
+    <div id="tab-mystere" style="display:none"></div>
     <div class="divider"></div>
     <button class="btn btn-outline" onclick="showScreen('screen-accueil')" style="font-size:13px">← Retour à l'accueil</button>
   </div>
@@ -436,6 +444,13 @@ input::placeholder { color:rgba(168,196,168,0.4); }
           <div id="admin-trivia-status" style="font-size:0.8rem;color:rgba(245,240,232,0.5);margin-bottom:0.5rem;font-style:italic;"></div>
           <textarea id="admin-trivia-json" placeholder='[{"q":"Question ?","opts":["A","B","C","D"],"answer":0},...]' style="width:100%;height:140px;background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.3);color:var(--cream);padding:0.5rem;border-radius:8px;font-size:0.75rem;font-family:monospace;resize:vertical;"></textarea>
           <button onclick="adminPostTriviaQuestions()" class="btn btn-gold" style="width:100%;margin-top:0.5rem;">Publier les questions du jour</button>
+      <div class="card">
+        <div class="card-title">Joueur Mystère</div>
+        <button class="btn btn-outline" onclick="adminLoadMystery()" style="margin-bottom:12px;font-size:13px;">Actualiser les tentatives</button>
+        <div id="admin-mystery-content"><p style="font-size:13px;font-style:italic;color:var(--text-muted)">Cliquez sur Actualiser.</p></div>
+        <div class="divider"></div>
+        <button class="btn btn-danger" onclick="adminResetMystery()" style="margin-top:8px;">&#128465;&#65039; Réinitialiser le jeu</button>
+      </div>
         </div>
       </div>
     </div>
@@ -710,9 +725,9 @@ function renderMainTabs(isOpen){
   tournamentIsOpen=isOpen;
   const el=document.getElementById('main-tabs');
   if(isOpen){
-    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">🕵️ Mystère</div>`;
   } else {
-    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">🕵️ Mystère</div>`;
   }
 }
 async function goClassement(){
@@ -834,7 +849,7 @@ async function loadClassement(){
 }
 function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
 function switchTab(tab){
-  const allTabs=['classement','selection','scores','news','trivia'];
+  const allTabs=['classement','selection','scores','news','trivia','mystere'];
   document.querySelectorAll('#main-tabs .tab').forEach(el=>{
     el.classList.toggle('active',el.getAttribute('onclick')===`switchTab('${tab}')`);
   });
@@ -843,6 +858,7 @@ function switchTab(tab){
   if(tab==='selection'&&!selectionTabLoaded) loadMaSelection();
   if(tab==='scores'&&!document.getElementById('tab-scores').innerHTML.trim()) loadJoueursList();
   if(tab==='trivia') { loadTriviaInline(); }
+  if(tab==='mystere') { loadMysteryInline(); }
 }
 
 // ---- PLAYER DATA ----
@@ -1568,6 +1584,154 @@ async function adminPostTriviaQuestions(){
   }catch(e){status.textContent='⚠ JSON invalide ou erreur : '+e.message;status.style.color='#f44';}
 }
 
+
+
+// ---- JOUEUR MYSTERE ----
+const MYSTERY_J1=new Date('2026-04-02T00:00:00');
+const MYSTERY_BLURS={1:20,2:15,3:11,4:7,5:4,6:2,7:2};
+const MYSTERY_INDICES=[
+  "J’ai remporté l’un des 4 Majeurs, mais une seule fois.",
+  "Mon palmarès sur le PGA Tour compte plus de 15 victoires, mais je n’ai jamais gagné un autre Major.",
+  "J’ai été numéro 1 mondial et pourtant beaucoup considèrent que mon palmarès est en dessous de mon talent.",
+  "Mon arme secrète n’est pas la technique — c’est quelque chose que je n’ai jamais vraiment travaillé.",
+  "Je suis né dans le nord-ouest des États-Unis, dans une ville connue pour sa pluie et sa musique.",
+  "En 1992, une pente et la physique ont décidé de me sourire au moment le plus important.",
+  "Mon surnom tient en un seul mot — et il dit tout sur ma façon de jouer et de vivre."
+];
+const MYSTERY_VALID=['fred couples','couples'];
+
+function getMysteryRawDay(){
+  const today=new Date();today.setHours(0,0,0,0);
+  return Math.floor((today-MYSTERY_J1)/86400000)+1;
+}
+function getMysteryDay(){return Math.min(Math.max(getMysteryRawDay(),1),7);}
+
+async function loadMysteryInline(){
+  const container=document.getElementById('tab-mystere');
+  if(!currentUser){
+    container.innerHTML='<p style="text-align:center;color:rgba(245,240,232,0.5);padding:2rem;">Connectez-vous pour jouer.</p>';
+    return;
+  }
+  container.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-style:italic">Chargement...</div>';
+  const jourActuel=getMysteryDay();
+  const rawDay=getMysteryRawDay();
+  const blur=MYSTERY_BLURS[jourActuel]||2;
+  const photoUrl='https://egasser17.github.io/Augusta/img/mystery.jpg';
+  const makePhoto=(blurPx)=>'<div class="mystery-photo-frame mystery-photo-fadein"><img src="'+photoUrl+'" alt="Joueur mystère" style="filter:blur('+blurPx+'px);" onerror="this.parentElement.innerHTML=\'<div style=\\'padding:40px;font-size:3rem;text-align:center;\\'>&#129399;</div>\'"></div>';
+  try{
+    const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
+    if(solved&&solved.length>0){
+      const winner=solved[0].nom;
+      const dayNum=Math.min(Math.max(Math.floor((new Date(solved[0].jour+' 00:00:00')-MYSTERY_J1)/86400000)+1,1),7);
+      const isWinner=winner===currentUser;
+      container.innerHTML=
+        '<div style="text-align:center;padding:1.5rem 1rem;">'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">&#129399;&#65039; Le joueur mystère a été démasqué !</div>'
+        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(2)+'</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Fred Couples</div>'
+        +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">Découvert par <strong style="color:var(--gold);">'+winner+'</strong> — Jour '+dayNum+'</div>'
+        +(isWinner
+          ?'<div class="msg success">&#127942; C’est vous qui avez trouvé ! +5000 pts ajoutés à votre score.</div>'
+          :'<div class="msg info">&#127881; Félicitations à <strong>'+winner+'</strong> pour avoir trouvé le joueur mystère !</div>')
+        +'</div>';
+      return;
+    }
+    if(rawDay>7){
+      container.innerHTML=
+        '<div style="text-align:center;padding:1.5rem 1rem;">'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--text-muted);margin-bottom:1rem;">&#128269; Le joueur mystère n’a pas été trouvé...</div>'
+        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(2)+'</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--text-muted);margin:0.5rem 0;font-style:italic;">C’était Fred Couples</div>'
+        +'</div>';
+      return;
+    }
+    const todayStr=getTodayDate();
+    const alreadyGuessed=await sbFetch('mystery_guesses?nom=eq.'+encodeURIComponent(currentUser)+'&jour=eq.'+todayStr+'&select=guess,correct');
+    let indicesHtml='';
+    for(let i=0;i<jourActuel&&i<MYSTERY_INDICES.length;i++){
+      indicesHtml+='<div class="mystery-clue-card"><span class="mystery-clue-day">Indice '+(i+1)+'</span>'+MYSTERY_INDICES[i]+'</div>';
+    }
+    let actionHtml='';
+    if(alreadyGuessed&&alreadyGuessed.length>0){
+      const g=alreadyGuessed[0];
+      actionHtml='<div class="msg error">Vous avez déjà tenté aujourd’hui : “<em>'+g.guess+'</em>”<br>Revenez demain pour un nouvel indice.</div>';
+    }else{
+      actionHtml='<div class="input-group" style="margin-bottom:12px;"><input type="text" id="mystery-input" placeholder="Votre réponse..." maxlength="50" style="text-align:center;" onkeydown="if(event.key===\'Enter\')submitMysteryGuess()"></div><button class="btn btn-gold" onclick="submitMysteryGuess()">Soumettre ma réponse</button>';
+    }
+    container.innerHTML=
+      '<div style="padding:0 0.25rem 1.5rem;">'
+      +'<div style="text-align:center;margin-bottom:1rem;">'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Jour '+jourActuel+' / 7</div>'
+      +'<div style="display:flex;justify-content:center;">'+makePhoto(blur)+'</div>'
+      +'</div>'
+      +'<div style="margin-bottom:1rem;">'+indicesHtml+'</div>'
+      +actionHtml
+      +'</div>';
+  }catch(e){
+    container.innerHTML='<div class="msg error">Erreur de chargement. Réessayez.</div>';
+    console.error(e);
+  }
+}
+
+async function submitMysteryGuess(){
+  const input=document.getElementById('mystery-input');
+  if(!input) return;
+  const guess=input.value.trim();
+  if(!guess){input.focus();return;}
+  const btn=document.querySelector('#tab-mystere .btn-gold');
+  if(btn){btn.disabled=true;btn.textContent='...';}
+  const todayStr=getTodayDate();
+  const isCorrect=MYSTERY_VALID.includes(guess.toLowerCase());
+  try{
+    await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:isCorrect}),prefer:'return=minimal'});
+    if(isCorrect){
+      try{await sbFetch('trivia_scores',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:5000,temps_total:0}),prefer:'return=minimal'});}catch(e){console.warn('Bonus:',e);}
+      loadMysteryInline();
+    }else{
+      document.getElementById('tab-mystere').innerHTML='<div style="padding:1.5rem 1rem;text-align:center;"><div class="msg error" style="margin-bottom:1rem;">Mauvaise réponse — revenez demain pour un nouvel indice.</div><div style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">Votre réponse : “'+guess+'”</div></div>';
+    }
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='Soumettre ma réponse';}
+    console.error(e);
+    document.getElementById('tab-mystere').innerHTML='<div class="msg error">Erreur lors de l’envoi. Réessayez.</div>';
+  }
+}
+
+async function adminLoadMystery(){
+  const el=document.getElementById('admin-mystery-content');
+  if(!el) return;
+  el.innerHTML='<p style="font-size:13px;font-style:italic;color:var(--text-muted)">Chargement...</p>';
+  try{
+    const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
+    const all=await sbFetch('mystery_guesses?select=*&order=guessed_at.desc');
+    let html='';
+    if(solved&&solved.length>0){
+      html+='<div class="msg success" style="margin-bottom:12px;">&#127942; Trouvé par <strong>'+solved[0].nom+'</strong> le '+solved[0].jour+'</div>';
+    }else{
+      html+='<div class="msg info" style="margin-bottom:12px;">Pas encore résolu.</div>';
+    }
+    if(!all||all.length===0){
+      html+='<p style="font-size:13px;font-style:italic;color:var(--text-muted)">Aucune tentative.</p>';
+    }else{
+      html+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">'+all.length+' tentative(s)</div>';
+      all.forEach(g=>{
+        html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(201,168,76,0.08);font-size:13px;">'
+          +'<div><strong>'+g.nom+'</strong> <span style="color:var(--text-muted);">&mdash; '+g.jour+'</span></div>'
+          +'<div><em style="color:'+(g.correct?'#80e0a0':'#e09090')+'">'+g.guess+'</em> '+(g.correct?'&#10003;':'&#10007;')+'</div>'
+          +'</div>';
+      });
+    }
+    el.innerHTML=html;
+  }catch(e){el.innerHTML='<p style="font-size:13px;color:#e09090">Erreur</p>';}
+}
+
+async function adminResetMystery(){
+  if(!confirm('Supprimer toutes les tentatives du Joueur Mystère ? Cette action est irréversible.')) return;
+  try{
+    await sbFetch('mystery_guesses?id=gt.0',{method:'DELETE',headers:{'Prefer':'return=minimal'}});
+    adminLoadMystery();
+  }catch(e){alert('Erreur lors de la réinitialisation : '+e.message);}
+}
 
 // ---- ÉVOLUTIONS CLASSEMENT ----
 async function saveAndGetEvolutions(classement){
