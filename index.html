@@ -1617,7 +1617,7 @@ async function loadMysteryInline(){
   const rawDay=getMysteryRawDay();
   const blur=MYSTERY_BLURS[jourActuel]||2;
   const photoUrl='https://egasser17.github.io/Augusta/img/mystery.jpg';
-  const makePhoto=(blurPx)=>'<div class="mystery-photo-frame mystery-photo-fadein"><img src="'+photoUrl+'" alt="Joueur mystère" style="filter:blur('+blurPx+'px);" onerror="this.parentElement.innerHTML=\'<div style=\\'padding:40px;font-size:3rem;text-align:center;\\'>&#129399;</div>\'"></div>';
+  const makePhoto=(blurPx)=>'<div class="mystery-photo-frame mystery-photo-fadein"><img src="'+photoUrl+'" alt="Joueur mystère" style="filter:blur('+blurPx+'px);"></div>';
   try{
     const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
     if(solved&&solved.length>0){
