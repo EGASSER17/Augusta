@@ -1414,9 +1414,9 @@ async function loadTriviaInline(){
 
   // Vérifier si déjà joué aujourd'hui (check aussi date brute pour compatibilité)
   const rawToday=getTodayDate();
-  let existing=await sbFetch(`trivia_scores?nom=eq.${encodeURIComponent(currentUser)}&jour=eq.${today}&select=score,temps_total`);
+  let existing=await sbFetch(`trivia_scores?nom=eq.${encodeURIComponent(currentUser)}&jour=eq.${today}&type=eq.trivia&select=score,temps_total`);
   if((!existing||!existing[0])&&rawToday!==today){
-    existing=await sbFetch(`trivia_scores?nom=eq.${encodeURIComponent(currentUser)}&jour=eq.${rawToday}&select=score,temps_total`);
+    existing=await sbFetch(`trivia_scores?nom=eq.${encodeURIComponent(currentUser)}&jour=eq.${rawToday}&type=eq.trivia&select=score,temps_total`);
   }
   if(existing&&existing[0]){
     await showTriviaResult(existing[0].score,existing[0].temps_total,true);
@@ -1519,7 +1519,7 @@ async function finishTrivia(){
   const totalTemps=Math.round(triviaState.temps.reduce((a,b)=>a+b,0));
   const today=getTodayDate()==='2026-04-01'?'2026-04-02':getTodayDate();
   try{
-    await sbFetch('trivia_scores?on_conflict=nom,jour','POST',{nom:currentUser,jour:today,score:triviaState.score,temps_total:totalTemps},true);
+    await sbFetch('trivia_scores?on_conflict=nom,jour,type','POST',{nom:currentUser,jour:today,score:triviaState.score,temps_total:totalTemps,type:'trivia'},true);
   }catch(e){}
   await showTriviaResult(triviaState.score,totalTemps,false);
 }
