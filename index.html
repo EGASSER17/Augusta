@@ -1587,24 +1587,21 @@ async function adminPostTriviaQuestions(){
 
 
 // ---- JOUEUR MYSTERE ----
-const MYSTERY_J1=new Date('2026-04-02T00:00:00');
-const MYSTERY_BLURS={1:20,2:15,3:11,4:7,5:4,6:2,7:2};
+const MYSTERY_J1=new Date(‘2026-04-03T00:00:00’);
+const MYSTERY_BLURS={1:20,2:15,3:11,4:2};
 const MYSTERY_INDICES=[
-  "J’ai remporté l’un des 4 Majeurs, mais une seule fois.",
-  "Mon palmarès sur le PGA Tour compte plus de 15 victoires, mais je n’ai jamais gagné un autre Major.",
-  "J’ai été numéro 1 mondial et pourtant beaucoup considèrent que mon palmarès est en dessous de mon talent.",
-  "Mon arme secrète n’est pas la technique — c’est quelque chose que je n’ai jamais vraiment travaillé.",
-  "Je suis né dans le nord-ouest des États-Unis, dans une ville connue pour sa pluie et sa musique.",
-  "En 1992, une pente et la physique ont décidé de me sourire au moment le plus important.",
-  "Mon surnom tient en un seul mot — et il dit tout sur ma façon de jouer et de vivre."
+  "Je n’ai remporté le Masters qu’une seule fois.",
+  "Je ne suis pas américain.",
+  "Je ne suis pas européen.",
+  "Je viens d’un pays de moins de 35 millions d’habitants."
 ];
-const MYSTERY_VALID=['fred couples','couples'];
+const MYSTERY_VALID=[‘mike weir’,’weir’];
 
 function getMysteryRawDay(){
   const today=new Date();today.setHours(0,0,0,0);
   return Math.floor((today-MYSTERY_J1)/86400000)+1;
 }
-function getMysteryDay(){return Math.min(Math.max(getMysteryRawDay(),1),7);}
+function getMysteryDay(){return Math.min(Math.max(getMysteryRawDay(),1),4);}
 
 async function loadMysteryInline(){
   const container=document.getElementById('tab-mystere');
@@ -1616,33 +1613,33 @@ async function loadMysteryInline(){
   const jourActuel=getMysteryDay();
   const rawDay=getMysteryRawDay();
   const blur=MYSTERY_BLURS[jourActuel]||2;
-  const photoUrl='https://egasser17.github.io/Augusta/img/mystery.jpg';
+  const photoUrl='https://egasser17.github.io/Augusta/img/mystery2.jpg';
   const makePhoto=(blurPx)=>'<div class="mystery-photo-frame mystery-photo-fadein"><img src="'+photoUrl+'" alt="Joueur mystère" style="filter:blur('+blurPx+'px);"></div>';
   try{
     const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
     if(solved&&solved.length>0){
       const winner=solved[0].nom;
-      const dayNum=Math.min(Math.max(Math.floor((new Date(solved[0].jour+' 00:00:00')-MYSTERY_J1)/86400000)+1,1),7);
+      const dayNum=Math.min(Math.max(Math.floor((new Date(solved[0].jour+’ 00:00:00’)-MYSTERY_J1)/86400000)+1,1),4);
       const isWinner=winner===currentUser;
       container.innerHTML=
-        '<div style="text-align:center;padding:1.5rem 1rem;">'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">&#129399;&#65039; Le joueur mystère a été démasqué !</div>'
-        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(2)+'</div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Fred Couples</div>'
-        +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">Découvert par <strong style="color:var(--gold);">'+winner+'</strong> — Jour '+dayNum+'</div>'
+        ‘<div style="text-align:center;padding:1.5rem 1rem;">’
+        +’<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">&#129399;&#65039; Le joueur mystère a été démasqué !</div>’
+        +’<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">’+makePhoto(0)+’</div>’
+        +’<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Mike Weir</div>’
+        +’<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">Découvert par <strong style="color:var(--gold);">’+winner+’</strong> — Jour ‘+dayNum+’</div>’
         +(isWinner
-          ?'<div class="msg success">&#127942; C’est vous qui avez trouvé ! +5000 pts ajoutés à votre score.</div>'
-          :'<div class="msg info">&#127881; Félicitations à <strong>'+winner+'</strong> pour avoir trouvé le joueur mystère !</div>')
-        +'</div>';
+          ?’<div class="msg success">&#127942; C’est vous qui avez trouvé ! +7500 pts ajoutés à votre score.</div>’
+          :’<div class="msg info">&#127881; Félicitations à <strong>’+winner+’</strong> pour avoir trouvé le joueur mystère !</div>’)
+        +’</div>’;
       return;
     }
-    if(rawDay>7){
+    if(rawDay>4){
       container.innerHTML=
-        '<div style="text-align:center;padding:1.5rem 1rem;">'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--text-muted);margin-bottom:1rem;">&#128269; Le joueur mystère n’a pas été trouvé...</div>'
-        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(2)+'</div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--text-muted);margin:0.5rem 0;font-style:italic;">C’était Fred Couples</div>'
-        +'</div>';
+        ‘<div style="text-align:center;padding:1.5rem 1rem;">’
+        +’<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--text-muted);margin-bottom:1rem;">&#128269; Le joueur mystère n’a pas été trouvé...</div>’
+        +’<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">’+makePhoto(0)+’</div>’
+        +’<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--text-muted);margin:0.5rem 0;font-style:italic;">C’était Mike Weir — seul Canadien vainqueur du Masters (2003)</div>’
+        +’</div>’;
       return;
     }
     const todayStr=getTodayDate();
@@ -1661,7 +1658,7 @@ async function loadMysteryInline(){
     container.innerHTML=
       '<div style="padding:0 0.25rem 1.5rem;">'
       +'<div style="text-align:center;margin-bottom:1rem;">'
-      +'<div style="font-family:Cormorant Garamond,serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Jour '+jourActuel+' / 7</div>'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Jour '+jourActuel+' / 4</div>'
       +'<div style="display:flex;justify-content:center;">'+makePhoto(blur)+'</div>'
       +'</div>'
       +'<div style="margin-bottom:1rem;">'+indicesHtml+'</div>'
@@ -1685,7 +1682,7 @@ async function submitMysteryGuess(){
   try{
     await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:isCorrect}),prefer:'return=minimal'});
     if(isCorrect){
-      try{await sbFetch('trivia_scores',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:5000,temps_total:0}),prefer:'return=minimal'});}catch(e){console.warn('Bonus:',e);}
+      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:7500,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
       loadMysteryInline();
     }else{
       document.getElementById('tab-mystere').innerHTML='<div style="padding:1.5rem 1rem;text-align:center;"><div class="msg error" style="margin-bottom:1rem;">Mauvaise réponse — revenez demain pour un nouvel indice.</div><div style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">Votre réponse : “'+guess+'”</div></div>';
