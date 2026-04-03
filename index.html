@@ -1590,12 +1590,11 @@ async function adminPostTriviaQuestions(){
 const MYSTERY_J1=new Date('2026-04-03T00:00:00');
 const MYSTERY_BLURS={1:20,2:15,3:11,4:2};
 const MYSTERY_INDICES=[
-  "Je n'ai remporté le Masters qu'une seule fois.",
-  "Je ne suis pas américain.",
-  "Je ne suis pas européen.",
-  "Je viens d'un pays de moins de 35 millions d'habitants."
+  "J'ai été numéro 1 mondial au cours de ma carrière.",
+  "Je suis européen.",
+  "Je ne suis pas anglais.",
+  "J'ai été sacré numéro 1 mondial la même année que ma victoire au Masters."
 ];
-const MYSTERY_VALID=['mike weir','weir'];
 
 function getMysteryRawDay(){
   const today=new Date();today.setHours(0,0,0,0);
@@ -1613,9 +1612,13 @@ async function loadMysteryInline(){
   const jourActuel=getMysteryDay();
   const rawDay=getMysteryRawDay();
   const blur=MYSTERY_BLURS[jourActuel]||2;
-  const photoUrl='https://egasser17.github.io/Augusta/img/mystery2.jpg';
+  const photoUrl='https://egasser17.github.io/Augusta/img/mystery3.jpg';
   const makePhoto=(blurPx)=>'<div class="mystery-photo-frame mystery-photo-fadein" style="position:relative;"><img src="'+photoUrl+'" alt="Joueur myst\u00e8re" style="filter:blur('+blurPx+'px);pointer-events:none;" draggable="false" oncontextmenu="return false"><div style="position:absolute;inset:0;z-index:1;" oncontextmenu="return false"></div></div>';
   try{
+    const cfgRows=await sbFetch('config?cle=in.(mystery_player_name,mystery_reveal_text)&select=cle,valeur');
+    const cfg={};(cfgRows||[]).forEach(r=>cfg[r.cle]=r.valeur);
+    const playerName=cfg['mystery_player_name']||'???';
+    const revealText=cfg['mystery_reveal_text']||'';
     const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
     if(solved&&solved.length>0){
       const winner=solved[0].nom;
@@ -1623,13 +1626,13 @@ async function loadMysteryInline(){
       const isWinner=winner===currentUser;
       container.innerHTML=
         '<div style="text-align:center;padding:1.5rem 1rem;">'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">&#129399;&#65039; Le joueur mystère a été démasqué !</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">&#129399;&#65039; Le joueur myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9 !</div>'
         +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(0)+'</div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Mike Weir</div>'
-        +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">Découvert par <strong style="color:var(--gold);">'+winner+'</strong> — Jour '+dayNum+'</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">'+playerName+'</div>'
+        +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9couvert par <strong style="color:var(--gold);">'+winner+'</strong> \u2014 Jour '+dayNum+'</div>'
         +(isWinner
           ?'<div class="msg success">&#127942; C\'est vous qui avez trouv\u00e9 ! +7500 pts ajout\u00e9s \u00e0 votre score.</div>'
-          :'<div class="msg info">&#127881; Félicitations à <strong>'+winner+'</strong> pour avoir trouvé le joueur mystère !</div>')
+          :'<div class="msg info">&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le joueur myst\u00e8re !</div>')
         +'</div>';
       return;
     }
@@ -1638,7 +1641,7 @@ async function loadMysteryInline(){
         '<div style="text-align:center;padding:1.5rem 1rem;">'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--text-muted);margin-bottom:1rem;">&#128269; Le joueur myst\u00e8re n\'a pas \u00e9t\u00e9 trouv\u00e9...</div>'
         +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(0)+'</div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--text-muted);margin:0.5rem 0;font-style:italic;">C\'était Mike Weir \u2014 seul Canadien vainqueur du Masters (2003)</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--text-muted);margin:0.5rem 0;font-style:italic;">'+revealText+'</div>'
         +'</div>';
       return;
     }
@@ -1678,9 +1681,9 @@ async function submitMysteryGuess(){
   const btn=document.querySelector('#tab-mystere .btn-gold');
   if(btn){btn.disabled=true;btn.textContent='...';}
   const todayStr=getTodayDate();
-  const isCorrect=MYSTERY_VALID.includes(guess.toLowerCase());
   try{
-    await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:isCorrect}),prefer:'return=minimal'});
+    const isCorrect=await sbFetch('rpc/check_mystery_guess','POST',{p_guess:guess});
+    await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:!!isCorrect}),prefer:'return=minimal'});
     if(isCorrect){
       try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:7500,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
       loadMysteryInline();
