@@ -1612,8 +1612,15 @@ async function loadMysteryInline(){
   const jourActuel=getMysteryDay();
   const rawDay=getMysteryRawDay();
   const blur=MYSTERY_BLURS[jourActuel]||2;
-  const photoUrl='https://egasser17.github.io/Augusta/img/mystery3.jpg';
-  const makePhoto=(blurPx)=>'<div class="mystery-photo-frame mystery-photo-fadein" style="position:relative;"><img src="'+photoUrl+'" alt="Joueur myst\u00e8re" style="filter:blur('+blurPx+'px);pointer-events:none;" draggable="false" oncontextmenu="return false"><div style="position:absolute;inset:0;z-index:1;" oncontextmenu="return false"></div></div>';
+  const _mp=['https:','','egasser17.github.io','Augusta','img','mystery3.jpg'].join('/');
+  const makePhoto=(blurPx)=>{
+    const uid='mf'+Math.random().toString(36).slice(2);
+    fetch(_mp).then(r=>r.blob()).then(b=>{
+      const el=document.getElementById(uid);
+      if(el){el.src=URL.createObjectURL(b);el.style.filter='blur('+blurPx+'px)';}
+    }).catch(()=>{});
+    return '<div class="mystery-photo-frame mystery-photo-fadein" style="position:relative;"><img id="'+uid+'" alt="Joueur myst\u00e8re" style="pointer-events:none;max-width:100%;" draggable="false" oncontextmenu="return false"><div style="position:absolute;inset:0;z-index:1;" oncontextmenu="return false"></div></div>';
+  };
   try{
     const cfgRows=await sbFetch('config?cle=in.(mystery_player_name,mystery_reveal_text)&select=cle,valeur');
     const cfg={};(cfgRows||[]).forEach(r=>cfg[r.cle]=r.valeur);
