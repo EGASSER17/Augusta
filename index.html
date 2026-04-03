@@ -322,6 +322,7 @@ input::placeholder { color:rgba(168,196,168,0.4); }
     <div id="tab-news" style="display:none"></div>
     <div id="tab-trivia" style="display:none"></div>
     <div id="tab-mystere" style="display:none"></div>
+    <div id="tab-allstars" style="display:none"></div>
     <div class="divider"></div>
     <button class="btn btn-outline" onclick="showScreen('screen-accueil')" style="font-size:13px">← Retour à l'accueil</button>
   </div>
@@ -725,9 +726,9 @@ function renderMainTabs(isOpen){
   tournamentIsOpen=isOpen;
   const el=document.getElementById('main-tabs');
   if(isOpen){
-    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Mystère</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Mystère</div><div class="tab" onclick="switchTab('allstars')">🏆 Club</div>`;
   } else {
-    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Mystère</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Mystère</div><div class="tab" onclick="switchTab('allstars')">🏆 Club</div>`;
   }
 }
 async function goClassement(){
@@ -849,7 +850,7 @@ async function loadClassement(){
 }
 function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
 function switchTab(tab){
-  const allTabs=['classement','selection','scores','news','trivia','mystere'];
+  const allTabs=['classement','selection','scores','news','trivia','mystere','allstars'];
   document.querySelectorAll('#main-tabs .tab').forEach(el=>{
     el.classList.toggle('active',el.getAttribute('onclick')===`switchTab('${tab}')`);
   });
@@ -859,6 +860,7 @@ function switchTab(tab){
   if(tab==='scores'&&!document.getElementById('tab-scores').innerHTML.trim()) loadJoueursList();
   if(tab==='trivia') { loadTriviaInline(); }
   if(tab==='mystere') { loadMysteryInline(); }
+  if(tab==='allstars') { loadAllStars(); }
 }
 
 // ---- PLAYER DATA ----
@@ -1819,6 +1821,105 @@ function renderEvolutionChart(historyData){
         <text x="${pad+i*xStep}" y="${yScale(p)-8}" text-anchor="middle" fill="#c9a84c" font-size="10">${p}</text>`).join('')}
     </svg>
   </div>`;
+}
+
+// ---- ALL STARS / CHAMPIONNAT DU CLUB ----
+const ALLSTARS_GROUPES=[
+  {n:1,h:'08:30',j:[{nom:'TRANCHANT Anne',idx:'5,3',hcp:9,dep:'Bleus'},{nom:'TILLOUS Rosalie',idx:'9,0',hcp:13,dep:'Bleus'},{nom:'OUDOT-DORATO Karen',idx:'9,3',hcp:14,dep:'Bleus'}]},
+  {n:2,h:'08:40',j:[{nom:'MAHY-CHAMPVERT Ferdinand',idx:'+1,7',hcp:0,dep:'Noirs'},{nom:'LELONG Thibault',idx:'+1,0',hcp:1,dep:'Noirs'},{nom:'HALES Stéphanie',idx:'1,1',hcp:3,dep:'Bleus'}]},
+  {n:3,h:'08:50',j:[{nom:'SCHNEIDER Jean-Louis',idx:'+0,7',hcp:1,dep:'Noirs'},{nom:'MACHERY Francois',idx:'+0,1',hcp:2,dep:'Noirs'},{nom:'PROUVAY Florent',idx:'0,5',hcp:3,dep:'Noirs'}]},
+  {n:4,h:'09:00',j:[{nom:'MOUHICA Raphael',idx:'0,9',hcp:3,dep:'Noirs'},{nom:'GODEFROY Joseph',idx:'1,0',hcp:3,dep:'Noirs'},{nom:'MANIETTE Théo',idx:'1,2',hcp:4,dep:'Noirs'}]},
+  {n:5,h:'09:10',j:[{nom:'VILLET Alexandre',idx:'2,3',hcp:5,dep:'Noirs'},{nom:'LANNES Guillaume',idx:'2,4',hcp:5,dep:'Noirs'},{nom:'TILLOUS Andreas',idx:'2,5',hcp:5,dep:'Noirs'}]},
+  {n:6,h:'09:20',j:[{nom:'BINET Benjamin',idx:'2,6',hcp:6,dep:'Noirs'},{nom:'BOULLE Steven',idx:'3,6',hcp:7,dep:'Noirs'},{nom:'BONIN Jules',idx:'3,7',hcp:7,dep:'Noirs'}]},
+  {n:7,h:'09:30',j:[{nom:'DE ROULHAC Sébastien',idx:'4,7',hcp:7,dep:'Blancs'},{nom:'GASSER Edouard',idx:'5,2',hcp:7,dep:'Blancs'},{nom:'HALES Arnott',idx:'5,8',hcp:8,dep:'Blancs'}]},
+  {n:8,h:'09:40',j:[{nom:'BERTHOUD Antoine',idx:'8,1',hcp:11,dep:'Blancs'},{nom:'DESFOND Grégoire',idx:'8,7',hcp:12,dep:'Blancs'},{nom:'LEROY Christophe',idx:'8,7',hcp:9,dep:'Jaunes'}]},
+  {n:9,h:'09:50',j:[{nom:'JUNGUENET Ambroise',idx:'5,3',hcp:8,dep:'Blancs'},{nom:'GODEFROY Ferdinand',idx:'5,9',hcp:8,dep:'Blancs'},{nom:'DUJARDIN Stanislas',idx:'8,0',hcp:11,dep:'Blancs'}]},
+  {n:10,h:'10:00',j:[{nom:'BULTE Valère',idx:'3,1',hcp:2,dep:'Jaunes'},{nom:'TILLOUS Arnaud',idx:'5,4',hcp:5,dep:'Jaunes'},{nom:'BINET Jérôme',idx:'7,0',hcp:7,dep:'Jaunes'}]},
+  {n:11,h:'10:10',j:[{nom:'ZUCCARELLI Paul',idx:'6,6',hcp:9,dep:'Blancs'},{nom:'BINET Nathan',idx:'6,6',hcp:9,dep:'Blancs'},{nom:'ROUTHIER Benjamin',idx:'6,6',hcp:9,dep:'Blancs'}]},
+  {n:12,h:'10:20',j:[{nom:'TRANCHANT Sébastien',idx:'7,3',hcp:10,dep:'Blancs'},{nom:'JOUHANNEAUD Jerome',idx:'7,3',hcp:10,dep:'Blancs'},{nom:'LETTMANN Daniel',idx:'9,2',hcp:13,dep:'Blancs'}]},
+  {n:13,h:'10:30',j:[{nom:'LE BOUBENNEC Erwan',idx:'8,1',hcp:9,dep:'Jaunes'},{nom:'BLASER Laurent',idx:'10,8',hcp:12,dep:'Jaunes'},{nom:'BINET Clément',idx:'11,8',hcp:13,dep:'Jaunes'}]},
+  {n:14,h:'10:40',j:[{nom:'UBALD-BOCQUET Marie-Christine',idx:'5,6',hcp:6,dep:'Rouges'},{nom:'TILLOUS Sandra',idx:'13,4',hcp:15,dep:'Rouges'},{nom:'MILLE Marine',idx:'14,5',hcp:16,dep:'Rouges'}]},
+  {n:15,h:'10:50',j:[{nom:'DE ROULHAC Thibaut',idx:'12,1',hcp:13,dep:'Jaunes'},{nom:'VILGRAIN Sébastien',idx:'12,1',hcp:13,dep:'Jaunes'},{nom:'MOUTTI Jean-Philippe',idx:'13,1',hcp:15,dep:'Jaunes'}]},
+  {n:16,h:'11:00',j:[{nom:'HALES Ludovic',idx:'13,3',hcp:15,dep:'Jaunes'},{nom:'BELLANGER Elliot',idx:'13,3',hcp:15,dep:'Jaunes'},{nom:'ARDILLY Marc',idx:'13,4',hcp:15,dep:'Jaunes'}]},
+  {n:17,h:'11:10',j:[{nom:'BERNARD Alexandre',idx:'14,4',hcp:16,dep:'Jaunes'},{nom:'WALKER Craig',idx:'14,9',hcp:17,dep:'Jaunes'},{nom:'RUSSAIL Antoine',idx:'16,1',hcp:18,dep:'Jaunes'}]},
+  {n:18,h:'11:20',j:[{nom:'WALKER Susan',idx:'15,4',hcp:17,dep:'Rouges'},{nom:'DOS REIS Clémentine',idx:'21,6',hcp:25,dep:'Rouges'},{nom:'BERTIN Sophie',idx:'23,3',hcp:27,dep:'Rouges'}]},
+  {n:19,h:'11:30',j:[{nom:'GRIMPREL Maxime',idx:'16,9',hcp:19,dep:'Jaunes'},{nom:'ROUTHIER Timothée',idx:'17,5',hcp:20,dep:'Jaunes'},{nom:'OUDOT Jean-Baptiste',idx:'18,7',hcp:21,dep:'Jaunes'}]},
+  {n:20,h:'11:40',j:[{nom:'DU BOUEXIC Marc',idx:'8,9',hcp:9,dep:'Jaunes'},{nom:'ROBIN Gilles',idx:'11,2',hcp:12,dep:'Jaunes'},{nom:'GAVELLE Yannick',idx:'13,5',hcp:15,dep:'Jaunes'}]},
+  {n:21,h:'11:50',j:[{nom:'HALLET Gaspard',idx:'19,5',hcp:22,dep:'Jaunes'},{nom:'ZUCCARELLI Francois',idx:'24,2',hcp:25,dep:'Bleus'},{nom:'FOURNIER François',idx:'26,7',hcp:31,dep:'Jaunes'}]},
+  {n:22,h:'12:00',j:[{nom:'BURGERT Caroline',idx:'16,1',hcp:18,dep:'Rouges'},{nom:'DE LA FERRIERE Anne',idx:'16,1',hcp:18,dep:'Rouges'},{nom:'BINET Stéphanie',idx:'27,4',hcp:31,dep:'Rouges'}]},
+  {n:23,h:'12:10',j:[{nom:'ROBIN Christine',idx:'19,7',hcp:22,dep:'Rouges'},{nom:'JUIGNET Anne',idx:'19,9',hcp:23,dep:'Rouges'},{nom:'DU BOUEXIC Isabelle',idx:'20,1',hcp:23,dep:'Rouges'}]},
+  {n:24,h:'12:20',j:[{nom:'DE LASTEYRIE Dominique',idx:'19,0',hcp:22,dep:'Rouges'},{nom:'GOUREAU Sophie',idx:'20,4',hcp:23,dep:'Rouges'},{nom:'BLIN Béatrice',idx:'20,5',hcp:23,dep:'Rouges'}]},
+  {n:25,h:'12:30',j:[{nom:'RAYNAUD Anne',idx:'22,9',hcp:26,dep:'Rouges'},{nom:'DE DAMPIERRE Diane',idx:'23,0',hcp:26,dep:'Rouges'},{nom:'SLOVE Marie-Cécile',idx:'24,6',hcp:28,dep:'Rouges'}]},
+  {n:26,h:'12:40',j:[{nom:'TRUBERT Alban',idx:'2,3',hcp:1,dep:'Jaunes'},{nom:'JANNOT Claude',idx:'4,8',hcp:5,dep:'Jaunes'},{nom:'BOULLE Frédéric',idx:'9,2',hcp:10,dep:'Jaunes'}]},
+  {n:27,h:'12:50',j:[{nom:'ARENE Olivier',idx:'9,3',hcp:7,dep:'Bleus'},{nom:'PARIS Xavier',idx:'9,5',hcp:7,dep:'Bleus'},{nom:'BURGERT Christian',idx:'11,3',hcp:10,dep:'Bleus'}]},
+  {n:28,h:'13:00',j:[{nom:'GINIEZ Gérard',idx:'10,0',hcp:8,dep:'Bleus'},{nom:'DECROIX Jean-Pierre',idx:'10,5',hcp:9,dep:'Bleus'},{nom:'VINAY Philippe',idx:'12,0',hcp:10,dep:'Bleus'}]},
+  {n:29,h:'13:10',j:[{nom:'CHERRIER Daniel',idx:'13,2',hcp:12,dep:'Bleus'},{nom:'ROUSSEREAU Etienne',idx:'13,7',hcp:12,dep:'Bleus'},{nom:'PANIE Jean-Paul',idx:'15,8',hcp:15,dep:'Bleus'}]},
+  {n:30,h:'13:20',j:[{nom:'DE LASTEYRIE Gilles',idx:'17,1',hcp:16,dep:'Bleus'},{nom:'ROUTHIER Hugo',idx:'18,5',hcp:18,dep:'Bleus'},{nom:'DE DAMPIERRE Olivier',idx:'19,7',hcp:19,dep:'Bleus'}]},
+  {n:31,h:'13:30',j:[{nom:'PARIS Stéphane',idx:'22,5',hcp:23,dep:'Bleus'},{nom:'DESFILIS José',idx:'30,8',hcp:32,dep:'Bleus'},{nom:'ROBIN MARIETON Olivier',idx:'31,3',hcp:33,dep:'Bleus'}]},
+  {n:32,h:'13:40',j:[{nom:'HALLET Fabien',idx:'5,3',hcp:5,dep:'Jaunes'},{nom:'GODEFROY Benjamin',idx:'5,6',hcp:5,dep:'Jaunes'},{nom:'MACHERY Louis',idx:'13,9',hcp:16,dep:'Jaunes'}]},
+  {n:33,h:'13:50',j:[{nom:'ORLOWSKI Jean-Stanislas',idx:'13,7',hcp:15,dep:'Jaunes'},{nom:'RENAUX Hugues',idx:'18,6',hcp:21,dep:'Jaunes'},{nom:'DUJARDIN Adrien',idx:'23,6',hcp:24,dep:'Bleus'}]},
+  {n:34,h:'14:00',j:[{nom:'DUJARDIN Raphaël',idx:'28,4',hcp:27,dep:'Rouges'},{nom:'FABRY Olivia',idx:'12,3',hcp:14,dep:'Rouges'},{nom:'TRANCHANT Nikita',idx:'34,1',hcp:39,dep:'Rouges'}]}
+];
+const ALLSTARS_DEP_COLORS={
+  'Noirs':{bg:'#1a1a1a',fg:'#f0f0f0'},
+  'Blancs':{bg:'#f0f0f0',fg:'#1a1a1a'},
+  'Jaunes':{bg:'#f0c430',fg:'#1a1a1a'},
+  'Rouges':{bg:'#cc3333',fg:'#fff'},
+  'Bleus':{bg:'#3366cc',fg:'#fff'}
+};
+let allStarsFilter='Tous';
+function loadAllStars(){
+  const container=document.getElementById('tab-allstars');
+  renderAllStars(container,allStarsFilter);
+}
+function renderAllStars(container,filtre){
+  const filtres=['Tous','Noirs','Blancs','Jaunes','Rouges','Bleus'];
+  let filtersHtml='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">';
+  filtres.forEach(f=>{
+    const active=f===filtre;
+    let style='padding:5px 10px;border-radius:20px;font-size:11px;font-family:\'Cormorant Garamond\',serif;letter-spacing:1px;cursor:pointer;border:1px solid;transition:all 0.2s;';
+    if(f==='Tous'){
+      style+=active?'background:var(--gold);color:var(--green-deep);border-color:var(--gold);':'background:transparent;color:var(--gold);border-color:rgba(201,168,76,0.4);';
+    } else {
+      const c=ALLSTARS_DEP_COLORS[f];
+      style+=active?`background:${c.bg};color:${c.fg};border-color:${c.bg};`:`background:transparent;color:${c.bg==='#f0f0f0'?'rgba(201,168,76,0.7)':c.bg};border-color:${c.bg==='#f0f0f0'?'rgba(201,168,76,0.3)':c.bg};opacity:0.8;`;
+    }
+    filtersHtml+=`<span style="${style}" onclick="allStarsFilter='${f}';renderAllStars(document.getElementById('tab-allstars'),'${f}')">${f==='Tous'?'Tous':f}</span>`;
+  });
+  filtersHtml+='</div>';
+
+  const groupes=filtre==='Tous'?ALLSTARS_GROUPES:ALLSTARS_GROUPES.filter(g=>g.j.some(j=>j.dep===filtre));
+  let html=`<div style="padding-bottom:1.5rem;">
+  <div style="text-align:center;margin-bottom:1.25rem;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--gold);letter-spacing:1px;">Championnat du Club 2026</div>
+    <div style="font-size:0.75rem;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;">Golf de Fontainebleau — 04.04.2026</div>
+  </div>
+  ${filtersHtml}`;
+
+  groupes.forEach(g=>{
+    const joueurs=filtre==='Tous'?g.j:g.j.filter(j=>j.dep===filtre);
+    html+=`<div class="card" style="margin-bottom:10px;padding:14px 16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.12);">
+      <span style="font-family:'Cormorant Garamond',serif;font-size:0.65rem;color:rgba(201,168,76,0.5);letter-spacing:2px;text-transform:uppercase;">Groupe ${g.n}</span>
+      <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);">⏱ ${g.h}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">`;
+    joueurs.forEach(j=>{
+      const c=ALLSTARS_DEP_COLORS[j.dep];
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <span style="font-weight:600;color:var(--cream);font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${j.nom}</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <span style="font-size:11px;color:var(--text-muted);">idx ${j.idx} · hcp ${j.hcp}</span>
+          <span style="background:${c.bg};color:${c.fg};font-size:10px;padding:2px 8px;border-radius:10px;font-family:'Cormorant Garamond',serif;letter-spacing:0.5px;white-space:nowrap;${c.bg==='#f0f0f0'?'border:1px solid #ccc;':''}">${j.dep}</span>
+        </div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+
+  if(groupes.length===0) html+='<div style="text-align:center;padding:2rem;color:var(--text-muted);font-style:italic;">Aucun groupe trouvé.</div>';
+  html+='</div>';
+  container.innerHTML=html;
 }
 
 // ---- PUSH NOTIFICATIONS ----
