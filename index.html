@@ -1589,13 +1589,13 @@ async function adminPostTriviaQuestions(){
 
 
 // ---- JOUEUR MYSTERE ----
-const MYSTERY_J1=new Date('2026-04-03T00:00:00');
+const MYSTERY_J1=new Date('2026-04-04T00:00:00');
 const MYSTERY_BLURS={1:20,2:15,3:11,4:2};
 const MYSTERY_INDICES=[
-  "J'ai été numéro 1 mondial au cours de ma carrière.",
-  "Je suis européen.",
-  "Je ne suis pas anglais.",
-  "J'ai été sacré numéro 1 mondial la même année que ma victoire au Masters."
+  "J'ai gagné le Masters une seule fois.",
+  "Je suis américain.",
+  "Je suis allé en playoff pour remporter ma veste verte.",
+  "Ma victoire est indissociable d'un chip holé out légendaire contre Greg Norman."
 ];
 
 function getMysteryRawDay(){
@@ -1614,7 +1614,7 @@ async function loadMysteryInline(){
   const jourActuel=getMysteryDay();
   const rawDay=getMysteryRawDay();
   const blur=MYSTERY_BLURS[jourActuel]||2;
-  const _mp=['https:','','egasser17.github.io','Augusta','img','mystery3.jpg'].join('/');
+  const _mp=['https:','','egasser17.github.io','Augusta','img','mystery4.jpg'].join('/');
   const makePhoto=(blurPx)=>{
     const uid='mf'+Math.random().toString(36).slice(2);
     fetch(_mp).then(r=>r.blob()).then(b=>{
@@ -1640,7 +1640,7 @@ async function loadMysteryInline(){
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">'+playerName+'</div>'
         +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9couvert par <strong style="color:var(--gold);">'+winner+'</strong> \u2014 Jour '+dayNum+'</div>'
         +(isWinner
-          ?'<div class="msg success">&#127942; C\'est vous qui avez trouv\u00e9 ! +7500 pts ajout\u00e9s \u00e0 votre score.</div>'
+          ?'<div class="msg success">&#127942; C\'est vous qui avez trouv\u00e9 ! +10000 pts ajout\u00e9s \u00e0 votre score.</div>'
           :'<div class="msg info">&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le joueur myst\u00e8re !</div>')
         +'</div>';
       return;
@@ -1694,7 +1694,7 @@ async function submitMysteryGuess(){
     const isCorrect=await sbFetch('rpc/check_mystery_guess','POST',{p_guess:guess});
     await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:!!isCorrect}),prefer:'return=minimal'});
     if(isCorrect){
-      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:7500,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
+      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:10000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
       loadMysteryInline();
     }else{
       document.getElementById('tab-mystere').innerHTML='<div style="padding:1.5rem 1rem;text-align:center;"><div class="msg error" style="margin-bottom:1rem;">Mauvaise réponse — revenez demain pour un nouvel indice.</div><div style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">Votre réponse : “'+guess+'”</div></div>';
