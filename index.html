@@ -2038,7 +2038,8 @@ function renderCdc() {
     else { skipCount++; }
     lastVal = sortVal;
 
-    const isQual = total != null && displayPos <= serie.nQual;
+    const allT2Done = !serie.twoRounds || serie.players.every(p => p.t2 != null);
+    const isQual = allT2Done && total != null && displayPos <= serie.nQual;
     if (!isQual && !sepDone) {
       sepDone = true;
       rows += '<tr><td colspan="6" style="padding:4px 8px;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;color:rgba(201,168,76,0.4);letter-spacing:2px;text-transform:uppercase;border-top:1px solid rgba(201,168,76,0.18);border-bottom:1px solid rgba(201,168,76,0.08);">Non qualifiés</td></tr>';
