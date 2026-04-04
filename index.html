@@ -1863,11 +1863,9 @@ const CDC_MP_H = {
 };
 
 const CDC_MP_F = {
-  sf: [
-    {j1:'HALES Stéphanie',  j2:'OUDOT-DORATO Karen', res:null},
-    {j1:'TRANCHANT Anne',   j2:'TILLOUS Rosalie',    res:null},
-  ],
-  f: {j1:null,j2:null,res:null},
+  // SF : 1vs4, 2vs3 — auto-généré après Tour 2
+  sf: [{res:null},{res:null}],
+  f:  {j1:null,j2:null,res:null},
 };
 
 let cdcTab='H';
@@ -1943,12 +1941,32 @@ function renderCdc(){
       );
     });
     mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin:12px 0 6px;">Demi-finales</div>';
-    mp.sf.forEach((m,i)=>{mpHtml+=mpCard(m,'DF'+(i+1));});
+    // SF auto : 1vs4, 2vs3 — affiche noms seulement si Tour 2 complet
+    const t2DoneF=sorted.every(p=>p.t2!=null);
+    const sfPairs=t2DoneF
+      ?[[sorted[0],sorted[3]],[sorted[1],sorted[2]]]
+      :[[null,null],[null,null]];
+    sfPairs.forEach(([p1,p2],i)=>{
+      mpHtml+=mpCard(
+        {j1:p1?p1.nom:null, j2:p2?p2.nom:null, res:mp.sf[i]?mp.sf[i].res:null},
+        'DF'+(i+1)
+      );
+    });
     mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin:12px 0 6px;">Finale</div>';
     mpHtml+=mpCard(mp.f,'Finale');
   }else{
     mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin-bottom:6px;">Demi-finales</div>';
-    mp.sf.forEach((m,i)=>{mpHtml+=mpCard(m,'DF'+(i+1));});
+    // SF auto : 1vs4, 2vs3 — affiche noms seulement si Tour 2 complet
+    const t2DoneF=sorted.every(p=>p.t2!=null);
+    const sfPairs=t2DoneF
+      ?[[sorted[0],sorted[3]],[sorted[1],sorted[2]]]
+      :[[null,null],[null,null]];
+    sfPairs.forEach(([p1,p2],i)=>{
+      mpHtml+=mpCard(
+        {j1:p1?p1.nom:null, j2:p2?p2.nom:null, res:mp.sf[i]?mp.sf[i].res:null},
+        'DF'+(i+1)
+      );
+    });
     mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin:12px 0 6px;">Finale</div>';
     mpHtml+=mpCard(mp.f,'Finale');
   }
