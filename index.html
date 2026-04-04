@@ -1829,176 +1829,327 @@ function renderEvolutionChart(historyData){
 }
 
 // ---- CHAMPIONNAT DU CLUB 2026 ----
-// =====================================================
-// DONNEES A METTRE A JOUR :
-//   - t1 / t2 : scores bruts Tour 1 et Tour 2 (null = pas joue)
-//   - res dans CDC_MP_H / CDC_MP_F : string libre ou null
-// =====================================================
+// ============================================================
+// MISE À JOUR DES DONNÉES : modifier les objets CDC_DATA ci-dessous
+// Format scores : entier ou null (non joué / absent)
+// Format matchs : {j1, j2, info, res} — res:null = "À venir", res:'string' = résultat
+// ============================================================
 
-const CDC_H = [
-  {nom:'MAHY-CHAMPVERT Ferdinand', idx:'+1,7', t1:72,  t2:null},
-  {nom:'MANIETTE Théo',            idx:'1,2',  t1:73,  t2:null},
-  {nom:'MACHERY François',         idx:'+0,1', t1:74,  t2:null},
-  {nom:'PROUVAY Florent',          idx:'0,5',  t1:76,  t2:null},
-  {nom:'LELONG Thibault',          idx:'+1,0', t1:77,  t2:null},
-  {nom:'SCHNEIDER Jean-Louis',     idx:'+0,7', t1:78,  t2:null},
-  {nom:'GODEFROY Joseph',          idx:'1,0',  t1:79,  t2:null},
-  {nom:'MOUHICA Raphael',          idx:'0,9',  t1:81,  t2:null},
-  {nom:'VILLET Alexandre',         idx:'2,3',  t1:81,  t2:null},
-  {nom:'BINET Benjamin',           idx:'2,6',  t1:81,  t2:null},
-  {nom:'TILLOUS Andreas',          idx:'2,5',  t1:82,  t2:null},
-  {nom:'BOULLE Steven',            idx:'3,6',  t1:83,  t2:null},
-  {nom:'LANNES Guillaume',         idx:'2,4',  t1:84,  t2:null},
-  {nom:'BONIN Jules',              idx:'3,7',  t1:92,  t2:null},
-];
+const CDC_DATA = {
+  '1H': {
+    label: '1ère H', nQual: 8, twoRounds: true,
+    players: [
+      {nom:'MAHY-CHAMPVERT Ferdinand', idx:'+1,7', t1:72,  t2:72},
+      {nom:'MACHERY François',         idx:'+0,1', t1:74,  t2:72},
+      {nom:'GODEFROY Joseph',          idx:'1,0',  t1:79,  t2:75},
+      {nom:'PROUVAY Florent',          idx:'0,5',  t1:76,  t2:79},
+      {nom:'MANIETTE Théo',            idx:'1,2',  t1:73,  t2:84},
+      {nom:'LELONG Thibault',          idx:'+1,0', t1:77,  t2:80},
+      {nom:'SCHNEIDER Jean-Louis',     idx:'+0,7', t1:78,  t2:80},
+      {nom:'MOUHICA Raphael',          idx:'0,9',  t1:81,  t2:82},
+      {nom:'VILLET Alexandre',         idx:'2,3',  t1:81,  t2:null},
+      {nom:'LANNES Guillaume',         idx:'2,4',  t1:84,  t2:null},
+      {nom:'TILLOUS Andreas',          idx:'2,5',  t1:82,  t2:null},
+      {nom:'BINET Benjamin',           idx:'2,6',  t1:81,  t2:null},
+      {nom:'BOULLE Steven',            idx:'3,6',  t1:83,  t2:null},
+      {nom:'BONIN Jules',              idx:'3,7',  t1:92,  t2:null},
+    ],
+    bracket: {
+      type: 'pending',
+      message: 'Résultats en cours...',
+    },
+  },
 
-const CDC_F = [
-  {nom:'HALES Stéphanie',      idx:'1,1', t1:77, t2:null},
-  {nom:'TRANCHANT Anne',       idx:'5,3', t1:85, t2:null},
-  {nom:'TILLOUS Rosalie',      idx:'9,0', t1:87, t2:null},
-  {nom:'OUDOT-DORATO Karen',   idx:'9,3', t1:94, t2:null},
-];
+  '1F': {
+    label: '1ère F', nQual: 4, twoRounds: true,
+    players: [
+      {nom:'HALES Stéphanie',    idx:'1,1', t1:77, t2:75},
+      {nom:'TRANCHANT Anne',     idx:'5,3', t1:85, t2:86},
+      {nom:'TILLOUS Rosalie',    idx:'9,0', t1:87, t2:86},
+      {nom:'OUDOT-DORATO Karen', idx:'9,3', t1:94, t2:93},
+    ],
+    bracket: {
+      type: 'sf4',
+      sf: [
+        {j1:'HALES S.',     j2:'OUDOT-DORATO K.', info:'Dimanche', res:null},
+        {j1:'TRANCHANT A.', j2:'TILLOUS R.',       info:'Dimanche', res:null},
+      ],
+      f: {j1:null, j2:null, info:'Lundi', res:null},
+    },
+  },
 
-// Résultats match play — string libre ou null = "\u00c0 venir"
-const CDC_MP_H = {
-  // QF : 1vs8, 2vs7, 3vs6, 4vs5 — auto-généré depuis classement final (après Tour 2)
-  qf: [{res:null},{res:null},{res:null},{res:null}],
-  sf: [{j1:null,j2:null,res:null},{j1:null,j2:null,res:null}],
-  f:  {j1:null,j2:null,res:null},
+  '2H': {
+    label: '2ème H', nQual: 8, twoRounds: false,
+    players: [
+      {nom:'GODEFROY Ferdinand',   idx:'5,9',  score:77},
+      {nom:'ROUTHIER Benjamin',    idx:'6,6',  score:79},
+      {nom:'JUNGUENET Ambroise',   idx:'5,3',  score:81},
+      {nom:'GASSER Edouard',       idx:'5,2',  score:83},
+      {nom:'LETTMANN Daniel',      idx:'9,2',  score:84},
+      {nom:'HALES Arnott',         idx:'5,8',  score:84},
+      {nom:'DESFOND Grégoire',     idx:'8,7',  score:84},
+      {nom:'BINET Nathan',         idx:'6,6',  score:85},
+      {nom:'JOUHANNEAUD Jerome',   idx:'7,3',  score:87},
+      {nom:'DUJARDIN Stanislas',   idx:'8,0',  score:88},
+      {nom:'DE ROULHAC Sébastien', idx:'4,7',  score:89},
+      {nom:'ZUCCARELLI Paul',      idx:'6,6',  score:90},
+      {nom:'BERTHOUD Antoine',     idx:'8,1',  score:92},
+      {nom:'TRANCHANT Sébastien',  idx:'7,3',  score:96},
+    ],
+    bracket: {
+      type: 'qf8',
+      qf: [
+        {j1:'GODEFROY F.',  j2:'BINET N.',   info:'Dimanche', res:null},
+        {j1:'ROUTHIER',     j2:'DESFOND',    info:'Dimanche', res:null},
+        {j1:'JUNGUENET',    j2:'HALES A.',   info:'Dimanche', res:null},
+        {j1:'GASSER',       j2:'LETTMANN',   info:'Dimanche', res:null},
+      ],
+      sf: [{j1:null,j2:null,info:'Lundi',res:null},{j1:null,j2:null,info:'Lundi',res:null}],
+      f:  {j1:null,j2:null,info:'Lundi',res:null},
+    },
+  },
+
+  '2F': {
+    label: '2ème F', nQual: 4, twoRounds: false,
+    players: [
+      {nom:'TILLOUS Sandra',      idx:'13,4', score:83},
+      {nom:'DOS REIS Clémentine', idx:'21,6', score:102},
+      {nom:'MILLE Marine',        idx:'14,5', score:103},
+      {nom:'BINET Stéphanie',     idx:'27,4', score:106},
+    ],
+    bracket: {
+      type: 'sf4',
+      sf: [
+        {j1:'TILLOUS S.',   j2:'BINET S.',  info:'Dimanche 12h00', res:null},
+        {j1:'DOS REIS C.',  j2:'MILLE M.',  info:'Dimanche 12h10', res:null},
+      ],
+      f: {j1:null, j2:null, info:'Lundi 13h04', res:null},
+    },
+  },
+
+  '3H': {
+    label: '3ème H', nQual: 8, twoRounds: false,
+    players: [
+      {nom:'DE ROULHAC Thibaut',  idx:'12,1', score:86},
+      {nom:'RUSSAIL Antoine',     idx:'16,1', score:87},
+      {nom:'VILGRAIN Sébastien',  idx:'12,1', score:89},
+      {nom:'GRIMPREL Maxime',     idx:'16,9', score:90},
+      {nom:'BERNARD Alexandre',   idx:'14,4', score:91},
+      {nom:'BINET Clément',       idx:'11,8', score:92},
+      {nom:'HALLET Gaspard',      idx:'19,5', score:92},
+      {nom:'BELLANGER Elliot',    idx:'13,3', score:93},
+      {nom:'ARDILLY Marc',        idx:'13,4', score:94},
+      {nom:'OUDOT Jean-Baptiste', idx:'18,7', score:94},
+      {nom:'WALKER Craig',        idx:'14,9', score:96},
+      {nom:'MOUTTI Jean-Philippe',idx:'13,1', score:104},
+      {nom:'HALES Ludovic',       idx:'13,3', score:101},
+      {nom:'ROUTHIER Timothée',   idx:'17,5', score:101},
+      {nom:'RENAUX Hugues',       idx:'18,6', score:112},
+      {nom:'DUJARDIN Adrien',     idx:'23,6', score:null},
+    ],
+    bracket: {
+      type: 'qf8',
+      qf: [
+        {j1:'DE ROULHAC T.', j2:'BELLANGER',  info:'Dimanche 14h00', res:null},
+        {j1:'RUSSAIL',       j2:'HALLET',     info:'Dimanche 18h30', res:null},
+        {j1:'VILGRAIN',      j2:'BINET C.',   info:'Dimanche 16h00', res:null},
+        {j1:'GRIMPREL',      j2:'BERNARD',    info:'Dimanche 14h10', res:null},
+      ],
+      sf: [{j1:null,j2:null,info:'Lundi',res:null},{j1:null,j2:null,info:'Lundi',res:null}],
+      f:  {j1:null,j2:null,info:'Lundi',res:null},
+    },
+  },
+
+  'SH': {
+    label: 'Seniors H', nQual: 8, twoRounds: false,
+    players: [
+      {nom:'TRUBERT Alban',          idx:'2,3',  score:75},
+      {nom:'BULTE Valère',           idx:'3,1',  score:75},
+      {nom:'JANNOT Claude',          idx:'4,8',  score:78},
+      {nom:'REGNIER Frédéric',       idx:'8,1',  score:80},
+      {nom:'TILLOUS Arnaud',         idx:'5,4',  score:82},
+      {nom:'GODEFROY Benjamin',      idx:'5,6',  score:82},
+      {nom:'BOULLE Frédéric',        idx:'9,2',  score:82},
+      {nom:'DU BOUEXIC Marc',        idx:'8,9',  score:84},
+      {nom:'HALLET Fabien',          idx:'5,3',  score:88},
+      {nom:'LE BOUBENNEC Erwan',     idx:'8,1',  score:88},
+      {nom:'ROBIN Gilles',           idx:'11,2', score:88},
+      {nom:'ORLOWSKI Jean-Stanislas',idx:'13,7', score:88},
+      {nom:'BLASER Laurent',         idx:'10,8', score:97},
+      {nom:'FOURNIER François',      idx:'26,7', score:104},
+    ],
+    bracket: {
+      type: 'qf8',
+      qf: [
+        {j1:'TRUBERT',    j2:'DU BOUEXIC',   info:'Dimanche 12h40', res:null},
+        {j1:'BULTE',      j2:'BOULLE F.',     info:'Dimanche 15h10', res:null},
+        {j1:'JANNOT',     j2:'GODEFROY B.',   info:'Dimanche 13h00', res:null},
+        {j1:'REGNIER',    j2:'TILLOUS A.',    info:'Dimanche 12h50', res:null},
+      ],
+      sf: [{j1:null,j2:null,info:'Lundi 9h32',res:null},{j1:null,j2:null,info:'Lundi 9h32',res:null}],
+      f:  {j1:null,j2:null,info:'Lundi 13h12',res:null},
+    },
+  },
 };
 
-const CDC_MP_F = {
-  // SF : 1vs4, 2vs3 — auto-généré après Tour 2
-  sf: [{res:null},{res:null}],
-  f:  {j1:null,j2:null,res:null},
-};
+const CDC_TABS = ['1H','1F','2H','2F','3H','SH'];
+let cdcTab = '1H';
 
-let cdcTab='H';
+function loadAllStars() { renderCdc(); }
 
-function loadAllStars(){renderCdc();}
+function renderCdc() {
+  const container = document.getElementById('tab-allstars');
+  const serie = CDC_DATA[cdcTab];
+  if (!serie) return;
 
-function renderCdc(){
-  const container=document.getElementById('tab-allstars');
-  const data=cdcTab==='H'?CDC_H:CDC_F;
-  const nQual=cdcTab==='H'?8:2;
-  const mp=cdcTab==='H'?CDC_MP_H:CDC_MP_F;
-
-  const sorted=[...data].sort((a,b)=>{
-    const ta=a.t2!=null?a.t1+a.t2:a.t1!=null?a.t1:9999;
-    const tb=b.t2!=null?b.t1+b.t2:b.t1!=null?b.t1:9999;
-    return ta-tb;
+  // --- tri ---
+  const sorted = [...serie.players].sort((a, b) => {
+    const ta = serie.twoRounds
+      ? (a.t2 != null ? a.t1 + a.t2 : a.t1 != null ? a.t1 + 999 : 9999)
+      : (a.score != null ? a.score : 9999);
+    const tb = serie.twoRounds
+      ? (b.t2 != null ? b.t1 + b.t2 : b.t1 != null ? b.t1 + 999 : 9999)
+      : (b.score != null ? b.score : 9999);
+    return ta - tb;
   });
 
-  const tabSty=(active)=>'padding:7px 18px;border-radius:20px;font-size:12px;font-family:\'Cormorant Garamond\',serif;letter-spacing:1px;cursor:pointer;border:1px solid;transition:all 0.2s;'+(active?'background:var(--gold);color:var(--green-deep);border-color:var(--gold);font-weight:bold;':'background:transparent;color:var(--gold);border-color:rgba(201,168,76,0.4);');
+  // --- onglets ---
+  const tabBar = CDC_TABS.map(k => {
+    const active = k === cdcTab;
+    const sty = 'padding:5px 11px;border-radius:16px;font-size:11px;font-family:\'Cormorant Garamond\',serif;letter-spacing:0.5px;cursor:pointer;border:1px solid;transition:all 0.2s;white-space:nowrap;'
+      + (active
+        ? 'background:var(--gold);color:var(--green-deep);border-color:var(--gold);font-weight:bold;'
+        : 'background:transparent;color:var(--gold);border-color:rgba(201,168,76,0.4);');
+    return '<span style="' + sty + '" onclick="cdcTab=\'' + k + '\';renderCdc()">' + CDC_DATA[k].label + '</span>';
+  }).join('');
 
-  const t2Done=sorted.every(p=>p.t2!=null);
-  let rows='';
-  let lastTotal=null,displayPos=0,skipCount=0,sepDone=false;
-  sorted.forEach((p)=>{
-    const total=p.t2!=null?p.t1+p.t2:p.t1!=null?p.t1:null;
-    if(total!==lastTotal){displayPos+=1+skipCount;skipCount=0;}else{skipCount++;}
-    lastTotal=total;
-    const isQual=t2Done&&displayPos<=nQual&&total!=null;
-    if(!isQual&&!sepDone){
-      sepDone=true;
-      rows+='<tr><td colspan="6" style="padding:4px 8px;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;color:rgba(201,168,76,0.4);letter-spacing:2px;text-transform:uppercase;border-top:1px solid rgba(201,168,76,0.18);border-bottom:1px solid rgba(201,168,76,0.08);">Non qualifi\u00e9s</td></tr>';
+  // --- tableau ---
+  let rows = '';
+  let lastVal = null, displayPos = 0, skipCount = 0, sepDone = false;
+  sorted.forEach(p => {
+    const total = serie.twoRounds
+      ? (p.t2 != null ? p.t1 + p.t2 : null)
+      : p.score;
+    const sortVal = serie.twoRounds
+      ? (p.t2 != null ? p.t1 + p.t2 : null)
+      : p.score;
+
+    if (sortVal !== lastVal) { displayPos += 1 + skipCount; skipCount = 0; }
+    else { skipCount++; }
+    lastVal = sortVal;
+
+    const isQual = total != null && displayPos <= serie.nQual;
+    if (!isQual && !sepDone) {
+      sepDone = true;
+      rows += '<tr><td colspan="6" style="padding:4px 8px;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;color:rgba(201,168,76,0.4);letter-spacing:2px;text-transform:uppercase;border-top:1px solid rgba(201,168,76,0.18);border-bottom:1px solid rgba(201,168,76,0.08);">Non qualifiés</td></tr>';
     }
-    const qual=isQual?'<span style="background:#1a5c2a;color:#7ee8a2;font-size:9px;padding:2px 7px;border-radius:10px;font-family:\'Cormorant Garamond\',serif;letter-spacing:0.5px;white-space:nowrap;border:1px solid #2d8c4e;">Qualifi\u00e9</span>':'';
-    const dash='<span style="color:rgba(245,240,232,0.25);">—</span>';
-    const t1s=p.t1!=null?p.t1:dash;
-    const t2s=p.t2!=null?p.t2:dash;
-    const tots=total!=null?'<strong>'+total+'</strong>':dash;
-    rows+='<tr style="border-bottom:1px solid rgba(201,168,76,0.07);">'
-      +'<td style="padding:9px 6px;text-align:center;font-family:\'Cormorant Garamond\',serif;color:var(--gold);width:28px;">'+displayPos+'</td>'
-      +'<td style="padding:9px 8px;font-family:\'EB Garamond\',serif;font-size:0.95rem;"><span style="color:var(--cream);">'+p.nom+'</span>'+(qual?'<br><span style="margin-top:3px;display:inline-block;">'+qual+'</span>':'')+'</td>'
-      +'<td style="padding:9px 6px;text-align:center;font-size:0.8rem;color:var(--text-muted);white-space:nowrap;">'+p.idx+'</td>'
-      +'<td style="padding:9px 6px;text-align:center;font-size:0.9rem;">'+t1s+'</td>'
-      +'<td style="padding:9px 6px;text-align:center;font-size:0.9rem;">'+t2s+'</td>'
-      +'<td style="padding:9px 6px;text-align:center;font-size:0.9rem;">'+tots+'</td>'
-      +'</tr>';
+    const badge = isQual
+      ? '<br><span style="background:#1a5c2a;color:#7ee8a2;font-size:9px;padding:2px 7px;border-radius:10px;font-family:\'Cormorant Garamond\',serif;border:1px solid #2d8c4e;">Qualifié</span>'
+      : '';
+    const dash = '<span style="color:rgba(245,240,232,0.25);">—</span>';
+    const posStr = '<td style="padding:9px 6px;text-align:center;font-family:\'Cormorant Garamond\',serif;color:var(--gold);width:24px;">' + (sortVal != null ? displayPos : '') + '</td>';
+    const nameStr = '<td style="padding:9px 8px;font-family:\'EB Garamond\',serif;font-size:0.92rem;"><span style="color:var(--cream);">' + p.nom + '</span>' + badge + '</td>';
+    const idxStr = '<td style="padding:9px 4px;text-align:center;font-size:0.78rem;color:var(--text-muted);white-space:nowrap;">' + p.idx + '</td>';
+
+    let scoreCells = '';
+    if (serie.twoRounds) {
+      const t1s = p.t1 != null ? p.t1 : dash;
+      const t2s = p.t2 != null ? p.t2 : dash;
+      const tots = total != null ? '<strong>' + total + '</strong>' : dash;
+      scoreCells = '<td style="padding:9px 5px;text-align:center;font-size:0.88rem;">' + t1s + '</td>'
+        + '<td style="padding:9px 5px;text-align:center;font-size:0.88rem;">' + t2s + '</td>'
+        + '<td style="padding:9px 5px;text-align:center;font-size:0.88rem;">' + tots + '</td>';
+    } else {
+      const sc = p.score != null ? p.score : dash;
+      scoreCells = '<td colspan="3" style="padding:9px 5px;text-align:center;font-size:0.88rem;font-weight:bold;">' + sc + '</td>';
+    }
+    rows += '<tr style="border-bottom:1px solid rgba(201,168,76,0.07);">' + posStr + nameStr + idxStr + scoreCells + '</tr>';
   });
 
-  function mpCard(m,label){
-    const j1=m.j1||'?';const j2=m.j2||'?';
-    const res=m.res
-      ?'<div style="font-size:0.8rem;color:#7ee8a2;margin-top:3px;">'+m.res+'</div>'
-      :'<div style="font-size:0.75rem;color:rgba(245,240,232,0.3);margin-top:3px;font-style:italic;">À venir</div>';
-    return '<div class="card" style="margin-bottom:8px;padding:12px 14px;">'
-      +'<div style="font-size:0.65rem;color:rgba(201,168,76,0.5);letter-spacing:2px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin-bottom:6px;">'+label+'</div>'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">'
-      +'<span style="font-family:\'EB Garamond\',serif;font-size:0.9rem;color:var(--cream);flex:1;text-align:left;">'+j1+'</span>'
-      +'<span style="font-family:\'Cormorant Garamond\',serif;font-size:0.75rem;color:rgba(201,168,76,0.6);flex-shrink:0;">vs</span>'
-      +'<span style="font-family:\'EB Garamond\',serif;font-size:0.9rem;color:var(--cream);flex:1;text-align:right;">'+j2+'</span>'
-      +'</div>'+res+'</div>';
-  }
+  const thSty = 'padding:8px 5px;text-align:center;font-family:\'Cormorant Garamond\',serif;font-size:0.6rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;';
+  const scoreHeaders = serie.twoRounds
+    ? '<th style="' + thSty + '">T1</th><th style="' + thSty + '">T2</th><th style="' + thSty + '">Total</th>'
+    : '<th colspan="3" style="' + thSty + '">Score</th>';
 
-  let mpHtml='<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.7rem;color:rgba(201,168,76,0.5);letter-spacing:2px;text-transform:uppercase;margin:1.5rem 0 0.75rem;">Match Play</div>';
-  if(cdcTab==='H'){
-    mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin-bottom:6px;">Quarts de finale</div>';
-    // QF auto : 1vs8, 2vs7, 3vs6, 4vs5 — affiche noms seulement si Tour 2 complet
-    const qfPairs=t2Done
-      ?[[sorted[0],sorted[7]],[sorted[1],sorted[6]],[sorted[2],sorted[5]],[sorted[3],sorted[4]]]
-      :[[null,null],[null,null],[null,null],[null,null]];
-    qfPairs.forEach(([p1,p2],i)=>{
-      mpHtml+=mpCard(
-        {j1:p1?p1.nom:null, j2:p2?p2.nom:null, res:mp.qf[i]?mp.qf[i].res:null},
-        'QF'+(i+1)
-      );
-    });
-    mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin:12px 0 6px;">Demi-finales</div>';
-    // SF auto : 1vs4, 2vs3 — affiche noms seulement si Tour 2 complet
-    const sfPairs=t2Done
-      ?[[sorted[0],sorted[3]],[sorted[1],sorted[2]]]
-      :[[null,null],[null,null]];
-    sfPairs.forEach(([p1,p2],i)=>{
-      mpHtml+=mpCard(
-        {j1:p1?p1.nom:null, j2:p2?p2.nom:null, res:mp.sf[i]?mp.sf[i].res:null},
-        'DF'+(i+1)
-      );
-    });
-    mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin:12px 0 6px;">Finale</div>';
-    mpHtml+=mpCard(mp.f,'Finale');
-  }else{
-    mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin-bottom:6px;">Demi-finales</div>';
-    // SF auto : 1vs4, 2vs3 — affiche noms seulement si Tour 2 complet
-    const sfPairs=t2Done
-      ?[[sorted[0],sorted[3]],[sorted[1],sorted[2]]]
-      :[[null,null],[null,null]];
-    sfPairs.forEach(([p1,p2],i)=>{
-      mpHtml+=mpCard(
-        {j1:p1?p1.nom:null, j2:p2?p2.nom:null, res:mp.sf[i]?mp.sf[i].res:null},
-        'DF'+(i+1)
-      );
-    });
-    mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin:12px 0 6px;">Finale</div>';
-    mpHtml+=mpCard(mp.f,'Finale');
-  }
+  const table = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">'
+    + '<thead><tr style="border-bottom:1px solid rgba(201,168,76,0.25);">'
+    + '<th style="' + thSty + 'width:24px;">Pos</th>'
+    + '<th style="' + thSty.replace('text-align:center','text-align:left') + '">Joueur</th>'
+    + '<th style="' + thSty + '">Idx</th>'
+    + scoreHeaders
+    + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
 
-  container.innerHTML=
-    '<div style="padding-bottom:2rem;">'
-    +'<div style="text-align:center;margin-bottom:1.25rem;">'
-    +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:1.5rem;color:var(--gold);letter-spacing:1px;">Championnat du Club 2026</div>'
-    +'<div style="font-size:0.72rem;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;">Golf de Fontainebleau</div>'
-    +'</div>'
-    +'<div style="display:flex;gap:8px;margin-bottom:16px;">'
-    +'<span style="'+tabSty(cdcTab==='H')+'" onclick="cdcTab=\'H\';renderCdc()">1ère série H</span>'
-    +'<span style="'+tabSty(cdcTab==='F')+'" onclick="cdcTab=\'F\';renderCdc()">1ère série F</span>'
-    +'</div>'
-    +'<div style="overflow-x:auto;">'
-    +'<table style="width:100%;border-collapse:collapse;">'
-    +'<thead><tr style="border-bottom:1px solid rgba(201,168,76,0.25);">'
-    +'<th style="padding:8px 6px;text-align:center;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;width:28px;">Pos</th>'
-    +'<th style="padding:8px 8px;text-align:left;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;">Joueur</th>'
-    +'<th style="padding:8px 6px;text-align:center;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;">Idx</th>'
-    +'<th style="padding:8px 6px;text-align:center;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;">T1</th>'
-    +'<th style="padding:8px 6px;text-align:center;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;">T2</th>'
-    +'<th style="padding:8px 6px;text-align:center;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;">Total</th>'
-    +'</tr></thead>'
-    +'<tbody>'+rows+'</tbody>'
-    +'</table></div>'
-    +mpHtml
-    +'</div>';
+  // --- bracket ---
+  const bracketHtml = makeBracket(serie.bracket);
+
+  container.innerHTML = '<div style="padding-bottom:2rem;">'
+    + '<div style="text-align:center;margin-bottom:1rem;">'
+    + '<div style="font-family:\'Cormorant Garamond\',serif;font-size:1.4rem;color:var(--gold);letter-spacing:1px;">Championnat du Club 2026</div>'
+    + '<div style="font-size:0.7rem;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:3px;">Golf de Fontainebleau</div>'
+    + '</div>'
+    + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">' + tabBar + '</div>'
+    + table
+    + bracketHtml
+    + '</div>';
 }
+
+function makeBracket(b) {
+  if (!b) return '';
+  if (b.type === 'pending') {
+    return '<div style="text-align:center;padding:1.2rem;font-style:italic;color:rgba(245,240,232,0.35);font-size:0.88rem;">' + (b.message || 'À venir') + '</div>';
+  }
+
+  function matchCard(m, label) {
+    if (!m) return '';
+    const j1 = m.j1 || '?';
+    const j2 = m.j2 || '?';
+    const info = m.info ? '<span style="font-size:0.7rem;color:rgba(201,168,76,0.45);margin-left:6px;">— ' + m.info + '</span>' : '';
+    let body;
+    if (m.res) {
+      // résultat connu : déduire vainqueur depuis res (contient le nom du vainqueur)
+      const w = m.res; // ex: "DUPONT bat MARTIN 3&2"
+      const j1Won = w.toLowerCase().startsWith(j1.toLowerCase().substring(0, 4));
+      const j1Sty = j1Won ? 'color:#7ee8a2;font-weight:bold;' : 'color:rgba(245,240,232,0.3);text-decoration:line-through;';
+      const j2Sty = !j1Won ? 'color:#7ee8a2;font-weight:bold;' : 'color:rgba(245,240,232,0.3);text-decoration:line-through;';
+      body = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">'
+        + '<span style="font-family:\'EB Garamond\',serif;font-size:0.88rem;flex:1;' + j1Sty + '">' + j1 + '</span>'
+        + '<span style="font-family:\'Cormorant Garamond\',serif;font-size:0.72rem;color:rgba(201,168,76,0.5);">vs</span>'
+        + '<span style="font-family:\'EB Garamond\',serif;font-size:0.88rem;flex:1;text-align:right;' + j2Sty + '">' + j2 + '</span>'
+        + '</div>'
+        + '<div style="font-size:0.78rem;color:#7ee8a2;">' + m.res + '</div>';
+    } else {
+      body = '<div style="display:flex;align-items:center;gap:6px;">'
+        + '<span style="font-family:\'EB Garamond\',serif;font-size:0.88rem;color:var(--cream);flex:1;">' + j1 + '</span>'
+        + '<span style="font-family:\'Cormorant Garamond\',serif;font-size:0.72rem;color:rgba(201,168,76,0.5);">vs</span>'
+        + '<span style="font-family:\'EB Garamond\',serif;font-size:0.88rem;color:var(--cream);flex:1;text-align:right;">' + j2 + '</span>'
+        + '</div>'
+        + '<div style="font-size:0.73rem;color:rgba(245,240,232,0.28);margin-top:2px;font-style:italic;">À venir</div>';
+    }
+    return '<div class="card" style="margin-bottom:7px;padding:11px 13px;">'
+      + '<div style="font-size:0.6rem;color:rgba(201,168,76,0.45);letter-spacing:2px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin-bottom:5px;">' + label + info + '</div>'
+      + body + '</div>';
+  }
+
+  const hd = s => '<div style="font-size:0.68rem;color:rgba(201,168,76,0.4);letter-spacing:1.5px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin:10px 0 5px;">' + s + '</div>';
+
+  let html = '<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.68rem;color:rgba(201,168,76,0.5);letter-spacing:2px;text-transform:uppercase;margin:1.4rem 0 0.6rem;">Match Play</div>';
+
+  if (b.type === 'qf8') {
+    html += hd('Quarts de finale');
+    b.qf.forEach((m, i) => { html += matchCard(m, 'QF' + (i + 1)); });
+    html += hd('Demi-finales');
+    b.sf.forEach((m, i) => { html += matchCard(m, 'DF' + (i + 1)); });
+    html += hd('Finale');
+    html += matchCard(b.f, 'Finale');
+  } else if (b.type === 'sf4') {
+    html += hd('Demi-finales');
+    b.sf.forEach((m, i) => { html += matchCard(m, 'DF' + (i + 1)); });
+    html += hd('Finale');
+    html += matchCard(b.f, 'Finale');
+  }
+  return html;
+}
+
 
 // ---- PUSH NOTIFICATIONS ----
 
