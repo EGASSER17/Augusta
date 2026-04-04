@@ -1886,13 +1886,14 @@ function renderCdc(){
 
   const tabSty=(active)=>'padding:7px 18px;border-radius:20px;font-size:12px;font-family:\'Cormorant Garamond\',serif;letter-spacing:1px;cursor:pointer;border:1px solid;transition:all 0.2s;'+(active?'background:var(--gold);color:var(--green-deep);border-color:var(--gold);font-weight:bold;':'background:transparent;color:var(--gold);border-color:rgba(201,168,76,0.4);');
 
+  const t2Done=sorted.every(p=>p.t2!=null);
   let rows='';
   let lastTotal=null,displayPos=0,skipCount=0,sepDone=false;
   sorted.forEach((p)=>{
     const total=p.t2!=null?p.t1+p.t2:p.t1!=null?p.t1:null;
     if(total!==lastTotal){displayPos+=1+skipCount;skipCount=0;}else{skipCount++;}
     lastTotal=total;
-    const isQual=displayPos<=nQual&&total!=null;
+    const isQual=t2Done&&displayPos<=nQual&&total!=null;
     if(!isQual&&!sepDone){
       sepDone=true;
       rows+='<tr><td colspan="6" style="padding:4px 8px;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;color:rgba(201,168,76,0.4);letter-spacing:2px;text-transform:uppercase;border-top:1px solid rgba(201,168,76,0.18);border-bottom:1px solid rgba(201,168,76,0.08);">Non qualifi\u00e9s</td></tr>';
@@ -1930,7 +1931,6 @@ function renderCdc(){
   if(cdcTab==='H'){
     mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin-bottom:6px;">Quarts de finale</div>';
     // QF auto : 1vs8, 2vs7, 3vs6, 4vs5 — affiche noms seulement si Tour 2 complet
-    const t2Done=sorted.every(p=>p.t2!=null);
     const qfPairs=t2Done
       ?[[sorted[0],sorted[7]],[sorted[1],sorted[6]],[sorted[2],sorted[5]],[sorted[3],sorted[4]]]
       :[[null,null],[null,null],[null,null],[null,null]];
@@ -1942,8 +1942,7 @@ function renderCdc(){
     });
     mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin:12px 0 6px;">Demi-finales</div>';
     // SF auto : 1vs4, 2vs3 — affiche noms seulement si Tour 2 complet
-    const t2DoneF=sorted.every(p=>p.t2!=null);
-    const sfPairs=t2DoneF
+    const sfPairs=t2Done
       ?[[sorted[0],sorted[3]],[sorted[1],sorted[2]]]
       :[[null,null],[null,null]];
     sfPairs.forEach(([p1,p2],i)=>{
@@ -1957,8 +1956,7 @@ function renderCdc(){
   }else{
     mpHtml+='<div style="font-size:0.7rem;color:rgba(201,168,76,0.4);letter-spacing:1px;text-transform:uppercase;font-family:\'Cormorant Garamond\',serif;margin-bottom:6px;">Demi-finales</div>';
     // SF auto : 1vs4, 2vs3 — affiche noms seulement si Tour 2 complet
-    const t2DoneF=sorted.every(p=>p.t2!=null);
-    const sfPairs=t2DoneF
+    const sfPairs=t2Done
       ?[[sorted[0],sorted[3]],[sorted[1],sorted[2]]]
       :[[null,null],[null,null]];
     sfPairs.forEach(([p1,p2],i)=>{
