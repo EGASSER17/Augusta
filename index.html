@@ -1846,17 +1846,24 @@ const CDC_DATA = {
       {nom:'MANIETTE Théo',            idx:'1,2',  t1:73,  t2:84},
       {nom:'LELONG Thibault',          idx:'+1,0', t1:77,  t2:80},
       {nom:'SCHNEIDER Jean-Louis',     idx:'+0,7', t1:78,  t2:80},
-      {nom:'MOUHICA Raphael',          idx:'0,9',  t1:81,  t2:82},
-      {nom:'VILLET Alexandre',         idx:'2,3',  t1:81,  t2:null},
-      {nom:'LANNES Guillaume',         idx:'2,4',  t1:84,  t2:null},
-      {nom:'TILLOUS Andreas',          idx:'2,5',  t1:82,  t2:null},
-      {nom:'BINET Benjamin',           idx:'2,6',  t1:81,  t2:null},
-      {nom:'BOULLE Steven',            idx:'3,6',  t1:83,  t2:null},
-      {nom:'BONIN Jules',              idx:'3,7',  t1:92,  t2:null},
+      {nom:'MOUHICA Raphaël',          idx:'0,9',  t1:81,  t2:82},
+      {nom:'VILLET Alexandre',         idx:'2,3',  t1:81,  t2:76},
+      {nom:'LANNES Guillaume',         idx:'2,4',  t1:84,  t2:79},
+      {nom:'BINET Benjamin',           idx:'2,6',  t1:81,  t2:82},
+      {nom:'TILLOUS Andreas',          idx:'2,5',  t1:82,  t2:82},
+      {nom:'BOULLE Steven',            idx:'3,6',  t1:83,  t2:null, forfait:true},
+      {nom:'BONIN Jules',              idx:'3,7',  t1:92,  t2:82},
     ],
     bracket: {
-      type: 'pending',
-      message: 'Résultats en cours...',
+      type: 'qf8',
+      qf: [
+        {j1:'MAHY-CHAMPVERT', j2:'SCHNEIDER J-L.', info:'Dimanche 10h00', res:null},
+        {j1:'PROUVAY',        j2:'VILLET',          info:'Dimanche 10h10', res:null},
+        {j1:'GODEFROY J.',    j2:'LELONG',          info:'Dimanche 10h20', res:null},
+        {j1:'MACHERY',        j2:'MANIETTE',        info:'Dimanche 10h30', res:null},
+      ],
+      sf: [{j1:null,j2:null,info:'Lundi 9h00',res:null},{j1:null,j2:null,info:'Lundi 9h08',res:null}],
+      f:  {j1:null,j2:null,info:'Lundi 13h20',res:null},
     },
   },
 
@@ -1871,10 +1878,10 @@ const CDC_DATA = {
     bracket: {
       type: 'sf4',
       sf: [
-        {j1:'HALES S.',     j2:'OUDOT-DORATO K.', info:'Dimanche', res:null},
-        {j1:'TRANCHANT A.', j2:'TILLOUS R.',       info:'Dimanche', res:null},
+        {j1:'HALES S.',     j2:'OUDOT-DORATO K.', info:'Dimanche 9h40', res:null},
+        {j1:'TRANCHANT A.', j2:'TILLOUS R.',       info:'Dimanche 9h50', res:null},
       ],
-      f: {j1:null, j2:null, info:'Lundi', res:null},
+      f: {j1:null, j2:null, info:'Lundi 12h56', res:null},
     },
   },
 
@@ -1899,13 +1906,13 @@ const CDC_DATA = {
     bracket: {
       type: 'qf8',
       qf: [
-        {j1:'GODEFROY F.',  j2:'BINET N.',   info:'Dimanche', res:null},
-        {j1:'ROUTHIER',     j2:'DESFOND',    info:'Dimanche', res:null},
-        {j1:'JUNGUENET',    j2:'HALES A.',   info:'Dimanche', res:null},
-        {j1:'GASSER',       j2:'LETTMANN',   info:'Dimanche', res:null},
+        {j1:'GODEFROY F.',  j2:'BINET N.',   info:'Dimanche 10h40', res:null},
+        {j1:'GASSER',       j2:'LETTMANN',   info:'Dimanche 10h50', res:null},
+        {j1:'JUNGUENET',    j2:'HALES A.',   info:'Dimanche 11h00', res:null},
+        {j1:'ROUTHIER',     j2:'DESFOND',    info:'Dimanche 11h10', res:null},
       ],
-      sf: [{j1:null,j2:null,info:'Lundi',res:null},{j1:null,j2:null,info:'Lundi',res:null}],
-      f:  {j1:null,j2:null,info:'Lundi',res:null},
+      sf: [{j1:null,j2:null,info:'Lundi 9h16',res:null},{j1:null,j2:null,info:'Lundi 9h24',res:null}],
+      f:  {j1:null,j2:null,info:'Lundi 13h28',res:null},
     },
   },
 
@@ -1951,12 +1958,12 @@ const CDC_DATA = {
       type: 'qf8',
       qf: [
         {j1:'DE ROULHAC T.', j2:'BELLANGER',  info:'Dimanche 14h00', res:null},
-        {j1:'RUSSAIL',       j2:'HALLET',     info:'Dimanche 18h30', res:null},
-        {j1:'VILGRAIN',      j2:'BINET C.',   info:'Dimanche 16h00', res:null},
         {j1:'GRIMPREL',      j2:'BERNARD',    info:'Dimanche 14h10', res:null},
+        {j1:'VILGRAIN',      j2:'BINET C.',   info:'Dimanche 14h20', res:null},
+        {j1:'RUSSAIL',       j2:'HALLET',     info:'Dimanche 14h30', res:null},
       ],
-      sf: [{j1:null,j2:null,info:'Lundi',res:null},{j1:null,j2:null,info:'Lundi',res:null}],
-      f:  {j1:null,j2:null,info:'Lundi',res:null},
+      sf: [{j1:null,j2:null,info:'Lundi 10h04',res:null},{j1:null,j2:null,info:'Lundi 10h12',res:null}],
+      f:  {j1:null,j2:null,info:'Lundi 13h52',res:null},
     },
   },
 
@@ -1971,10 +1978,13 @@ const CDC_DATA = {
       {nom:'GODEFROY Benjamin',      idx:'5,6',  score:82},
       {nom:'BOULLE Frédéric',        idx:'9,2',  score:82},
       {nom:'DU BOUEXIC Marc',        idx:'8,9',  score:84},
+      {nom:'LEROY Christophe',       idx:'8,7',  score:84},
       {nom:'HALLET Fabien',          idx:'5,3',  score:88},
       {nom:'LE BOUBENNEC Erwan',     idx:'8,1',  score:88},
       {nom:'ROBIN Gilles',           idx:'11,2', score:88},
       {nom:'ORLOWSKI Jean-Stanislas',idx:'13,7', score:88},
+      {nom:'BINET Jérôme',           idx:'7,0',  score:93},
+      {nom:'GAVELLE Yannick',        idx:'13,5', score:95},
       {nom:'BLASER Laurent',         idx:'10,8', score:97},
       {nom:'FOURNIER François',      idx:'26,7', score:104},
     ],
@@ -1982,17 +1992,98 @@ const CDC_DATA = {
       type: 'qf8',
       qf: [
         {j1:'TRUBERT',    j2:'DU BOUEXIC',   info:'Dimanche 12h40', res:null},
-        {j1:'BULTE',      j2:'BOULLE F.',     info:'Dimanche 15h10', res:null},
-        {j1:'JANNOT',     j2:'GODEFROY B.',   info:'Dimanche 13h00', res:null},
         {j1:'REGNIER',    j2:'TILLOUS A.',    info:'Dimanche 12h50', res:null},
+        {j1:'JANNOT',     j2:'GODEFROY B.',   info:'Dimanche 13h00', res:null},
+        {j1:'BULTE',      j2:'BOULLE F.',     info:'Dimanche 13h10', res:null},
       ],
-      sf: [{j1:null,j2:null,info:'Lundi 9h32',res:null},{j1:null,j2:null,info:'Lundi 9h32',res:null}],
+      sf: [{j1:null,j2:null,info:'Lundi 9h32',res:null},{j1:null,j2:null,info:'Lundi 9h40',res:null}],
       f:  {j1:null,j2:null,info:'Lundi 13h12',res:null},
+    },
+  },
+
+  'VH': {
+    label: 'Vétérans H', nQual: 8, twoRounds: false,
+    players: [
+      {nom:'BURGERT Christian',       idx:'11,3', score:83},
+      {nom:'GINIEZ Gérard',           idx:'10,0', score:84},
+      {nom:'VINAY Philippe',          idx:'12,0', score:86},
+      {nom:'PARIS Xavier',            idx:'9,5',  score:89},
+      {nom:'CHERRIER Daniel',         idx:'13,2', score:92},
+      {nom:'DECROIX Jean-Pierre',     idx:'10,5', score:92},
+      {nom:'ROUSSEREAU Etienne',      idx:'13,7', score:92},
+      {nom:'ARENE Olivier',           idx:'9,3',  score:93},
+      {nom:'PANIE Jean-Paul',         idx:'15,8', score:94},
+      {nom:'PARIS Stéphane',          idx:'22,5', score:99},
+      {nom:'ROBIN MARIETON Olivier',  idx:'31,3', score:102},
+      {nom:'LASTEYRIE Gilles de',     idx:'17,1', score:106},
+      {nom:'DAMPIERRE Olivier de',    idx:'19,7', score:106},
+      {nom:'DESFILIS José',           idx:'30,8', score:null, forfait:true},
+    ],
+    bracket: {
+      type: 'qf8',
+      qf: [
+        {j1:'BURGERT C.',  j2:'ARENE',      info:'Dimanche 11h20', res:null},
+        {j1:'PARIS X.',    j2:'CHERRIER',   info:'Dimanche 11h30', res:null},
+        {j1:'VINAY',       j2:'DECROIX',    info:'Dimanche 11h40', res:null},
+        {j1:'GINIEZ',      j2:'ROUSSEREAU', info:'Dimanche 11h50', res:null},
+      ],
+      sf: [{j1:null,j2:null,info:'Lundi 10h20',res:null},{j1:null,j2:null,info:'Lundi 10h28',res:null}],
+      f:  {j1:null,j2:null,info:'Lundi 14h00',res:null},
+    },
+  },
+
+  'SF': {
+    label: 'Seniors F', nQual: 8, twoRounds: false,
+    players: [
+      {nom:'FABRY Olivia',              idx:'12,3', score:87},
+      {nom:'UBALD-BOCQUET Marie-Chr.',  idx:'5,6',  score:91},
+      {nom:'BURGERT Caroline',          idx:'16,1', score:92},
+      {nom:'ROBIN Christine',           idx:'19,7', score:94},
+      {nom:'RAYNAUD Anne',              idx:'22,9', score:96},
+      {nom:'BLIN Béatrice',             idx:'20,5', score:101},
+      {nom:'LASTEYRIE Dominique de',    idx:'19,0', score:103},
+      {nom:'WALKER Susan',              idx:'15,4', score:104},
+      {nom:'GOUREAU Sophie',            idx:'20,4', score:104},
+      {nom:'JUIGNET Anne',              idx:'19,9', score:105},
+      {nom:'DAMPIERRE Diane de',        idx:'23,0', score:110},
+      {nom:'SLOVE Marie-Cécile',        idx:'24,6', score:111},
+      {nom:'BOUEXIC Isabelle du',       idx:'20,1', score:125},
+      {nom:'FERRIERE Anne de la',       idx:'16,1', score:null, forfait:true},
+    ],
+    bracket: {
+      type: 'qf8',
+      qf: [
+        {j1:'FABRY',          j2:'WALKER S.',    info:'Dimanche 13h20', res:null},
+        {j1:'ROBIN C.',       j2:'RAYNAUD A.',   info:'Dimanche 13h30', res:null},
+        {j1:'BURGERT C.',     j2:'BLIN',         info:'Dimanche 13h40', res:null},
+        {j1:'UBALD-BOCQUET',  j2:'LASTEYRIE D.', info:'Dimanche 13h50', res:null},
+      ],
+      sf: [{j1:null,j2:null,info:'Lundi 9h48',res:null},{j1:null,j2:null,info:'Lundi 9h56',res:null}],
+      f:  {j1:null,j2:null,info:'Lundi 13h44',res:null},
+    },
+  },
+
+  'JH': {
+    label: 'Juniors', nQual: 4, twoRounds: false,
+    players: [
+      {nom:'ROUTHIER Hugo',       idx:'18,5', score:89},
+      {nom:'DUJARDIN Adrien',     idx:'23,6', score:92},
+      {nom:'TRANCHANT Nikita',    idx:'34,1', score:111},
+      {nom:'ZUCCARELLI François', idx:'24,2', score:112},
+      {nom:'DUJARDIN Raphaël',    idx:'28,4', score:115},
+    ],
+    bracket: {
+      type: 'sf4',
+      sf: [
+        {j1:'ROUTHIER H.',     j2:'ZUCCARELLI F.', info:'Dimanche 12h20', res:null},
+        {j1:'DUJARDIN Adrien', j2:'TRANCHANT N.',  info:'Dimanche 12h30', res:null},
+      ],
+      f: {j1:null, j2:null, info:'Lundi 13h36', res:null},
     },
   },
 };
 
-const CDC_TABS = ['1H','1F','2H','2F','3H','SH'];
+const CDC_TABS = ['1H','1F','2H','2F','3H','SH','VH','SF','JH'];
 let cdcTab = '1H';
 
 function loadAllStars() { renderCdc(); }
