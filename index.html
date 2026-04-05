@@ -1646,13 +1646,13 @@ async function loadMysteryInline(){
         const ctx=cv.getContext('2d');
         const scale=Math.max(W/tmpImg.naturalWidth,H/tmpImg.naturalHeight);
         const sw=tmpImg.naturalWidth*scale,sh=tmpImg.naturalHeight*scale;
-        if(blurPx>0)ctx.filter='blur('+blurPx+'px)';
         ctx.drawImage(tmpImg,(W-sw)/2,0,sw,sh);
         URL.revokeObjectURL(tmpImg.src);
       };
       tmpImg.src=URL.createObjectURL(b);
     }).catch(()=>{});
-    return '<div class="mystery-photo-frame mystery-photo-fadein" style="position:relative;"><canvas id="'+uid+'" style="width:100%;height:160px;display:block;" oncontextmenu="return false"></canvas><div style="position:absolute;inset:0;z-index:1;" oncontextmenu="return false"></div></div>';
+    const blurCss=blurPx>0?'filter:blur('+blurPx+'px);':'';
+    return '<div class="mystery-photo-frame mystery-photo-fadein" style="position:relative;"><canvas id="'+uid+'" style="width:100%;height:160px;display:block;'+blurCss+'" oncontextmenu="return false"></canvas><div style="position:absolute;inset:0;z-index:1;" oncontextmenu="return false"></div></div>';
   };
   try{
     const cfgRows=await sbFetch('config?cle=in.(mystery_player_name,mystery_reveal_text)&select=cle,valeur');
