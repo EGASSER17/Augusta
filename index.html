@@ -851,6 +851,11 @@ async function loadClassement(){
 function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
 function switchTab(tab){
   const allTabs=['classement','selection','scores','news','trivia','mystere','allstars'];
+  // Pause le timer trivia si on quitte l'onglet trivia en cours de partie
+  if(tab!=='trivia' && triviaState.timerInterval){
+    clearInterval(triviaState.timerInterval);
+    triviaState.timerInterval=null;
+  }
   document.querySelectorAll('#main-tabs .tab').forEach(el=>{
     el.classList.toggle('active',el.getAttribute('onclick')===`switchTab('${tab}')`);
   });
@@ -858,7 +863,14 @@ function switchTab(tab){
   if(tab==='news'&&!newsLoaded) loadNews();
   if(tab==='selection'&&!selectionTabLoaded) loadMaSelection();
   if(tab==='scores'&&!document.getElementById('tab-scores').innerHTML.trim()) loadJoueursList();
-  if(tab==='trivia') { loadTriviaInline(); }
+  if(tab==='trivia'){
+    // Reprendre la partie en cours si elle existe, sinon charger normalement
+    if(triviaState.questions.length>0 && triviaState.idx<triviaState.questions.length){
+      showTriviaQuestion();
+    } else {
+      loadTriviaInline();
+    }
+  }
   if(tab==='mystere') { loadMysteryInline(); }
   if(tab==='allstars') { loadAllStars(); }
 }
@@ -1400,7 +1412,7 @@ const TRIVIA_PHASE1 = {
   ]
 };
 
-let triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null,questions:[]};
+let triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null,questions:[],timeLeft:15};
 
 function getTodayDate(){
   return new Date().toISOString().split('T')[0];
@@ -1461,7 +1473,7 @@ function showTriviaQuestion(){
   const container=document.getElementById('tab-trivia');
   if(!container) return;
   triviaState.startTime=Date.now();
-  let timeLeft=15;
+  if(triviaState.timeLeft===undefined||triviaState.timeLeft<=0) triviaState.timeLeft=15;
   container.innerHTML=`
     <div style="padding:1rem;">
       <div style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:0.8rem;text-align:center;margin-bottom:0.5rem;">Question ${triviaState.idx+1} / ${triviaState.questions.length}</div>
@@ -1470,19 +1482,19 @@ function showTriviaQuestion(){
         <div id="trivia-timer-bar-wrap" style="background:rgba(201,168,76,0.2);border-radius:4px;height:6px;margin-bottom:0.5rem;">
           <div id="trivia-timer-bar" style="background:var(--gold);height:6px;border-radius:4px;width:100%;transition:width 1s linear;"></div>
         </div>
-        <div id="trivia-timer-txt" style="font-size:0.7rem;color:var(--gold);text-align:right;margin-bottom:1rem;">${timeLeft}s</div>
+        <div id="trivia-timer-txt" style="font-size:0.7rem;color:var(--gold);text-align:right;margin-bottom:1rem;">${triviaState.timeLeft}s</div>
         <div id="trivia-opts" style="display:flex;flex-direction:column;gap:0.5rem;">
           ${q.opts.map((opt,i)=>`<button onclick="answerTrivia(${i})" style="background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.3);color:var(--cream);padding:0.75rem 1rem;border-radius:8px;text-align:left;cursor:pointer;font-family:'EB Garamond',serif;font-size:1rem;">${opt}</button>`).join('')}
         </div>
       </div>
     </div>`;
   triviaState.timerInterval=setInterval(()=>{
-    timeLeft--;
+    triviaState.timeLeft--;
     const bar=document.getElementById('trivia-timer-bar');
     const txt=document.getElementById('trivia-timer-txt');
-    if(bar) bar.style.width=(timeLeft/15*100)+'%';
-    if(txt) txt.textContent=timeLeft+'s';
-    if(timeLeft<=0){clearInterval(triviaState.timerInterval);answerTrivia(-1);}
+    if(bar) bar.style.width=(triviaState.timeLeft/15*100)+'%';
+    if(txt) txt.textContent=triviaState.timeLeft+'s';
+    if(triviaState.timeLeft<=0){clearInterval(triviaState.timerInterval);triviaState.timerInterval=null;answerTrivia(-1);}
   },1000);
 }
 
@@ -1517,6 +1529,7 @@ function answerTrivia(chosen){
   }
   setTimeout(()=>{
     triviaState.idx++;
+    triviaState.timeLeft=15;
     if(triviaState.idx<triviaState.questions.length) showTriviaQuestion();
     else finishTrivia();
   },2000);
