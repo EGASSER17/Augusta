@@ -2170,10 +2170,14 @@ function renderCdc() {
     const sortVal = serie.twoRounds
       ? (p.t2 != null ? p.t1 + p.t2 : null)
       : p.score;
+    // Clé de position : unique si classement officiel, partagée si ex-aequo sans classement
+    const posKey = sortVal !== null
+      ? (p.classement != null ? sortVal * 10000 + p.classement : sortVal * 10000 + 9999)
+      : null;
 
-    if (sortVal !== lastVal) { displayPos += 1 + skipCount; skipCount = 0; }
+    if (posKey !== lastVal) { displayPos += 1 + skipCount; skipCount = 0; }
     else { skipCount++; }
-    lastVal = sortVal;
+    lastVal = posKey;
 
     const allT2Done = !serie.twoRounds || serie.players.every(p => p.t2 != null);
     const isQual = allT2Done && total != null && displayPos <= serie.nQual;
