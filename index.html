@@ -1632,10 +1632,9 @@ async function loadMysteryInline(){
   const rawDay=getMysteryRawDay();
   const _base=['https:','','egasser17.github.io','Augusta','img'].join('/');
   const _mpDay=(d)=>_base+'/mystery6_j'+d+'.jpg';
-  const _mpFull=_base+'/mystery6.jpg';
-  const makePhoto=(revealed)=>{
+  const makePhoto=(revealed,revealFile)=>{
     const uid='mf'+Math.random().toString(36).slice(2);
-    const url=revealed?_mpFull:_mpDay(jourActuel);
+    const url=revealed?(_base+'/'+(revealFile||'')):_mpDay(jourActuel);
     fetch(url).then(r=>r.blob()).then(b=>{
       const tmpImg=new Image();
       tmpImg.onload=function(){
@@ -1654,10 +1653,11 @@ async function loadMysteryInline(){
     return '<div class="mystery-photo-frame mystery-photo-fadein" style="position:relative;"><canvas id="'+uid+'" style="width:100%;height:160px;display:block;" oncontextmenu="return false"></canvas><div style="position:absolute;inset:0;z-index:1;" oncontextmenu="return false"></div></div>';
   };
   try{
-    const cfgRows=await sbFetch('config?cle=in.(mystery_player_name,mystery_reveal_text)&select=cle,valeur');
+    const cfgRows=await sbFetch('config?cle=in.(mystery_player_name,mystery_reveal_text,mystery_reveal_image)&select=cle,valeur');
     const cfg={};(cfgRows||[]).forEach(r=>cfg[r.cle]=r.valeur);
     const playerName=cfg['mystery_player_name']||'???';
     const revealText=cfg['mystery_reveal_text']||'';
+    const revealFile=cfg['mystery_reveal_image']||'';
     const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
     if(solved&&solved.length>0){
       const winner=solved[0].nom;
@@ -1666,7 +1666,7 @@ async function loadMysteryInline(){
       container.innerHTML=
         '<div style="text-align:center;padding:1.5rem 1rem;">'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">&#129399;&#65039; Le joueur myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9 !</div>'
-        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(true)+'</div>'
+        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(true,revealFile)+'</div>'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">'+playerName+'</div>'
         +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9couvert par <strong style="color:var(--gold);">'+winner+'</strong> \u2014 Jour '+dayNum+'</div>'
         +(isWinner
@@ -1679,7 +1679,7 @@ async function loadMysteryInline(){
       container.innerHTML=
         '<div style="text-align:center;padding:1.5rem 1rem;">'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--text-muted);margin-bottom:1rem;">&#128269; Le joueur myst\u00e8re n\'a pas \u00e9t\u00e9 trouv\u00e9...</div>'
-        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(true)+'</div>'
+        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(true,revealFile)+'</div>'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--text-muted);margin:0.5rem 0;font-style:italic;">'+revealText+'</div>'
         +'</div>';
       return;
