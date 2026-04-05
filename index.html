@@ -1608,7 +1608,6 @@ async function adminPostTriviaQuestions(){
 
 // ---- JOUEUR MYSTERE ----
 const MYSTERY_J1=new Date('2026-04-05T00:00:00');
-const MYSTERY_BLURS={1:20,2:15,3:11,4:2};
 const MYSTERY_INDICES=[
   "J'ai repr\u00e9sent\u00e9 mon pays en Ryder Cup.",
   "Je fais partie des rares joueurs \u00e0 avoir gagn\u00e9 \u00e0 la fois le Masters et un Major europ\u00e9en.",
@@ -1631,11 +1630,13 @@ async function loadMysteryInline(){
   container.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-style:italic">Chargement...</div>';
   const jourActuel=getMysteryDay();
   const rawDay=getMysteryRawDay();
-  const blur=MYSTERY_BLURS[jourActuel]||2;
-  const _mp=['https:','','egasser17.github.io','Augusta','img','mystery6.jpg'].join('/');
-  const makePhoto=(blurPx)=>{
+  const _base=['https:','','egasser17.github.io','Augusta','img'].join('/');
+  const _mpDay=(d)=>_base+'/mystery6_j'+d+'.jpg';
+  const _mpFull=_base+'/mystery6.jpg';
+  const makePhoto=(revealed)=>{
     const uid='mf'+Math.random().toString(36).slice(2);
-    fetch(_mp).then(r=>r.blob()).then(b=>{
+    const url=revealed?_mpFull:_mpDay(jourActuel);
+    fetch(url).then(r=>r.blob()).then(b=>{
       const tmpImg=new Image();
       tmpImg.onload=function(){
         const cv=document.getElementById(uid);
@@ -1650,8 +1651,7 @@ async function loadMysteryInline(){
       };
       tmpImg.src=URL.createObjectURL(b);
     }).catch(()=>{});
-    const blurCss=blurPx>0?'filter:blur('+blurPx+'px);':'';
-    return '<div class="mystery-photo-frame mystery-photo-fadein" style="position:relative;"><canvas id="'+uid+'" style="width:100%;height:160px;display:block;'+blurCss+'" oncontextmenu="return false"></canvas><div style="position:absolute;inset:0;z-index:1;" oncontextmenu="return false"></div></div>';
+    return '<div class="mystery-photo-frame mystery-photo-fadein" style="position:relative;"><canvas id="'+uid+'" style="width:100%;height:160px;display:block;" oncontextmenu="return false"></canvas><div style="position:absolute;inset:0;z-index:1;" oncontextmenu="return false"></div></div>';
   };
   try{
     const cfgRows=await sbFetch('config?cle=in.(mystery_player_name,mystery_reveal_text)&select=cle,valeur');
@@ -1666,7 +1666,7 @@ async function loadMysteryInline(){
       container.innerHTML=
         '<div style="text-align:center;padding:1.5rem 1rem;">'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">&#129399;&#65039; Le joueur myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9 !</div>'
-        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(0)+'</div>'
+        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(true)+'</div>'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">'+playerName+'</div>'
         +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9couvert par <strong style="color:var(--gold);">'+winner+'</strong> \u2014 Jour '+dayNum+'</div>'
         +(isWinner
@@ -1679,7 +1679,7 @@ async function loadMysteryInline(){
       container.innerHTML=
         '<div style="text-align:center;padding:1.5rem 1rem;">'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--text-muted);margin-bottom:1rem;">&#128269; Le joueur myst\u00e8re n\'a pas \u00e9t\u00e9 trouv\u00e9...</div>'
-        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(0)+'</div>'
+        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(true)+'</div>'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--text-muted);margin:0.5rem 0;font-style:italic;">'+revealText+'</div>'
         +'</div>';
       return;
@@ -1701,7 +1701,7 @@ async function loadMysteryInline(){
       '<div style="padding:0 0.25rem 1.5rem;">'
       +'<div style="text-align:center;margin-bottom:1rem;">'
       +'<div style="font-family:Cormorant Garamond,serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Jour '+jourActuel+' / 4</div>'
-      +'<div style="display:flex;justify-content:center;">'+makePhoto(blur)+'</div>'
+      +'<div style="display:flex;justify-content:center;">'+makePhoto(false)+'</div>'
       +'</div>'
       +'<div style="margin-bottom:1rem;">'+indicesHtml+'</div>'
       +actionHtml
