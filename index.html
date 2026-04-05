@@ -1864,15 +1864,15 @@ const CDC_DATA = {
   '1H': {
     label: '1ère H', nQual: 8, twoRounds: true,
     players: [
-      {nom:'MAHY-CHAMPVERT Ferdinand', idx:'+1,7', t1:72,  t2:72},
-      {nom:'MACHERY François',         idx:'+0,1', t1:74,  t2:72},
-      {nom:'GODEFROY Joseph',          idx:'1,0',  t1:79,  t2:75},
-      {nom:'PROUVAY Florent',          idx:'0,5',  t1:76,  t2:79},
-      {nom:'MANIETTE Théo',            idx:'1,2',  t1:73,  t2:84},
-      {nom:'LELONG Thibault',          idx:'+1,0', t1:77,  t2:80},
-      {nom:'SCHNEIDER Jean-Louis',     idx:'+0,7', t1:78,  t2:80},
+      {nom:'MAHY-CHAMPVERT Ferdinand', idx:'+1,7', t1:72,  t2:72,  classement:1},
+      {nom:'MACHERY François',         idx:'+0,1', t1:74,  t2:72,  classement:2},
+      {nom:'GODEFROY Joseph',          idx:'1,0',  t1:79,  t2:75,  classement:3},
+      {nom:'PROUVAY Florent',          idx:'0,5',  t1:76,  t2:79,  classement:4},
+      {nom:'MANIETTE Théo',            idx:'1,2',  t1:73,  t2:84,  classement:7},
+      {nom:'LELONG Thibault',          idx:'+1,0', t1:77,  t2:80,  classement:6},
+      {nom:'SCHNEIDER Jean-Louis',     idx:'+0,7', t1:78,  t2:80,  classement:8},
       {nom:'MOUHICA Raphaël',          idx:'0,9',  t1:81,  t2:82},
-      {nom:'VILLET Alexandre',         idx:'2,3',  t1:81,  t2:76},
+      {nom:'VILLET Alexandre',         idx:'2,3',  t1:81,  t2:76,  classement:5},
       {nom:'LANNES Guillaume',         idx:'2,4',  t1:84,  t2:79},
       {nom:'BINET Benjamin',           idx:'2,6',  t1:81,  t2:82},
       {nom:'TILLOUS Andreas',          idx:'2,5',  t1:82,  t2:82},
@@ -1895,10 +1895,10 @@ const CDC_DATA = {
   '1F': {
     label: '1ère F', nQual: 4, twoRounds: true,
     players: [
-      {nom:'HALES Stéphanie',    idx:'1,1', t1:77, t2:75},
-      {nom:'TRANCHANT Anne',     idx:'5,3', t1:85, t2:86},
-      {nom:'TILLOUS Rosalie',    idx:'9,0', t1:87, t2:86},
-      {nom:'OUDOT-DORATO Karen', idx:'9,3', t1:94, t2:93},
+      {nom:'HALES Stéphanie',    idx:'1,1', t1:77, t2:75, classement:1},
+      {nom:'TRANCHANT Anne',     idx:'5,3', t1:85, t2:86, classement:2},
+      {nom:'TILLOUS Rosalie',    idx:'9,0', t1:87, t2:86, classement:3},
+      {nom:'OUDOT-DORATO Karen', idx:'9,3', t1:94, t2:93, classement:4},
     ],
     bracket: {
       type: 'sf4',
@@ -1913,14 +1913,14 @@ const CDC_DATA = {
   '2H': {
     label: '2ème H', nQual: 8, twoRounds: false,
     players: [
-      {nom:'GODEFROY Ferdinand',   idx:'5,9',  score:77},
-      {nom:'ROUTHIER Benjamin',    idx:'6,6',  score:79},
-      {nom:'JUNGUENET Ambroise',   idx:'5,3',  score:81},
-      {nom:'GASSER Edouard',       idx:'5,2',  score:83},
-      {nom:'LETTMANN Daniel',      idx:'9,2',  score:84},
-      {nom:'HALES Arnott',         idx:'5,8',  score:84},
-      {nom:'DESFOND Grégoire',     idx:'8,7',  score:84},
-      {nom:'BINET Nathan',         idx:'6,6',  score:85},
+      {nom:'GODEFROY Ferdinand',   idx:'5,9',  score:77, classement:1},
+      {nom:'ROUTHIER Benjamin',    idx:'6,6',  score:79, classement:2},
+      {nom:'JUNGUENET Ambroise',   idx:'5,3',  score:81, classement:3},
+      {nom:'GASSER Edouard',       idx:'5,2',  score:83, classement:4},
+      {nom:'LETTMANN Daniel',      idx:'9,2',  score:84, classement:5},
+      {nom:'HALES Arnott',         idx:'5,8',  score:84, classement:6},
+      {nom:'DESFOND Grégoire',     idx:'8,7',  score:84, classement:7},
+      {nom:'BINET Nathan',         idx:'6,6',  score:85, classement:8},
       {nom:'JOUHANNEAUD Jerome',   idx:'7,3',  score:87},
       {nom:'DUJARDIN Stanislas',   idx:'8,0',  score:88},
       {nom:'DE ROULHAC Sébastien', idx:'4,7',  score:89},
@@ -1944,10 +1944,10 @@ const CDC_DATA = {
   '2F': {
     label: '2ème F', nQual: 4, twoRounds: false,
     players: [
-      {nom:'TILLOUS Sandra',      idx:'13,4', score:83},
-      {nom:'DOS REIS Clémentine', idx:'21,6', score:102},
-      {nom:'MILLE Marine',        idx:'14,5', score:103},
-      {nom:'BINET Stéphanie',     idx:'27,4', score:106},
+      {nom:'TILLOUS Sandra',      idx:'13,4', score:83,  classement:1},
+      {nom:'DOS REIS Clémentine', idx:'21,6', score:102, classement:2},
+      {nom:'MILLE Marine',        idx:'14,5', score:103, classement:3},
+      {nom:'BINET Stéphanie',     idx:'27,4', score:106, classement:4},
     ],
     bracket: {
       type: 'sf4',
@@ -1962,15 +1962,15 @@ const CDC_DATA = {
   '3H': {
     label: '3ème H', nQual: 8, twoRounds: false,
     players: [
-      {nom:'DE ROULHAC Thibaut',  idx:'12,1', score:86},
-      {nom:'RUSSAIL Antoine',     idx:'16,1', score:87},
+      {nom:'DE ROULHAC Thibaut',  idx:'12,1', score:86,  classement:1},
+      {nom:'RUSSAIL Antoine',     idx:'16,1', score:87,  classement:2},
       {nom:'MACHERY Louis',        idx:'13,9', score:88, forfait:true},
-      {nom:'VILGRAIN Sébastien',  idx:'12,1', score:89},
-      {nom:'GRIMPREL Maxime',     idx:'16,9', score:90},
-      {nom:'BERNARD Alexandre',   idx:'14,4', score:91},
-      {nom:'BINET Clément',       idx:'11,8', score:92},
-      {nom:'HALLET Gaspard',      idx:'19,5', score:92},
-      {nom:'BELLANGER Elliot',    idx:'13,3', score:93},
+      {nom:'VILGRAIN Sébastien',  idx:'12,1', score:89,  classement:3},
+      {nom:'GRIMPREL Maxime',     idx:'16,9', score:90,  classement:4},
+      {nom:'BERNARD Alexandre',   idx:'14,4', score:91,  classement:5},
+      {nom:'BINET Clément',       idx:'11,8', score:92,  classement:6},
+      {nom:'HALLET Gaspard',      idx:'19,5', score:92,  classement:7},
+      {nom:'BELLANGER Elliot',    idx:'13,3', score:93,  classement:8},
       {nom:'ARDILLY Marc',        idx:'13,4', score:94},
       {nom:'OUDOT Jean-Baptiste', idx:'18,7', score:94},
       {nom:'WALKER Craig',        idx:'14,9', score:96},
@@ -1995,14 +1995,14 @@ const CDC_DATA = {
   'SH': {
     label: 'Seniors H', nQual: 8, twoRounds: false,
     players: [
-      {nom:'TRUBERT Alban',          idx:'2,3',  score:75},
-      {nom:'BULTE Valère',           idx:'3,1',  score:75},
-      {nom:'JANNOT Claude',          idx:'4,8',  score:78},
-      {nom:'REGNIER Frédéric',       idx:'8,1',  score:80},
-      {nom:'TILLOUS Arnaud',         idx:'5,4',  score:82},
-      {nom:'GODEFROY Benjamin',      idx:'5,6',  score:82},
-      {nom:'BOULLE Frédéric',        idx:'9,2',  score:82},
-      {nom:'DU BOUEXIC Marc',        idx:'8,9',  score:84},
+      {nom:'TRUBERT Alban',          idx:'2,3',  score:75, classement:1},
+      {nom:'BULTE Valère',           idx:'3,1',  score:75, classement:2},
+      {nom:'JANNOT Claude',          idx:'4,8',  score:78, classement:3},
+      {nom:'REGNIER Frédéric',       idx:'8,1',  score:80, classement:4},
+      {nom:'TILLOUS Arnaud',         idx:'5,4',  score:82, classement:5},
+      {nom:'GODEFROY Benjamin',      idx:'5,6',  score:82, classement:6},
+      {nom:'BOULLE Frédéric',        idx:'9,2',  score:82, classement:7},
+      {nom:'DU BOUEXIC Marc',        idx:'8,9',  score:84, classement:8},
       {nom:'LEROY Christophe',       idx:'8,7',  score:84},
       {nom:'HALLET Fabien',          idx:'5,3',  score:88},
       {nom:'LE BOUBENNEC Erwan',     idx:'8,1',  score:88},
@@ -2029,14 +2029,14 @@ const CDC_DATA = {
   'VH': {
     label: 'Vétérans H', nQual: 8, twoRounds: false,
     players: [
-      {nom:'BURGERT Christian',       idx:'11,3', score:83},
-      {nom:'GINIEZ Gérard',           idx:'10,0', score:84},
-      {nom:'VINAY Philippe',          idx:'12,0', score:86},
-      {nom:'PARIS Xavier',            idx:'9,5',  score:89},
-      {nom:'CHERRIER Daniel',         idx:'13,2', score:92},
-      {nom:'DECROIX Jean-Pierre',     idx:'10,5', score:92},
-      {nom:'ROUSSEREAU Etienne',      idx:'13,7', score:92},
-      {nom:'ARENE Olivier',           idx:'9,3',  score:93},
+      {nom:'BURGERT Christian',       idx:'11,3', score:83, classement:1},
+      {nom:'GINIEZ Gérard',           idx:'10,0', score:84, classement:2},
+      {nom:'VINAY Philippe',          idx:'12,0', score:86, classement:3},
+      {nom:'PARIS Xavier',            idx:'9,5',  score:89, classement:4},
+      {nom:'CHERRIER Daniel',         idx:'13,2', score:92, classement:5},
+      {nom:'DECROIX Jean-Pierre',     idx:'10,5', score:92, classement:6},
+      {nom:'ROUSSEREAU Etienne',      idx:'13,7', score:92, classement:7},
+      {nom:'ARENE Olivier',           idx:'9,3',  score:93, classement:8},
       {nom:'PANIE Jean-Paul',         idx:'15,8', score:94},
       {nom:'PARIS Stéphane',          idx:'22,5', score:99},
       {nom:'ROBIN MARIETON Olivier',  idx:'31,3', score:102},
@@ -2060,14 +2060,14 @@ const CDC_DATA = {
   'SF': {
     label: 'Seniors F', nQual: 8, twoRounds: false,
     players: [
-      {nom:'FABRY Olivia',              idx:'12,3', score:87},
-      {nom:'UBALD-BOCQUET Marie-Chr.',  idx:'5,6',  score:91},
-      {nom:'BURGERT Caroline',          idx:'16,1', score:92},
-      {nom:'ROBIN Christine',           idx:'19,7', score:94},
-      {nom:'RAYNAUD Anne',              idx:'22,9', score:96},
-      {nom:'BLIN Béatrice',             idx:'20,5', score:101},
-      {nom:'LASTEYRIE Dominique de',    idx:'19,0', score:103},
-      {nom:'WALKER Susan',              idx:'15,4', score:104},
+      {nom:'FABRY Olivia',              idx:'12,3', score:87,  classement:1},
+      {nom:'UBALD-BOCQUET Marie-Chr.',  idx:'5,6',  score:91,  classement:2},
+      {nom:'BURGERT Caroline',          idx:'16,1', score:92,  classement:3},
+      {nom:'ROBIN Christine',           idx:'19,7', score:94,  classement:4},
+      {nom:'RAYNAUD Anne',              idx:'22,9', score:96,  classement:5},
+      {nom:'BLIN Béatrice',             idx:'20,5', score:101, classement:6},
+      {nom:'LASTEYRIE Dominique de',    idx:'19,0', score:103, classement:7},
+      {nom:'WALKER Susan',              idx:'15,4', score:104, classement:8},
       {nom:'GOUREAU Sophie',            idx:'20,4', score:104},
       {nom:'JUIGNET Anne',              idx:'19,9', score:105},
       {nom:'DAMPIERRE Diane de',        idx:'23,0', score:110},
@@ -2091,10 +2091,10 @@ const CDC_DATA = {
   'J9': {
     label: 'Juniors 9T', nQual: 4, twoRounds: false,
     players: [
-      {nom:'GODEFROY Barnabé',  idx:'47,9', score:55},
-      {nom:'MACHERY Tristan',   idx:'37,2', score:58},
-      {nom:'GASSER Suzanne',    idx:'49,3', score:59},
-      {nom:'MILLE Baptiste',    idx:'52,0', score:63},
+      {nom:'GODEFROY Barnabé',  idx:'47,9', score:55, classement:1},
+      {nom:'MACHERY Tristan',   idx:'37,2', score:58, classement:2},
+      {nom:'GASSER Suzanne',    idx:'49,3', score:59, classement:3},
+      {nom:'MILLE Baptiste',    idx:'52,0', score:63, classement:4},
       {nom:'TRANCHANT Zoé',     idx:'54,0', score:73},
       {nom:'MACHERY Constance', idx:'39,9', score:75},
     ],
@@ -2111,10 +2111,10 @@ const CDC_DATA = {
   'JH': {
     label: 'Juniors 18T', nQual: 4, twoRounds: false,
     players: [
-      {nom:'ROUTHIER Hugo',       idx:'18,5', score:89},
-      {nom:'DUJARDIN Adrien',     idx:'23,6', score:92},
-      {nom:'TRANCHANT Nikita',    idx:'34,1', score:111},
-      {nom:'ZUCCARELLI François', idx:'24,2', score:112},
+      {nom:'ROUTHIER Hugo',       idx:'18,5', score:89,  classement:1},
+      {nom:'DUJARDIN Adrien',     idx:'23,6', score:92,  classement:2},
+      {nom:'TRANCHANT Nikita',    idx:'34,1', score:111, classement:3},
+      {nom:'ZUCCARELLI François', idx:'24,2', score:112, classement:4},
       {nom:'DUJARDIN Raphaël',    idx:'28,4', score:115},
     ],
     bracket: {
@@ -2146,7 +2146,8 @@ function renderCdc() {
     const tb = serie.twoRounds
       ? (b.t2 != null ? b.t1 + b.t2 : b.t1 != null ? b.t1 + 999 : 9999)
       : (b.score != null ? b.score : 9999);
-    return ta - tb;
+    if (ta !== tb) return ta - tb;
+    return (a.classement ?? 9999) - (b.classement ?? 9999);
   });
 
   // --- onglets ---
