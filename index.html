@@ -2063,8 +2063,28 @@ const CDC_DATA = {
     },
   },
 
+  'J9': {
+    label: 'Juniors 9T', nQual: 4, twoRounds: false,
+    players: [
+      {nom:'GODEFROY Barnabé',  idx:'47,9', score:55},
+      {nom:'MACHERY Tristan',   idx:'37,2', score:58},
+      {nom:'GASSER Suzanne',    idx:'49,3', score:59},
+      {nom:'MILLE Baptiste',    idx:'52,0', score:63},
+      {nom:'TRANCHANT Zoé',     idx:'54,0', score:73},
+      {nom:'MACHERY Constance', idx:'39,9', score:75},
+    ],
+    bracket: {
+      type: 'sf4',
+      sf: [
+        {j1:'GODEFROY B.', j2:'MILLE B.',    info:'Lundi 10h36', res:null},
+        {j1:'MACHERY T.',  j2:'GASSER S.',   info:'Lundi 10h44', res:null},
+      ],
+      f: {j1:null, j2:null, info:'Lundi 14h10', res:null},
+    },
+  },
+
   'JH': {
-    label: 'Juniors', nQual: 4, twoRounds: false,
+    label: 'Juniors 18T', nQual: 4, twoRounds: false,
     players: [
       {nom:'ROUTHIER Hugo',       idx:'18,5', score:89},
       {nom:'DUJARDIN Adrien',     idx:'23,6', score:92},
@@ -2083,7 +2103,7 @@ const CDC_DATA = {
   },
 };
 
-const CDC_TABS = ['1H','1F','2H','2F','3H','SH','VH','SF','JH'];
+const CDC_TABS = ['1H','1F','2H','2F','3H','SH','VH','SF','J9','JH'];
 let cdcTab = '1H';
 
 function loadAllStars() { renderCdc(); }
