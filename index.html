@@ -1619,7 +1619,7 @@ async function loadMysteryInline(){
   const _base=['https:','','egasser17.github.io','Augusta','img'].join('/');
   const makePhoto=(revealed)=>{
     const uid='mf'+Math.random().toString(36).slice(2);
-    const url=_base+'/hole11.jpg';
+    const url=_base+'/trou11_white_dogwood.jpg';
     const blurCss=revealed?'':'filter:blur(10px);-webkit-filter:blur(10px);';
     fetch(url).then(r=>r.blob()).then(b=>{
       const tmpImg=new Image();
