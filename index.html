@@ -1606,42 +1606,28 @@ async function adminPostTriviaQuestions(){
 
 
 
-// ---- JOUEUR MYSTERE ----
-const MYSTERY_J1=new Date('2026-04-05T00:00:00');
-const MYSTERY_INDICES=[
-  "J'ai repr\u00e9sent\u00e9 mon pays en Ryder Cup.",
-  "Je fais partie des rares joueurs \u00e0 avoir gagn\u00e9 \u00e0 la fois le Masters et un Major europ\u00e9en.",
-  "Je n'ai gagn\u00e9 le Masters qu'une seule fois.",
-  "Ma victoire au Masters est associ\u00e9e \u00e0 un bunker du 18\u00e8me trou."
-];
-
-function getMysteryRawDay(){
-  const today=new Date();today.setHours(0,0,0,0);
-  return Math.floor((today-MYSTERY_J1)/86400000)+1;
-}
-function getMysteryDay(){return Math.min(Math.max(getMysteryRawDay(),1),4);}
+// ---- TROU MYSTERE ----
+const MYSTERY_CLUE=”Ce trou n\u2019a jamais jou\u00e9 sous le par sur l\u2019ensemble d\u2019un Masters \u2014 c\u2019est le seul trou d\u2019Augusta avec cette particularit\u00e9 historique.”;
 
 async function loadMysteryInline(){
   const container=document.getElementById('tab-mystere');
   if(!currentUser){
-    container.innerHTML='<p style="text-align:center;color:rgba(245,240,232,0.5);padding:2rem;">Connectez-vous pour jouer.</p>';
+    container.innerHTML='<p style=”text-align:center;color:rgba(245,240,232,0.5);padding:2rem;”>Connectez-vous pour jouer.</p>';
     return;
   }
-  container.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-style:italic">Chargement...</div>';
-  const jourActuel=getMysteryDay();
-  const rawDay=getMysteryRawDay();
+  container.innerHTML='<div style=”text-align:center;padding:20px;color:var(--text-muted);font-style:italic”>Chargement...</div>';
   const _base=['https:','','egasser17.github.io','Augusta','img'].join('/');
-  const _mpDay=(d)=>_base+'/mystery6_j'+d+'.jpg';
-  const makePhoto=(revealed,revealFile)=>{
+  const HOLE_IMG=_base+'/hole_mystery.jpg';
+  const makePhoto=(revealed)=>{
     const uid='mf'+Math.random().toString(36).slice(2);
-    const url=revealed?(_base+'/'+(revealFile||'')):_mpDay(jourActuel);
-    fetch(url).then(r=>r.blob()).then(b=>{
+    fetch(HOLE_IMG).then(r=>r.blob()).then(b=>{
       const tmpImg=new Image();
       tmpImg.onload=function(){
         const cv=document.getElementById(uid);
         if(!cv)return;
         const W=280,H=160;
         cv.width=W;cv.height=H;
+        if(!revealed){cv.style.filter='blur(8px)';cv.style.webkitFilter='blur(8px)';}
         const ctx=cv.getContext('2d');
         const scale=Math.max(W/tmpImg.naturalWidth,H/tmpImg.naturalHeight);
         const sw=tmpImg.naturalWidth*scale,sh=tmpImg.naturalHeight*scale;
@@ -1650,64 +1636,45 @@ async function loadMysteryInline(){
       };
       tmpImg.src=URL.createObjectURL(b);
     }).catch(()=>{});
-    return '<div class="mystery-photo-frame mystery-photo-fadein" style="position:relative;"><canvas id="'+uid+'" style="width:100%;height:160px;display:block;" oncontextmenu="return false"></canvas><div style="position:absolute;inset:0;z-index:1;" oncontextmenu="return false"></div></div>';
+    return '<div class=”mystery-photo-frame mystery-photo-fadein” style=”position:relative;”><canvas id=”'+uid+'” style=”width:100%;height:160px;display:block;” oncontextmenu=”return false”></canvas><div style=”position:absolute;inset:0;z-index:1;” oncontextmenu=”return false”></div></div>';
   };
   try{
-    const cfgRows=await sbFetch('config?cle=in.(mystery_player_name,mystery_reveal_text,mystery_reveal_image)&select=cle,valeur');
-    const cfg={};(cfgRows||[]).forEach(r=>cfg[r.cle]=r.valeur);
-    const playerName=cfg['mystery_player_name']||'???';
-    const revealText=cfg['mystery_reveal_text']||'';
-    const revealFile=cfg['mystery_reveal_image']||'';
     const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
     if(solved&&solved.length>0){
       const winner=solved[0].nom;
-      const dayNum=Math.min(Math.max(Math.floor((new Date(solved[0].jour+' 00:00:00')-MYSTERY_J1)/86400000)+1,1),4);
       const isWinner=winner===currentUser;
       container.innerHTML=
-        '<div style="text-align:center;padding:1.5rem 1rem;">'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">&#129399;&#65039; Le joueur myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9 !</div>'
-        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(true,revealFile)+'</div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">'+playerName+'</div>'
-        +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9couvert par <strong style="color:var(--gold);">'+winner+'</strong> \u2014 Jour '+dayNum+'</div>'
+        '<div style=”text-align:center;padding:1.5rem 1rem;”>'
+        +'<div style=”font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;”>\u26f3 Le trou myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
+        +'<div style=”display:flex;justify-content:center;margin-bottom:0.75rem;”>'+makePhoto(true)+'</div>'
+        +'<div style=”font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;”>Trou 11 \u2014 White Dogwood</div>'
+        +'<div style=”font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;”>D\u00e9couvert par <strong style=”color:var(--gold);”>'+winner+'</strong></div>'
         +(isWinner
-          ?'<div class="msg success">&#127942; C\'est vous qui avez trouv\u00e9 ! +10000 pts ajout\u00e9s \u00e0 votre score.</div>'
-          :'<div class="msg info">&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le joueur myst\u00e8re !</div>')
-        +'</div>';
-      return;
-    }
-    if(rawDay>4){
-      container.innerHTML=
-        '<div style="text-align:center;padding:1.5rem 1rem;">'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--text-muted);margin-bottom:1rem;">&#128269; Le joueur myst\u00e8re n\'a pas \u00e9t\u00e9 trouv\u00e9...</div>'
-        +'<div style="display:flex;justify-content:center;margin-bottom:0.75rem;">'+makePhoto(true,revealFile)+'</div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--text-muted);margin:0.5rem 0;font-style:italic;">'+revealText+'</div>'
+          ?'<div class=”msg success”>\u26f3 Bravo\u00a0! C\u2019\u00e9tait le trou\u00a011 \u2014 White Dogwood\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
+          :'<div class=”msg info”>&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le trou myst\u00e8re\u00a0!</div>')
         +'</div>';
       return;
     }
     const todayStr=getTodayDate();
     const alreadyGuessed=await sbFetch('mystery_guesses?nom=eq.'+encodeURIComponent(currentUser)+'&jour=eq.'+todayStr+'&select=guess,correct');
-    let indicesHtml='';
-    for(let i=0;i<jourActuel&&i<MYSTERY_INDICES.length;i++){
-      indicesHtml+='<div class="mystery-clue-card"><span class="mystery-clue-day">Indice '+(i+1)+'</span>'+MYSTERY_INDICES[i]+'</div>';
-    }
     let actionHtml='';
     if(alreadyGuessed&&alreadyGuessed.length>0){
       const g=alreadyGuessed[0];
-      actionHtml='<div class=”msg error”>Vous avez d\u00e9j\u00e0 tent\u00e9 aujourd\'hui : “<em>'+g.guess+'</em>”<br>Revenez demain pour un nouvel indice.</div>';
+      actionHtml='<div class=”msg error”>Vous avez d\u00e9j\u00e0 tent\u00e9 aujourd\u2019hui\u00a0: \u00ab\u00a0<em>'+g.guess+'</em>\u00a0\u00bb<br>Revenez demain pour retenter.</div>';
     }else{
-      actionHtml='<div class="input-group" style="margin-bottom:12px;"><input type="text" id="mystery-input" placeholder="Votre réponse..." maxlength="50" style="text-align:center;" onkeydown="if(event.key===\'Enter\')submitMysteryGuess()"></div><button class="btn btn-gold" onclick="submitMysteryGuess()">Soumettre ma réponse</button>';
+      actionHtml='<div class=”input-group” style=”margin-bottom:12px;”><input type=”text” id=”mystery-input” placeholder=”Votre r\u00e9ponse\u2026” maxlength=”50” style=”text-align:center;” onkeydown=”if(event.key===\'Enter\')submitMysteryGuess()”></div><button class=”btn btn-gold” onclick=”submitMysteryGuess()”>Soumettre ma r\u00e9ponse</button>';
     }
     container.innerHTML=
-      '<div style="padding:0 0.25rem 1.5rem;">'
-      +'<div style="text-align:center;margin-bottom:1rem;">'
-      +'<div style="font-family:Cormorant Garamond,serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Jour '+jourActuel+' / 4</div>'
-      +'<div style="display:flex;justify-content:center;">'+makePhoto(false)+'</div>'
+      '<div style=”padding:0 0.25rem 1.5rem;”>'
+      +'<div style=”text-align:center;margin-bottom:1rem;”>'
+      +'<div style=”font-family:Cormorant Garamond,serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;”>Trou Myst\u00e8re</div>'
+      +'<div style=”display:flex;justify-content:center;”>'+makePhoto(false)+'</div>'
       +'</div>'
-      +'<div style="margin-bottom:1rem;">'+indicesHtml+'</div>'
+      +'<div style=”margin-bottom:1rem;”><div class=”mystery-clue-card”><span class=”mystery-clue-day”>Indice</span>'+MYSTERY_CLUE+'</div></div>'
       +actionHtml
       +'</div>';
   }catch(e){
-    container.innerHTML='<div class="msg error">Erreur de chargement. Réessayez.</div>';
+    container.innerHTML='<div class=”msg error”>Erreur de chargement. R\u00e9essayez.</div>';
     console.error(e);
   }
 }
@@ -1724,52 +1691,52 @@ async function submitMysteryGuess(){
     const isCorrect=await sbFetch('rpc/check_mystery_guess','POST',{p_guess:guess});
     await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:!!isCorrect}),prefer:'return=minimal'});
     if(isCorrect){
-      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:10000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
+      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:5000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
       loadMysteryInline();
     }else{
-      document.getElementById('tab-mystere').innerHTML='<div style="padding:1.5rem 1rem;text-align:center;"><div class="msg error" style="margin-bottom:1rem;">Mauvaise réponse — revenez demain pour un nouvel indice.</div><div style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">Votre réponse : “'+guess+'”</div></div>';
+      document.getElementById('tab-mystere').innerHTML='<div style=”padding:1.5rem 1rem;text-align:center;”><div class=”msg error” style=”margin-bottom:1rem;”>Mauvaise r\u00e9ponse \u2014 revenez demain pour retenter.</div><div style=”font-size:0.85rem;color:var(--text-muted);font-style:italic;”>Votre r\u00e9ponse\u00a0: \u00ab\u00a0'+guess+'\u00a0\u00bb</div></div>';
     }
   }catch(e){
-    if(btn){btn.disabled=false;btn.textContent='Soumettre ma réponse';}
+    if(btn){btn.disabled=false;btn.textContent='Soumettre ma r\u00e9ponse';}
     console.error(e);
-    document.getElementById('tab-mystere').innerHTML='<div class="msg error">Erreur lors de l\'envoi. R\u00e9essayez.</div>';
+    document.getElementById('tab-mystere').innerHTML='<div class=”msg error”>Erreur lors de l\u2019envoi. R\u00e9essayez.</div>';
   }
 }
 
 async function adminLoadMystery(){
   const el=document.getElementById('admin-mystery-content');
   if(!el) return;
-  el.innerHTML='<p style="font-size:13px;font-style:italic;color:var(--text-muted)">Chargement...</p>';
+  el.innerHTML='<p style=”font-size:13px;font-style:italic;color:var(--text-muted)”>Chargement...</p>';
   try{
     const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
     const all=await sbFetch('mystery_guesses?select=*&order=guessed_at.desc');
     let html='';
     if(solved&&solved.length>0){
-      html+='<div class="msg success" style="margin-bottom:12px;">&#127942; Trouvé par <strong>'+solved[0].nom+'</strong> le '+solved[0].jour+'</div>';
+      html+='<div class=”msg success” style=”margin-bottom:12px;”>\u26f3 Trouv\u00e9 par <strong>'+solved[0].nom+'</strong> le '+solved[0].jour+'</div>';
     }else{
-      html+='<div class="msg info" style="margin-bottom:12px;">Pas encore résolu.</div>';
+      html+='<div class=”msg info” style=”margin-bottom:12px;”>Pas encore r\u00e9solu.</div>';
     }
     if(!all||all.length===0){
-      html+='<p style="font-size:13px;font-style:italic;color:var(--text-muted)">Aucune tentative.</p>';
+      html+='<p style=”font-size:13px;font-style:italic;color:var(--text-muted)”>Aucune tentative.</p>';
     }else{
-      html+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">'+all.length+' tentative(s)</div>';
+      html+='<div style=”font-size:12px;color:var(--text-muted);margin-bottom:8px;”>'+all.length+' tentative(s)</div>';
       all.forEach(g=>{
-        html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(201,168,76,0.08);font-size:13px;">'
-          +'<div><strong>'+g.nom+'</strong> <span style="color:var(--text-muted);">&mdash; '+g.jour+'</span></div>'
-          +'<div><em style="color:'+(g.correct?'#80e0a0':'#e09090')+'">'+g.guess+'</em> '+(g.correct?'&#10003;':'&#10007;')+'</div>'
+        html+='<div style=”display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(201,168,76,0.08);font-size:13px;”>'
+          +'<div><strong>'+g.nom+'</strong> <span style=”color:var(--text-muted);”>&mdash; '+g.jour+'</span></div>'
+          +'<div><em style=”color:'+(g.correct?'#80e0a0':'#e09090')+'”>'+g.guess+'</em> '+(g.correct?'&#10003;':'&#10007;')+'</div>'
           +'</div>';
       });
     }
     el.innerHTML=html;
-  }catch(e){el.innerHTML='<p style="font-size:13px;color:#e09090">Erreur</p>';}
+  }catch(e){el.innerHTML='<p style=”font-size:13px;color:#e09090”>Erreur</p>';}
 }
 
 async function adminResetMystery(){
-  if(!confirm('Supprimer toutes les tentatives du Joueur Mystère ? Cette action est irréversible.')) return;
+  if(!confirm('Supprimer toutes les tentatives du Trou Myst\u00e8re ? Cette action est irr\u00e9versible.')) return;
   try{
     await sbFetch('mystery_guesses?id=gt.0',{method:'DELETE',headers:{'Prefer':'return=minimal'}});
     adminLoadMystery();
-  }catch(e){alert('Erreur lors de la réinitialisation : '+e.message);}
+  }catch(e){alert('Erreur lors de la r\u00e9initialisation : '+e.message);}
 }
 
 // ---- ÉVOLUTIONS CLASSEMENT ----
