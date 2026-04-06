@@ -1616,27 +1616,13 @@ async function loadMysteryInline(){
     return;
   }
   container.innerHTML='<div style=”text-align:center;padding:20px;color:var(--text-muted);font-style:italic”>Chargement...</div>';
-  const _base=['https:','','egasser17.github.io','Augusta','img'].join('/');
-  const HOLE_IMG=_base+'/hole_mystery.jpg';
+  const HOLE_IMG='https://egasser17.github.io/Augusta/img/hole_mystery.jpg';
   const makePhoto=(revealed)=>{
-    const uid='mf'+Math.random().toString(36).slice(2);
-    fetch(HOLE_IMG).then(r=>r.blob()).then(b=>{
-      const tmpImg=new Image();
-      tmpImg.onload=function(){
-        const cv=document.getElementById(uid);
-        if(!cv)return;
-        const W=280,H=160;
-        cv.width=W;cv.height=H;
-        if(!revealed){cv.style.filter='blur(8px)';cv.style.webkitFilter='blur(8px)';}
-        const ctx=cv.getContext('2d');
-        const scale=Math.max(W/tmpImg.naturalWidth,H/tmpImg.naturalHeight);
-        const sw=tmpImg.naturalWidth*scale,sh=tmpImg.naturalHeight*scale;
-        ctx.drawImage(tmpImg,(W-sw)/2,0,sw,sh);
-        URL.revokeObjectURL(tmpImg.src);
-      };
-      tmpImg.src=URL.createObjectURL(b);
-    }).catch(()=>{});
-    return '<div class=”mystery-photo-frame mystery-photo-fadein” style=”position:relative;”><canvas id=”'+uid+'” style=”width:100%;height:160px;display:block;” oncontextmenu=”return false”></canvas><div style=”position:absolute;inset:0;z-index:1;” oncontextmenu=”return false”></div></div>';
+    const f=revealed?'none':'blur(8px)';
+    return '<div class=”mystery-photo-frame mystery-photo-fadein” style=”position:relative;”>'
+      +'<img src=”'+HOLE_IMG+'” style=”width:100%;height:160px;object-fit:cover;display:block;filter:'+f+';-webkit-filter:'+f+';” draggable=”false” oncontextmenu=”return false”>'
+      +'<div style=”position:absolute;inset:0;z-index:1;” oncontextmenu=”return false”></div>'
+      +'</div>';
   };
   try{
     const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
