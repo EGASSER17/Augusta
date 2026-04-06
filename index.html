@@ -1644,14 +1644,14 @@ async function loadMysteryInline(){
       const winner=solved[0].nom;
       const isWinner=winner===currentUser;
       container.innerHTML=
-        '<div style=”padding:1.5rem 1rem;text-align:center;”>'
-        +'<div style=”font-family:\'Cormorant Garamond\',serif;font-size:1.2rem;font-weight:600;color:#c9a84c;margin-bottom:1rem;text-align:center;”>\u26f3 Le trou myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
+        '<div style=”text-align:center;padding:1.5rem 1rem;”>'
+        +'<div style=”font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;”>\u26f3 Le trou myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
         +'<div style=”display:flex;justify-content:center;margin-bottom:0.75rem;”>'+makePhoto(true)+'</div>'
-        +'<div style=”font-family:\'Cormorant Garamond\',serif;font-size:1.8rem;color:#c9a84c;margin:0.75rem 0;font-style:italic;text-align:center;”>Trou\u00a011 \u2014 White Dogwood</div>'
-        +'<div style=”font-size:0.95rem;color:#e8e0d0;margin-bottom:1.25rem;text-align:center;”>D\u00e9couvert par <strong style=”color:#c9a84c;”>'+winner+'</strong></div>'
+        +'<div style=”font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;”>Trou\u00a011 \u2014 White Dogwood</div>'
+        +'<div style=”font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;”>D\u00e9couvert par <strong style=”color:var(--gold);”>'+winner+'</strong></div>'
         +(isWinner
-          ?'<div style=”background:rgba(26,74,42,0.6);border:1px solid rgba(79,200,112,0.3);border-radius:4px;padding:12px 16px;color:#80e0a0;font-size:14px;font-style:italic;text-align:center;”>\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9tait le trou\u00a011\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
-          :'<div style=”background:rgba(26,42,74,0.6);border:1px solid rgba(74,144,200,0.3);border-radius:4px;padding:12px 16px;color:#90b8e0;font-size:14px;font-style:italic;text-align:center;”>&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le trou myst\u00e8re\u00a0!</div>')
+          ?'<div class=”msg success”>\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9tait le trou\u00a011 \u2014 White Dogwood\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
+          :'<div class=”msg info”>&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le trou myst\u00e8re\u00a0!</div>')
         +'</div>';
       return;
     }
