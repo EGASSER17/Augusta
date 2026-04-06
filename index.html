@@ -1615,28 +1615,12 @@ async function loadMysteryInline(){
     container.innerHTML='<p style=”text-align:center;color:rgba(245,240,232,0.5);padding:2rem;”>Connectez-vous pour jouer.</p>';
     return;
   }
-  container.innerHTML='<div style=”text-align:center;padding:20px;color:var(--text-muted);font-style:italic”>Chargement...</div>';
-  const HOLE_IMG='https://egasser17.github.io/Augusta/img/hole11.jpg?v=2';
-  const makePhoto=(revealed)=>{
-    const uid='mf'+Math.random().toString(36).slice(2);
-    const blurStyle=revealed?'':'filter:blur(10px);-webkit-filter:blur(10px);';
-    fetch(HOLE_IMG).then(r=>r.blob()).then(b=>{
-      const tmpImg=new Image();
-      tmpImg.onload=function(){
-        const cv=document.getElementById(uid);
-        if(!cv) return;
-        const W=320, H=220;
-        cv.width=W; cv.height=H;
-        const ctx=cv.getContext('2d');
-        const scale=Math.max(W/tmpImg.naturalWidth, H/tmpImg.naturalHeight);
-        const sw=tmpImg.naturalWidth*scale, sh=tmpImg.naturalHeight*scale;
-        ctx.drawImage(tmpImg, (W-sw)/2, 0, sw, sh);
-        URL.revokeObjectURL(tmpImg.src);
-      };
-      tmpImg.src=URL.createObjectURL(b);
-    }).catch(()=>{});
-    return '<div class=”mystery-photo-frame mystery-photo-fadein” style=”position:relative;”>'
-      +'<canvas id=”'+uid+'” width=”320” height=”220” style=”width:100%;height:220px;display:block;'+blurStyle+'” oncontextmenu=”return false”></canvas>'
+  container.innerHTML='<div style=”text-align:center;padding:20px;color:rgba(245,240,232,0.5);font-style:italic”>Chargement...</div>';
+  const HOLE_IMG='https://raw.githubusercontent.com/EGASSER17/Augusta/main/img/hole11.jpg';
+  const makePhotoHtml=(blurred)=>{
+    const f=blurred?'filter:blur(10px);-webkit-filter:blur(10px);':'';
+    return '<div style=”max-width:340px;margin:0 auto 0.75rem auto;border:2px solid #c9a84c;border-radius:4px;overflow:hidden;position:relative;”>'
+      +'<img src=”'+HOLE_IMG+'” style=”width:100%;height:220px;display:block;object-fit:cover;object-position:center top;'+f+'” crossorigin=”anonymous”>'
       +'<div style=”position:absolute;inset:0;z-index:1;” oncontextmenu=”return false”></div>'
       +'</div>';
   };
@@ -1645,16 +1629,15 @@ async function loadMysteryInline(){
     if(solved&&solved.length>0){
       const winner=solved[0].nom;
       const isWinner=winner===currentUser;
-      const C='text-align:center;display:block;width:100%;';
       container.innerHTML=
-        '<div style=”padding:1.5rem 1rem;”>'
-        +'<div style=”'+C+'font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;”>\u26f3 Le trou myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
-        +'<div style=”display:flex;justify-content:center;margin-bottom:0.75rem;”>'+makePhoto(true)+'</div>'
-        +'<div style=”'+C+'font-family:Cormorant Garamond,serif;font-size:1.8rem;color:var(--gold);margin:0.75rem 0;font-style:italic;”>Trou\u00a011 \u2014 White Dogwood</div>'
-        +'<div style=”'+C+'font-size:0.95rem;color:var(--cream-dark);margin-bottom:1.25rem;”>D\u00e9couvert par <strong style=”color:var(--gold);”>'+winner+'</strong></div>'
+        '<div style=”padding:1.5rem 1rem;text-align:center;”>'
+        +'<div style=”font-family:\'Cormorant Garamond\',serif;font-size:1.2rem;font-weight:600;color:#c9a84c;margin-bottom:1rem;text-align:center;”>\u26f3 Le trou myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
+        +makePhotoHtml(false)
+        +'<div style=”font-family:\'Cormorant Garamond\',serif;font-size:1.8rem;color:#c9a84c;margin:0.75rem 0;font-style:italic;text-align:center;”>Trou\u00a011 \u2014 White Dogwood</div>'
+        +'<div style=”font-size:0.95rem;color:#e8e0d0;margin-bottom:1.25rem;text-align:center;”>D\u00e9couvert par <strong style=”color:#c9a84c;”>'+winner+'</strong></div>'
         +(isWinner
-          ?'<div class=”msg success”>\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9tait le trou\u00a011 \u2014 White Dogwood\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
-          :'<div class=”msg info”>&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le trou myst\u00e8re\u00a0!</div>')
+          ?'<div style=”background:rgba(26,74,42,0.6);border:1px solid rgba(79,200,112,0.3);border-radius:4px;padding:12px 16px;color:#80e0a0;font-size:14px;font-style:italic;text-align:center;”>\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9tait le trou\u00a011\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
+          :'<div style=”background:rgba(26,42,74,0.6);border:1px solid rgba(74,144,200,0.3);border-radius:4px;padding:12px 16px;color:#90b8e0;font-size:14px;font-style:italic;text-align:center;”>&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le trou myst\u00e8re\u00a0!</div>')
         +'</div>';
       return;
     }
