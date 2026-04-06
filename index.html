@@ -1628,7 +1628,8 @@ async function loadMysteryInline(){
       tmpImg.onload=function(){
         console.log('[MYSTERE] onload',tmpImg.naturalWidth,tmpImg.naturalHeight);
         const cv=document.getElementById(uid);
-        if(!cv){console.log('[MYSTERE] canvas not found');return;}
+        console.log('[MYSTERE] uid=',uid,'found=',cv,'canvases in doc=',document.querySelectorAll('canvas').length);
+        if(!cv){console.log('[MYSTERE] canvas not found - innerHTML=',document.getElementById('tab-mystere')?.innerHTML?.slice(0,200));return;}
         const W=280,H=160;
         cv.width=W;cv.height=H;
         const ctx=cv.getContext('2d');
