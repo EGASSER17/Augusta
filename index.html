@@ -1613,27 +1613,15 @@ async function loadHoleMystery(){
     return;
   }
   container.innerHTML='<div style=”text-align:center;padding:20px;color:var(--text-muted);font-style:italic”>Chargement...</div>';
+  const photoUrl='https://egasser17.github.io/Augusta/img/hole_mystery.jpg';
   const makePhoto=(revealed)=>{
-    const uid='hm'+Math.random().toString(36).slice(2);
-    const photoUrl=['https:','','egasser17.github.io','Augusta','img','hole_mystery.jpg'].join('/');
-    fetch(photoUrl).then(r=>r.blob()).then(b=>{
-      const tmpImg=new Image();
-      tmpImg.onload=function(){
-        const cv=document.getElementById(uid);
-        if(!cv)return;
-        const W=300,H=200;
-        cv.width=W;cv.height=H;
-        if(!revealed){cv.style.filter='blur(8px)';cv.style.webkitFilter='blur(8px)';}
-        const ctx=cv.getContext('2d');
-        const scale=Math.max(W/tmpImg.naturalWidth,H/tmpImg.naturalHeight);
-        const sw=tmpImg.naturalWidth*scale,sh=tmpImg.naturalHeight*scale;
-        ctx.drawImage(tmpImg,(W-sw)/2,(H-sh)/2,sw,sh);
-        URL.revokeObjectURL(tmpImg.src);
-      };
-      tmpImg.src=URL.createObjectURL(b);
-    }).catch(()=>{});
-    return '<div class=”mystery-photo-frame mystery-photo-fadein”><canvas id=”'+uid+'” style=”width:100%;height:200px;display:block;” oncontextmenu=”return false”></canvas><div style=”position:absolute;inset:0;z-index:1;” oncontextmenu=”return false”></div></div>';
+    const blurStyle=revealed?'':'filter:blur(8px);-webkit-filter:blur(8px);';
+    return '<div class=”mystery-photo-frame mystery-photo-fadein”>'
+      +'<img src=”'+photoUrl+'” style=”width:100%;height:200px;object-fit:cover;display:block;'+blurStyle+'” oncontextmenu=”return false” draggable=”false”>'
+      +'<div style=”position:absolute;inset:0;z-index:1;” oncontextmenu=”return false”></div>'
+      +'</div>';
   };
+  const inputStyle='text-align:center;-webkit-appearance:none;appearance:none;background:rgba(26,61,40,0.6);border:1px solid rgba(201,168,76,0.3);border-radius:2px;color:#f5f0e8;font-family:\'EB Garamond\',serif;font-size:16px;padding:14px 16px;width:100%;outline:none;';
   try{
     const past=await sbFetch('hole_guesses?nom=eq.'+encodeURIComponent(currentUser)+'&select=guess,correct&limit=1');
     if(past&&past.length>0){
@@ -1663,7 +1651,7 @@ async function loadHoleMystery(){
       +'<div style=”margin-bottom:1rem;”>'
       +'<div class=”mystery-clue-card”><span class=”mystery-clue-day”>Indice</span>Ce trou n\u2019a jamais jou\u00e9 sous le par sur l\u2019ensemble d\u2019un Masters \u2014 c\u2019est le seul trou d\u2019Augusta avec cette particularit\u00e9 historique.</div>'
       +'</div>'
-      +'<div class=”input-group” style=”margin-bottom:12px;”><input type=”text” id=”hole-input” placeholder=”Votre r\u00e9ponse\u2026” maxlength=”30” style=”text-align:center;” onkeydown=”if(event.key===\'Enter\')submitHoleGuess()”></div>'
+      +'<div class=”input-group” style=”margin-bottom:12px;”><input type=”text” id=”hole-input” placeholder=”Votre r\u00e9ponse\u2026” maxlength=”30” style=”'+inputStyle+'” onkeydown=”if(event.key===\'Enter\')submitHoleGuess()”></div>'
       +'<button class=”btn btn-gold” onclick=”submitHoleGuess()”>Soumettre ma r\u00e9ponse</button>'
       +'<div style=”margin-top:10px;font-size:0.72rem;color:rgba(245,240,232,0.3);text-align:center;font-style:italic;”>Une seule tentative \u2014 d\u00e9finitive.</div>'
       +'</div>';
