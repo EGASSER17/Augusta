@@ -1618,9 +1618,25 @@ async function loadMysteryInline(){
   container.innerHTML='<div style=”text-align:center;padding:20px;color:var(--text-muted);font-style:italic”>Chargement...</div>';
   const HOLE_IMG='https://egasser17.github.io/Augusta/img/hole11.jpg?v=2';
   const makePhoto=(revealed)=>{
-    const f=revealed?'none':'blur(10px)';
-    return '<div class=”mystery-photo-frame mystery-photo-fadein”>'
-      +'<img src=”'+HOLE_IMG+'” style=”filter:'+f+';-webkit-filter:'+f+';” draggable=”false” oncontextmenu=”return false”>'
+    const uid='mf'+Math.random().toString(36).slice(2);
+    const blurStyle=revealed?'':'filter:blur(10px);-webkit-filter:blur(10px);';
+    fetch(HOLE_IMG).then(r=>r.blob()).then(b=>{
+      const tmpImg=new Image();
+      tmpImg.onload=function(){
+        const cv=document.getElementById(uid);
+        if(!cv) return;
+        const W=cv.offsetWidth||320, H=260;
+        cv.width=W; cv.height=H;
+        const ctx=cv.getContext('2d');
+        const scale=Math.max(W/tmpImg.naturalWidth, H/tmpImg.naturalHeight);
+        const sw=tmpImg.naturalWidth*scale, sh=tmpImg.naturalHeight*scale;
+        ctx.drawImage(tmpImg, (W-sw)/2, 0, sw, sh);
+        URL.revokeObjectURL(tmpImg.src);
+      };
+      tmpImg.src=URL.createObjectURL(b);
+    }).catch(()=>{});
+    return '<div class=”mystery-photo-frame mystery-photo-fadein” style=”position:relative;”>'
+      +'<canvas id=”'+uid+'” style=”width:100%;height:260px;display:block;'+blurStyle+'” oncontextmenu=”return false”></canvas>'
       +'<div style=”position:absolute;inset:0;z-index:1;” oncontextmenu=”return false”></div>'
       +'</div>';
   };
