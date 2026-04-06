@@ -1621,21 +1621,29 @@ async function loadMysteryInline(){
     const uid='mf'+Math.random().toString(36).slice(2);
     const url=_base+'/hole_mystery.jpg';
     const blurCss=revealed?'':'filter:blur(10px);-webkit-filter:blur(10px);';
-    fetch(url).then(r=>r.blob()).then(b=>{
+    console.log('[MYSTERE] fetch start', url);
+    fetch(url).then(r=>{console.log('[MYSTERE] fetch ok',r.status);return r.blob();}).then(b=>{
+      console.log('[MYSTERE] blob size',b.size);
       const tmpImg=new Image();
       tmpImg.onload=function(){
+        console.log('[MYSTERE] onload',tmpImg.naturalWidth,tmpImg.naturalHeight);
         const cv=document.getElementById(uid);
-        if(!cv)return;
+        if(!cv){console.log('[MYSTERE] canvas not found');return;}
         const W=280,H=160;
         cv.width=W;cv.height=H;
         const ctx=cv.getContext('2d');
+        console.log('[MYSTERE] ctx',ctx);
+        if(!ctx)return;
         const scale=Math.max(W/tmpImg.naturalWidth,H/tmpImg.naturalHeight);
         const sw=tmpImg.naturalWidth*scale,sh=tmpImg.naturalHeight*scale;
         ctx.drawImage(tmpImg,(W-sw)/2,0,sw,sh);
+        console.log('[MYSTERE] drawn');
         URL.revokeObjectURL(tmpImg.src);
       };
+      tmpImg.onerror=function(e){console.log('[MYSTERE] img error',e);};
       tmpImg.src=URL.createObjectURL(b);
-    }).catch(()=>{});
+      console.log('[MYSTERE] src set',tmpImg.src);
+    }).catch(e=>{console.log('[MYSTERE] fetch error',e);});
     return '<div class=”mystery-photo-frame mystery-photo-fadein” style=”position:relative;”><canvas id=”'+uid+'” style=”width:100%;height:160px;display:block;'+blurCss+'” oncontextmenu=”return false”></canvas><div style=”position:absolute;inset:0;z-index:1;” oncontextmenu=”return false”></div></div>';
   };
   try{
