@@ -725,9 +725,9 @@ function renderMainTabs(isOpen){
   tournamentIsOpen=isOpen;
   const el=document.getElementById('main-tabs');
   if(isOpen){
-    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">⛳ Trou ?</div><div class="tab" onclick="switchTab('allstars')">Club</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Mystère</div><div class="tab" onclick="switchTab('allstars')">Club</div>`;
   } else {
-    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">⛳ Trou ?</div><div class="tab" onclick="switchTab('allstars')">Club</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Mystère</div><div class="tab" onclick="switchTab('allstars')">Club</div>`;
   }
 }
 async function goClassement(){
@@ -1655,20 +1655,23 @@ async function loadHoleMystery(){
       return;
     }
     container.innerHTML=
-      '<div style=”padding:0 0.25rem 1.5rem;”>'
+      '<div style=”padding-bottom:1.5rem;”>'
       +'<div style=”text-align:center;margin-bottom:1.2rem;”>'
-      +'<div style=”font-family:\'Cormorant Garamond\',serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem;”>\u26f3 Trou Myst\u00e8re</div>'
-      +'<div style=”display:flex;justify-content:center;margin-bottom:1.2rem;”>'+makePhoto(false)+'</div>'
+      +'<div style=”display:flex;justify-content:center;”>'+makePhoto(false)+'</div>'
       +'</div>'
-      +'<div class=”mystery-clue-card” style=”margin-bottom:1.2rem;”>'
-      +'<span class=”mystery-clue-day”>Indice</span>'
-      +'Ce trou n\u2019a jamais jou\u00e9 sous le par sur l\u2019ensemble d\u2019un Masters \u2014 c\u2019est le seul trou d\u2019Augusta avec cette particularit\u00e9 historique.'
+      +'<div class=”card”>'
+      +'<div class=”card-title”>Indice</div>'
+      +'<p style=”font-family:\'EB Garamond\',serif;font-size:1rem;font-style:italic;line-height:1.6;color:var(--cream);”>Ce trou n\u2019a jamais jou\u00e9 sous le par sur l\u2019ensemble d\u2019un Masters \u2014 c\u2019est le seul trou d\u2019Augusta avec cette particularit\u00e9 historique.</p>'
       +'</div>'
-      +'<div class=”input-group” style=”margin-bottom:12px;”>'
-      +'<input type=”text” id=”hole-input” placeholder=”Quel trou\u00a0? (ex\u00a0: 7, trou 7\u2026)” maxlength=”30” style=”text-align:center;” onkeydown=”if(event.key===\'Enter\')submitHoleGuess()”>'
+      +'<div class=”card”>'
+      +'<div class=”card-title”>Votre r\u00e9ponse</div>'
+      +'<div class=”input-group”>'
+      +'<label class=”input-label”>Num\u00e9ro du trou</label>'
+      +'<input type=”text” id=”hole-input” placeholder=”Ex\u00a0: 7, trou 7\u2026” maxlength=”30” onkeydown=”if(event.key===\'Enter\')submitHoleGuess()”>'
       +'</div>'
-      +'<button class=”btn btn-gold” onclick=”submitHoleGuess()”>Soumettre ma r\u00e9ponse</button>'
+      +'<button class=”btn btn-gold” style=”width:100%;” onclick=”submitHoleGuess()”>Soumettre ma r\u00e9ponse</button>'
       +'<div style=”margin-top:10px;font-size:0.72rem;color:rgba(245,240,232,0.3);text-align:center;font-style:italic;”>Une seule tentative \u2014 d\u00e9finitive.</div>'
+      +'</div>'
       +'</div>';
   }catch(e){
     container.innerHTML='<div class=”msg error”>Erreur de chargement. R\u00e9essayez.</div>';
