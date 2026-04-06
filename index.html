@@ -1623,8 +1623,8 @@ async function loadHoleMystery(){
         if(!cv)return;
         const W=300,H=200;
         cv.width=W;cv.height=H;
+        if(!revealed){cv.style.filter='blur(8px)';cv.style.webkitFilter='blur(8px)';}
         const ctx=cv.getContext('2d');
-        if(!revealed){ctx.filter='blur(8px)';}
         const scale=Math.max(W/tmpImg.naturalWidth,H/tmpImg.naturalHeight);
         const sw=tmpImg.naturalWidth*scale,sh=tmpImg.naturalHeight*scale;
         ctx.drawImage(tmpImg,(W-sw)/2,(H-sh)/2,sw,sh);
