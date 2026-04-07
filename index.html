@@ -1661,7 +1661,7 @@ async function loadMysteryInline(){
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Trou\u00a05 \u2014 Magnolia</div>'
         +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9couvert par <strong style="color:var(--gold);">'+winner+'</strong></div>'
         +(isWinner
-          ?'<div class="msg success">\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9tait le trou\u00a05 \u2014 Magnolia\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
+          ?'<div class="msg success">\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9taient les trous\u00a07, 8 et 11\u00a0! +10000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
           :'<div class="msg info">&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le trou myst\u00e8re\u00a0!</div>')
         +'</div>';
       document.getElementById('mystery-photo-slot').appendChild(makePhotoEl(true));
@@ -1704,7 +1704,7 @@ async function submitMysteryGuess(){
     const isCorrect=await sbFetch('rpc/check_mystery_guess','POST',{p_guess:guess});
     await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:!!isCorrect,challenge:MYSTERY_CHALLENGE}),prefer:'return=minimal'});
     if(isCorrect){
-      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:5000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
+      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:10000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
       loadMysteryInline();
     }else{
       document.getElementById('tab-mystere').innerHTML='<div style="padding:1.5rem 1rem;text-align:center;"><div class="msg error" style="margin-bottom:1rem;">Mauvaise r\u00e9ponse \u2014 revenez demain pour retenter.</div><div style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">Votre r\u00e9ponse\u00a0: \u00ab\u00a0'+guess+'\u00a0\u00bb</div></div>';
