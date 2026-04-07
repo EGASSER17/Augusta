@@ -1607,8 +1607,8 @@ async function adminPostTriviaQuestions(){
 
 
 // ---- TROU MYSTERE ----
-const MYSTERY_CLUE='Ce trou n\u2019a jamais jou\u00e9 sous le par sur l\u2019ensemble d\u2019un Masters \u2014 c\u2019est le seul trou d\u2019Augusta avec cette particularit\u00e9 historique.';
-const MYSTERY_CHALLENGE='trou11';
+const MYSTERY_CLUE='Jack Nicklaus est le seul joueur de l\u2019histoire du Masters \u00e0 avoir r\u00e9alis\u00e9 deux eagles sur ce trou lors du m\u00eame tournoi.';
+const MYSTERY_CHALLENGE='trou5';
 
 async function loadMysteryInline(){
   const container=document.getElementById('tab-mystere');
@@ -1658,10 +1658,10 @@ async function loadMysteryInline(){
         '<div style="text-align:center;padding:1.5rem 1rem;">'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">\u26f3 Le trou myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
         +'<div id="mystery-photo-slot" style="display:flex;justify-content:center;margin-bottom:0.75rem;"></div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Trou\u00a011 \u2014 White Dogwood</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Trou\u00a05 \u2014 Magnolia</div>'
         +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9couvert par <strong style="color:var(--gold);">'+winner+'</strong></div>'
         +(isWinner
-          ?'<div class="msg success">\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9tait le trou\u00a011 \u2014 White Dogwood\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
+          ?'<div class="msg success">\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9tait le trou\u00a05 \u2014 Magnolia\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
           :'<div class="msg info">&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le trou myst\u00e8re\u00a0!</div>')
         +'</div>';
       document.getElementById('mystery-photo-slot').appendChild(makePhotoEl(true));
