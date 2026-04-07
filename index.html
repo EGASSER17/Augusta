@@ -1610,8 +1610,8 @@ async function adminPostTriviaQuestions(){
 
 
 // ---- TROU MYSTERE ----
-const MYSTERY_CLUE='Au Golf de Fontainebleau, trois trous ont \u00e9t\u00e9 enti\u00e8rement redessin\u00e9s from scratch lors de la r\u00e9novation de 1965 par Fred Hawtree. Quels sont ces trois trous\u00a0?';
-const MYSTERY_CHALLENGE='hawtree65';
+const MYSTERY_CLUE='On m\u2019a jou\u00e9 en par\u00a05 alors que je suis un par\u00a03. Qui suis-je\u00a0?';
+const MYSTERY_CHALLENGE='par3_trou10';
 
 async function loadMysteryInline(){
   const container=document.getElementById('tab-mystere');
@@ -1661,10 +1661,10 @@ async function loadMysteryInline(){
         '<div style="text-align:center;padding:1.5rem 1rem;">'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">\u26f3 Le trou myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
         +'<div id="mystery-photo-slot" style="display:flex;justify-content:center;margin-bottom:0.75rem;"></div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Trous\u00a07, 8 et 11 \u2014 Fontainebleau</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Le Trou\u00a010 \u2014 Fontainebleau</div>'
         +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9couvert par <strong style="color:var(--gold);">'+winner+'</strong></div>'
         +(isWinner
-          ?'<div class="msg success">\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9taient les trous\u00a07, 8 et 11\u00a0! +10000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
+          ?'<div class="msg success">\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9tait le trou\u00a010\u00a0! +10000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
           :'<div class="msg info">&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le trou myst\u00e8re\u00a0!</div>')
         +'</div>';
       document.getElementById('mystery-photo-slot').appendChild(makePhotoEl(true));
