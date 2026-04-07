@@ -669,6 +669,9 @@ function renderChapeau(){
   document.getElementById('step-dots').innerHTML=dotsHtml;
   const joueurs=JOUEURS[currentChapeau],sel=selections[currentChapeau];
   let html=`<div class="card"><div class="chapeau-header"><div class="chapeau-num">${currentChapeau}</div><div class="chapeau-info"><h3>${CHAPEAU_TITRES[currentChapeau]}</h3><p>${sel.length}/2 joueurs sélectionnés</p></div></div><div class="joueurs-grid">`;
+  sel.filter(j=>!joueurs.includes(j)).forEach(j=>{
+    html+=`<button class="joueur-btn selected" style="opacity:0.55;text-decoration:line-through;" onclick="toggleJoueur('${j.replace(/'/g,"\\'")}',${currentChapeau})" title="Joueur retiré — cliquer pour déselectionner">${j} ✕</button>`;
+  });
   joueurs.forEach(j=>{
     const isSel=sel.includes(j),isDisabled=!isSel&&sel.length>=2;
     html+=`<button class="joueur-btn ${isSel?'selected':''} ${isDisabled?'disabled':''}" onclick="toggleJoueur('${j.replace(/'/g,"\\'")}',${currentChapeau})">${j}</button>`;
