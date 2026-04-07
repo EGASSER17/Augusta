@@ -1608,6 +1608,7 @@ async function adminPostTriviaQuestions(){
 
 // ---- TROU MYSTERE ----
 const MYSTERY_CLUE='Ce trou n\u2019a jamais jou\u00e9 sous le par sur l\u2019ensemble d\u2019un Masters \u2014 c\u2019est le seul trou d\u2019Augusta avec cette particularit\u00e9 historique.';
+const MYSTERY_CHALLENGE='trou11';
 
 async function loadMysteryInline(){
   const container=document.getElementById('tab-mystere');
@@ -1649,7 +1650,7 @@ async function loadMysteryInline(){
     return frame;
   };
   try{
-    const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
+    const solved=await sbFetch('mystery_guesses?correct=eq.true&challenge=eq.'+MYSTERY_CHALLENGE+'&limit=1&select=nom,jour');
     if(solved&&solved.length>0){
       const winner=solved[0].nom;
       const isWinner=winner===currentUser;
@@ -1667,7 +1668,7 @@ async function loadMysteryInline(){
       return;
     }
     const todayStr=getTodayDate();
-    const alreadyGuessed=await sbFetch('mystery_guesses?nom=eq.'+encodeURIComponent(currentUser)+'&jour=eq.'+todayStr+'&select=guess,correct');
+    const alreadyGuessed=await sbFetch('mystery_guesses?nom=eq.'+encodeURIComponent(currentUser)+'&jour=eq.'+todayStr+'&challenge=eq.'+MYSTERY_CHALLENGE+'&select=guess,correct');
     let actionHtml='';
     if(alreadyGuessed&&alreadyGuessed.length>0){
       const g=alreadyGuessed[0];
@@ -1701,7 +1702,7 @@ async function submitMysteryGuess(){
   const todayStr=getTodayDate();
   try{
     const isCorrect=await sbFetch('rpc/check_mystery_guess','POST',{p_guess:guess});
-    await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:!!isCorrect}),prefer:'return=minimal'});
+    await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:!!isCorrect,challenge:MYSTERY_CHALLENGE}),prefer:'return=minimal'});
     if(isCorrect){
       try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:5000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
       loadMysteryInline();
@@ -1720,8 +1721,8 @@ async function adminLoadMystery(){
   if(!el) return;
   el.innerHTML='<p style="font-size:13px;font-style:italic;color:var(--text-muted)">Chargement...</p>';
   try{
-    const solved=await sbFetch('mystery_guesses?correct=eq.true&limit=1&select=nom,jour');
-    const all=await sbFetch('mystery_guesses?select=*&order=guessed_at.desc');
+    const solved=await sbFetch('mystery_guesses?correct=eq.true&challenge=eq.'+MYSTERY_CHALLENGE+'&limit=1&select=nom,jour');
+    const all=await sbFetch('mystery_guesses?challenge=eq.'+MYSTERY_CHALLENGE+'&select=*&order=guessed_at.desc');
     let html='';
     if(solved&&solved.length>0){
       html+='<div class="msg success" style="margin-bottom:12px;">\u26f3 Trouv\u00e9 par <strong>'+solved[0].nom+'</strong> le '+solved[0].jour+'</div>';
