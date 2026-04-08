@@ -833,49 +833,7 @@ async function loadClassement(){
     }
     if(!html) html='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Aucun participant pour l\'instant</div>';
     document.getElementById('tab-classement').innerHTML=html;
-    const isTournament=!tournamentIsOpen&&espnAllPlayers.length>0;
-    let shtml='<div class="card">';
-    if(isTournament){
-      // Pendant le tournoi : leaderboard ESPN complet
-      shtml+=`<div style="font-family:'Cormorant Garamond',serif;font-size:0.65rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;padding:8px 0 4px;text-align:center;">Leaderboard complet · ${espnAllPlayers.length} joueurs</div>`;
-      espnAllPlayers.forEach((j,i)=>{
-        const eid=PLAYER_ESPN_IDS[j.nom];
-        const photoUrl=eid?`https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${eid}.png&w=60&h=44&scale=crop&location=origin&transparent=true`:null;
-        const photoEl=photoUrl?`<img src="${photoUrl}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(201,168,76,0.4);flex-shrink:0;" onerror="this.style.display='none'">`:
-          `<div style="width:36px;height:36px;border-radius:50%;background:rgba(42,90,58,0.5);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🏌️</div>`;
-        shtml+=`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-family:'Cormorant Garamond',serif;font-size:13px;color:rgba(201,168,76,0.6);width:20px;flex-shrink:0;">${i+1}</span>
-            ${photoEl}
-            <span style="font-size:14px;font-style:italic">${j.nom}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600" class="${scoreClass(j.score)}">${fmtScore(j.score)}</span>
-            <span style="color:var(--text-muted);font-size:14px">›</span>
-          </div>
-        </div>`;
-      });
-    } else {
-      // Avant le tournoi : liste des chapeaux
-      const scoresTab=ALL_JOUEURS.map(n=>({nom:n,score:getScore(n)})).filter(j=>j.score!==null).sort((a,b)=>a.score-b.score);
-      const listPlayers=scoresTab.length?scoresTab:ALL_JOUEURS.map(n=>({nom:n,score:null}));
-      if(!scoresTab.length) shtml+='<div style="padding:8px 0;font-style:italic;color:var(--text-muted);font-size:13px;text-align:center">Les scores ne sont pas encore disponibles</div>';
-      listPlayers.forEach(j=>{
-        const eid=PLAYER_ESPN_IDS[j.nom];
-        const photoUrl=eid?`https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${eid}.png&w=60&h=44&scale=crop&location=origin&transparent=true`:null;
-        const photoEl=photoUrl?`<img src="${photoUrl}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(201,168,76,0.4);flex-shrink:0;" onerror="this.style.display='none'">`:
-          `<div style="width:36px;height:36px;border-radius:50%;background:rgba(42,90,58,0.5);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🏌️</div>`;
-        shtml+=`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
-          <div style="display:flex;align-items:center;gap:10px;">${photoEl}<span style="font-size:14px;font-style:italic">${j.nom}</span></div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            ${j.score!==null?`<span style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600" class="${scoreClass(j.score)}">${fmtScore(j.score)}</span>`:''}
-            <span style="color:var(--text-muted);font-size:14px">›</span>
-          </div>
-        </div>`;
-      });
-    }
-    shtml+='</div>';
-    document.getElementById('tab-scores').innerHTML=shtml;
+    document.getElementById('tab-scores').innerHTML='';
   }catch(e){document.getElementById('tab-classement').innerHTML='<div class="msg error">Erreur de chargement</div>';console.error(e);}
 }
 function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
@@ -892,7 +850,7 @@ function switchTab(tab){
   allTabs.forEach(t=>{const el=document.getElementById('tab-'+t);if(el) el.style.display=t===tab?'block':'none';});
   if(tab==='news'&&!newsLoaded) loadNews();
   if(tab==='selection'&&!selectionTabLoaded) loadMaSelection();
-  if(tab==='scores'&&!document.getElementById('tab-scores').innerHTML.trim()) loadJoueursList().catch(console.error);
+  if(tab==='scores') loadJoueursList().catch(console.error);
   if(tab==='trivia'){
     // Reprendre la partie en cours si elle existe, sinon charger normalement
     if(triviaState.questions.length>0 && triviaState.idx<triviaState.questions.length){
