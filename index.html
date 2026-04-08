@@ -803,11 +803,14 @@ async function loadClassement(){
     const histMap=await saveAndGetEvolutions(qualifies);
     let html='';
     qualifies.forEach((r,i)=>{
-      const nc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+      const rank=i===0?1:(r.total===qualifies[i-1].total?qualifies.findIndex(x=>x.total===r.total)+1:i+1);
+      const tied=qualifies.filter(x=>x.total===r.total).length>1;
+      const rankStr=(tied?'T':'')+rank;
+      const nc=rank===1?'gold':rank===2?'silver':rank===3?'bronze':'';
       const b4=r.best4.map(j=>j.nom.split(' ').pop()).join(', ');
-      const arrow=getArrow(i+1,histMap[r.nom]);
+      const arrow=getArrow(rank,histMap[r.nom]);
       html+=`<div class="rank-item" onclick="toggleDetail('d${i}')">
-        <div class="rank-num ${nc}">${i+1}</div>
+        <div class="rank-num ${nc}">${rankStr}</div>
         <div style="width:20px;text-align:center;flex-shrink:0;">${arrow}</div>
         <div class="rank-info"><div class="rank-name">${r.nom}</div><div class="rank-joueurs">Best 4 : ${b4}</div></div>
         <div class="rank-score ${scoreClass(r.total)}">${fmtScore(r.total)}</div>
