@@ -1288,7 +1288,7 @@ async function loadJoueursList(){
         <div style="display:flex;align-items:center;gap:10px;">
           <span style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.5);width:18px;text-align:right;flex-shrink:0;">${i+1}</span>
           ${photoEl}
-          <span style="font-size:14px;${isInChapeaux?'color:var(--gold);':''}">${j.nom}</span>
+          <span style="font-size:14px;">${j.nom}</span>
         </div>
         <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:${scColor};font-weight:600;">${scStr}</span>
       </div>`;
@@ -1321,7 +1321,7 @@ async function loadJoueursList(){
       html+=hourLabel+`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
         <div style="display:flex;align-items:center;gap:10px;">
           ${photoEl}
-          <span style="font-size:14px;${isInChapeaux?'color:var(--gold);':''}">${j.nom}</span>
+          <span style="font-size:14px;">${j.nom}</span>
         </div>
         ${rightCol}
       </div>`;
