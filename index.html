@@ -1233,25 +1233,50 @@ async function loadJoueursList(){
   const el=document.getElementById('tab-scores');
   el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-style:italic">Chargement...</div>';
   if(tournamentIsOpen){
-    // Tournoi en cours : leaderboard complet trié par score
     if(espnAllPlayers.length===0) await fetchESPNScores();
+    if(espnFullField.length===0) await fetchTeeTimes();
+    const fieldMap={};
+    espnFullField.forEach(f=>{fieldMap[normalizeName(f.nom)]={espnId:f.espnId,teeTime:f.teeTime};});
+    const allE=espnAllPlayers.every(j=>j.score===0);
+    let players=[...espnAllPlayers];
+    if(allE){
+      players.sort((a,b)=>{
+        const fa=fieldMap[normalizeName(a.nom)];
+        const fb=fieldMap[normalizeName(b.nom)];
+        if(!fa?.teeTime&&!fb?.teeTime) return 0;
+        if(!fa?.teeTime) return 1;
+        if(!fb?.teeTime) return -1;
+        return new Date(fa.teeTime)-new Date(fb.teeTime);
+      });
+    }
     let html='<div class="card">';
-    espnAllPlayers.forEach((j,i)=>{
-      const eid=PLAYER_ESPN_IDS[j.nom];
+    let lastDay='';
+    players.forEach((j,i)=>{
+      const info=fieldMap[normalizeName(j.nom)];
+      const eid=info?.espnId||PLAYER_ESPN_IDS[j.nom];
       const photoEl=eid
         ?`<img src="https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${eid}.png&w=60&h=44&scale=crop&location=origin&transparent=true" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(201,168,76,0.4);flex-shrink:0;" onerror="this.style.display='none'">`
         :`<span style="font-size:20px;flex-shrink:0;">🏌️</span>`;
       const sc=j.score;
       const scStr=sc>0?'+'+sc:(sc===0?'E':sc);
       const scColor=sc<0?'#4caf7d':(sc>0?'#e05050':'var(--cream)');
-      const isInChapeaux=ALL_JOUEURS.includes(j.nom);
-      html+=`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
+      let rightCol,dayLabel='';
+      if(allE&&info?.teeTime){
+        const d=new Date(info.teeTime);
+        const hParis=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
+        rightCol=`<span style="font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:rgba(201,168,76,0.85);">⏱ ${hParis}</span>`;
+        const dayKey=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Paris'});
+        if(dayKey!==lastDay){lastDay=dayKey;dayLabel=`<div style="font-family:'Cormorant Garamond',serif;font-size:0.7rem;color:rgba(201,168,76,0.5);letter-spacing:2px;text-transform:uppercase;padding:8px 0 4px;">${dayKey}</div>`;}
+      } else {
+        rightCol=`<span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:${scColor};font-weight:600;">${scStr}</span>`;
+      }
+      html+=dayLabel+`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
         <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.5);width:18px;text-align:right;flex-shrink:0;">${i+1}</span>
+          ${allE?'':` <span style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.5);width:18px;text-align:right;flex-shrink:0;">${i+1}</span>`}
           ${photoEl}
           <span style="font-size:14px;">${j.nom}</span>
         </div>
-        <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:${scColor};font-weight:600;">${scStr}</span>
+        ${rightCol}
       </div>`;
     });
     html+='</div>';
