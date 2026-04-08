@@ -509,7 +509,7 @@ const PLAYER_ESPN_IDS = {
 
 let currentUser='',currentCode='',currentChapeau=1,isEditMode=false;
 let selections={1:[],2:[],3:[],4:[]};
-let espnScores={},espnAllPlayers=[],espnStatuses={},espnTeeTimes={},refreshTimer=null,lastUpdated=null,newsLoaded=false,selectionTabLoaded=false,tournamentIsOpen=false;
+let espnScores={},espnAllPlayers=[],espnStatuses={},espnTeeTimes={},espnFullField=[],refreshTimer=null,lastUpdated=null,newsLoaded=false,selectionTabLoaded=false,tournamentIsOpen=false;
 let showingInscription=false;
 
 // ---- SUPABASE ----
@@ -584,11 +584,21 @@ async function fetchTeeTimes(){
     const res=await fetch('https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?event=401811941');
     const data=await res.json();
     const competitors=data.events?.[0]?.competitions?.[0]?.competitors||[];
-    espnTeeTimes={};
+    espnTeeTimes={};espnFullField=[];
     competitors.forEach(c=>{
       const nom=c.athlete?.displayName;
+      const espnId=c.athlete?.id||c.id;
       const teeTime=c.status?.teeTime||c.linescores?.[0]?.teeTime;
-      if(nom&&teeTime) espnTeeTimes[normalizeName(nom)]=teeTime;
+      if(nom){
+        if(teeTime) espnTeeTimes[normalizeName(nom)]=teeTime;
+        espnFullField.push({nom,espnId,teeTime:teeTime||null});
+      }
+    });
+    espnFullField.sort((a,b)=>{
+      if(!a.teeTime&&!b.teeTime) return 0;
+      if(!a.teeTime) return 1;
+      if(!b.teeTime) return -1;
+      return new Date(a.teeTime)-new Date(b.teeTime);
     });
   }catch(e){console.error('fetchTeeTimes',e);}
 }
@@ -1259,28 +1269,66 @@ async function editSelection(){
 
 // ---- JOUEURS LIST (pré-tournoi) ----
 async function loadJoueursList(){
-  if(Object.keys(espnTeeTimes).length===0) await fetchTeeTimes();
-  let html='<div class="card">';
-  ALL_JOUEURS.forEach(n=>{
-    const eid=PLAYER_ESPN_IDS[n];
-    const photoEl=eid
-      ?`<img src="https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${eid}.png&w=60&h=44&scale=crop&location=origin&transparent=true" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(201,168,76,0.4);flex-shrink:0;" onerror="this.style.display='none'">`
-      :`<span style="font-size:22px;flex-shrink:0;">🏌️</span>`;
-    const tt=espnTeeTimes[normalizeName(n)];
-    let rightCol;
-    if(tt){
-      const hParis=new Date(tt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
-      rightCol=`<span style="font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:rgba(201,168,76,0.85);">⏱ ${hParis}</span>`;
-    } else {
-      rightCol=`<span style="color:var(--text-muted);font-size:18px">›</span>`;
-    }
-    html+=`<div class="score-item" onclick="openPlayerCard('${n.replace(/'/g,"\\'")}')">
-      <div style="display:flex;align-items:center;gap:10px;">${photoEl}<span style="font-size:14px;font-style:italic">${n}</span></div>
-      ${rightCol}
-    </div>`;
-  });
-  html+='</div>';
-  document.getElementById('tab-scores').innerHTML=html;
+  const el=document.getElementById('tab-scores');
+  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-style:italic">Chargement...</div>';
+  if(tournamentIsOpen){
+    // Tournoi en cours : leaderboard complet trié par score
+    if(espnAllPlayers.length===0) await fetchESPNScores();
+    let html='<div class="card">';
+    espnAllPlayers.forEach((j,i)=>{
+      const eid=PLAYER_ESPN_IDS[j.nom];
+      const photoEl=eid
+        ?`<img src="https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${eid}.png&w=60&h=44&scale=crop&location=origin&transparent=true" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(201,168,76,0.4);flex-shrink:0;" onerror="this.style.display='none'">`
+        :`<span style="font-size:20px;flex-shrink:0;">🏌️</span>`;
+      const sc=j.score;
+      const scStr=sc>0?'+'+sc:(sc===0?'E':sc);
+      const scColor=sc<0?'#4caf7d':(sc>0?'#e05050':'var(--cream)');
+      const isInChapeaux=ALL_JOUEURS.includes(j.nom);
+      html+=`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.5);width:18px;text-align:right;flex-shrink:0;">${i+1}</span>
+          ${photoEl}
+          <span style="font-size:14px;${isInChapeaux?'color:var(--gold);':''}">${j.nom}</span>
+        </div>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:${scColor};font-weight:600;">${scStr}</span>
+      </div>`;
+    });
+    html+='</div>';
+    el.innerHTML=html;
+  } else {
+    // Pré-tournoi : champ complet trié par heure de départ
+    if(espnFullField.length===0) await fetchTeeTimes();
+    const field=espnFullField.length>0?espnFullField:ALL_JOUEURS.map(n=>({nom:n,espnId:PLAYER_ESPN_IDS[n]||null,teeTime:null}));
+    let html='<div class="card">';
+    let lastHour='';
+    field.forEach(j=>{
+      const photoEl=j.espnId
+        ?`<img src="https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${j.espnId}.png&w=60&h=44&scale=crop&location=origin&transparent=true" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(201,168,76,0.4);flex-shrink:0;" onerror="this.style.display='none'">`
+        :`<span style="font-size:20px;flex-shrink:0;">🏌️</span>`;
+      let rightCol='<span style="color:var(--text-muted);font-size:18px">›</span>';
+      let hourLabel='';
+      if(j.teeTime){
+        const d=new Date(j.teeTime);
+        const hParis=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
+        rightCol=`<span style="font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:rgba(201,168,76,0.85);">⏱ ${hParis}</span>`;
+        const hKey=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Paris'});
+        if(hKey!==lastHour){
+          lastHour=hKey;
+          hourLabel=`<div style="font-family:'Cormorant Garamond',serif;font-size:0.7rem;color:rgba(201,168,76,0.5);letter-spacing:2px;text-transform:uppercase;padding:8px 0 4px;">${hKey}</div>`;
+        }
+      }
+      const isInChapeaux=ALL_JOUEURS.includes(j.nom);
+      html+=hourLabel+`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
+        <div style="display:flex;align-items:center;gap:10px;">
+          ${photoEl}
+          <span style="font-size:14px;${isInChapeaux?'color:var(--gold);':''}">${j.nom}</span>
+        </div>
+        ${rightCol}
+      </div>`;
+    });
+    html+='</div>';
+    el.innerHTML=html;
+  }
 }
 
 // ---- NEWS (YOUTUBE) ----
