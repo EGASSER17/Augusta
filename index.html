@@ -1548,27 +1548,30 @@ async function finishTrivia(){
 }
 
 async function showTriviaResult(scoreDuJour,tempsDuJour,alreadyPlayed){
-  // Déterminer la phase selon la date du jour
   const today=getTodayDate();
-  const isPhase2=today>='2026-04-09';
-  const dateMin=isPhase2?'2026-04-09':'2026-04-01';
-  const dateMax=isPhase2?'2026-04-12':'2026-04-08';
-  const phaseLabel=isPhase2?'Phase Tournoi':'Phase Pré-tournoi';
 
-  // Calcul du score cumulatif de l'utilisateur sur la phase en cours
-  const allScores=await sbFetch(`trivia_scores?nom=eq.${encodeURIComponent(currentUser)}&jour=gte.${dateMin}&jour=lte.${dateMax}&select=score,temps_total`);
-  const cumul=(allScores||[]).reduce((s,r)=>s+r.score,0);
+  // Charger les deux phases en parallèle
+  const [tousP1,tousP2]=await Promise.all([
+    sbFetch('trivia_scores?jour=gte.2026-04-01&jour=lte.2026-04-08&select=nom,score,temps_total'),
+    sbFetch('trivia_scores?jour=gte.2026-04-09&jour=lte.2026-04-12&select=nom,score,temps_total')
+  ]);
 
-  // Classement de la phase en cours
-  const tous=await sbFetch(`trivia_scores?jour=gte.${dateMin}&jour=lte.${dateMax}&select=nom,score,temps_total`);
-  const cumMap={};
-  (tous||[]).forEach(r=>{
-    if(!cumMap[r.nom]) cumMap[r.nom]={total:0,temps:0};
-    cumMap[r.nom].total+=r.score;
-    cumMap[r.nom].temps+=r.temps_total;
-  });
-  const classement=Object.entries(cumMap).map(([nom,d])=>({nom,total:d.total,temps:d.temps})).sort((a,b)=>b.total-a.total||a.temps-b.temps);
+  // Construire les maps par nom
+  const mapP1={},mapP2={};
+  (tousP1||[]).forEach(r=>{if(!mapP1[r.nom])mapP1[r.nom]=0;mapP1[r.nom]+=r.score;});
+  (tousP2||[]).forEach(r=>{if(!mapP2[r.nom])mapP2[r.nom]=0;mapP2[r.nom]+=r.score;});
+
+  // Fusionner tous les noms
+  const allNoms=new Set([...Object.keys(mapP1),...Object.keys(mapP2)]);
+  const classement=Array.from(allNoms).map(nom=>({
+    nom,
+    p1:mapP1[nom]||0,
+    p2:mapP2[nom]||0,
+    total:(mapP1[nom]||0)+(mapP2[nom]||0)
+  })).sort((a,b)=>b.total-a.total);
+
   const rank=classement.findIndex(r=>r.nom===currentUser)+1;
+  const moi=classement.find(r=>r.nom===currentUser)||{p1:0,p2:0,total:0};
 
   const container=document.getElementById('tab-trivia');
   container.innerHTML=`
@@ -1580,15 +1583,29 @@ async function showTriviaResult(scoreDuJour,tempsDuJour,alreadyPlayed){
         <div style="font-family:'Cormorant Garamond',serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;">Score du jour</div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--gold);font-weight:700;">${scoreDuJour}</div>
         <div style="font-size:0.8rem;color:rgba(245,240,232,0.5);">pts · ${tempsDuJour}s</div>
-        <div style="margin-top:0.5rem;font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:var(--cream);">Total cumulé : <strong style="color:var(--gold);">${cumul} pts</strong></div>
-        <div style="font-size:0.9rem;color:var(--gold);margin-top:0.25rem;">🏆 Classement général : ${rank}ème</div>
+        <div style="margin-top:0.5rem;font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:var(--cream);">Total général : <strong style="color:var(--gold);">${moi.total} pts</strong></div>
+        <div style="font-size:0.9rem;color:var(--gold);margin-top:0.25rem;">Classement général : ${rank}ème</div>
       </div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Classement Trivia · ${phaseLabel}</div>
-      ${classement.map((r,i)=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0.5rem;border-radius:6px;margin-bottom:0.25rem;background:${r.nom===currentUser?'rgba(201,168,76,0.1)':'transparent'};border:1px solid ${r.nom===currentUser?'rgba(201,168,76,0.25)':'transparent'};">
-          <span style="font-size:0.85rem;color:${r.nom===currentUser?'var(--gold)':'var(--cream)'};">${i+1}. ${r.nom}</span>
-          <span style="font-family:'Cormorant Garamond',serif;font-size:0.9rem;color:${r.nom===currentUser?'var(--gold)':'rgba(245,240,232,0.7)'};">${r.total} pts</span>
-        </div>`).join('')}
+      <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Classement Trivia · Cumulé</div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:0 0.5rem;align-items:center;margin-bottom:0.5rem;padding:0 0.5rem;">
+        <span style="font-size:0.65rem;color:rgba(201,168,76,0.5);text-transform:uppercase;letter-spacing:1px;"></span>
+        <span style="font-size:0.65rem;color:rgba(201,168,76,0.5);text-align:right;white-space:nowrap;">Pré</span>
+        <span style="font-size:0.65rem;color:rgba(201,168,76,0.5);text-align:right;white-space:nowrap;">Tournoi</span>
+        <span style="font-size:0.65rem;color:rgba(201,168,76,0.5);text-align:right;white-space:nowrap;">Total</span>
+      </div>
+      ${classement.map((r,i)=>{
+        const isMoi=r.nom===currentUser;
+        const bg=isMoi?'rgba(201,168,76,0.1)':'transparent';
+        const border=isMoi?'rgba(201,168,76,0.25)':'transparent';
+        const col=isMoi?'var(--gold)':'var(--cream)';
+        const colMuted=isMoi?'var(--gold)':'rgba(245,240,232,0.6)';
+        return`<div style="display:grid;grid-template-columns:1fr auto auto auto;gap:0 0.5rem;align-items:center;padding:0.4rem 0.5rem;border-radius:6px;margin-bottom:0.25rem;background:${bg};border:1px solid ${border};">
+          <span style="font-size:0.85rem;color:${col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i+1}. ${r.nom}</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:${colMuted};text-align:right;min-width:40px;">${r.p1||'—'}</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:${colMuted};text-align:right;min-width:40px;">${r.p2||'—'}</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-weight:700;color:${col};text-align:right;min-width:48px;">${r.total}</span>
+        </div>`;
+      }).join('')}
     </div>`;
 }
 
