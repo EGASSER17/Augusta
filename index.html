@@ -1653,7 +1653,7 @@ async function loadMysteryInline(){
     return frame;
   };
   try{
-    const solved=await sbFetch('mystery_guesses?correct=eq.true&challenge=eq.'+MYSTERY_CHALLENGE+'&limit=1&select=nom,jour');
+    const solved=await sbFetch('mystery_guesses?correct=eq.true&challenge=eq.'+MYSTERY_CHALLENGE+'&order=guessed_at.asc&limit=1&select=nom,jour');
     if(solved&&solved.length>0){
       const winner=solved[0].nom;
       const isWinner=winner===currentUser;
@@ -1724,7 +1724,7 @@ async function adminLoadMystery(){
   if(!el) return;
   el.innerHTML='<p style="font-size:13px;font-style:italic;color:var(--text-muted)">Chargement...</p>';
   try{
-    const solved=await sbFetch('mystery_guesses?correct=eq.true&challenge=eq.'+MYSTERY_CHALLENGE+'&limit=1&select=nom,jour');
+    const solved=await sbFetch('mystery_guesses?correct=eq.true&challenge=eq.'+MYSTERY_CHALLENGE+'&order=guessed_at.asc&limit=1&select=nom,jour');
     const all=await sbFetch('mystery_guesses?challenge=eq.'+MYSTERY_CHALLENGE+'&select=*&order=guessed_at.desc');
     let html='';
     if(solved&&solved.length>0){
