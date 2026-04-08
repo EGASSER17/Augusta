@@ -481,28 +481,30 @@ const ALL_JOUEURS=Object.values(JOUEURS).flat();
 const NB_CHAPEAUX=4;
 
 const PLAYER_ESPN_IDS = {
-  'Scottie Scheffler':'9478','Rory McIlroy':'3470','Bryson DeChambeau':'9885',
-  'Jon Rahm':'9780','Ludvig Åberg':'11813','Xander Schauffele':'9003',
-  'Matt Fitzpatrick':'9025','Cameron Young':'11104','Tommy Fleetwood':'9384',
-  'Justin Rose':'2294','Collin Morikawa':'10676','Patrick Reed':'6284',
+  'Scottie Scheffler':'9478','Rory McIlroy':'3470','Bryson DeChambeau':'10046',
+  'Jon Rahm':'9780','Ludvig Åberg':'4375972','Xander Schauffele':'10140',
+  'Matt Fitzpatrick':'9025','Cameron Young':'4425906','Tommy Fleetwood':'9384',
+  'Justin Rose':'2294','Collin Morikawa':'10592','Patrick Reed':'6284',
   'Brooks Koepka':'5765','Jordan Spieth':'3741','Hideki Matsuyama':'5860',
-  'Min Woo Lee':'11122','Robert MacIntyre':'11203','Viktor Hovland':'10817',
-  'Shane Lowry':'6825','Chris Gotterup':'11610','Tyrrell Hatton':'9026',
-  'Russell Henley':'5771','Patrick Cantlay':'9817','Akshay Bhatia':'11524',
-  'Si Woo Kim':'9999','Sepp Straka':'10555','Jason Day':'3698',
+  'Min Woo Lee':'4410932','Robert MacIntyre':'11378','Viktor Hovland':'4364873',
+  'Shane Lowry':'4587','Chris Gotterup':'4690755','Tyrrell Hatton':'9026',
+  'Russell Henley':'5409','Patrick Cantlay':'9817','Akshay Bhatia':'4419142',
+  'Si Woo Kim':'9999','Sepp Straka':'10555','Jason Day':'1680',
   'Sam Burns':'11120','Justin Thomas':'4848','Corey Conners':'10220',
-  'Adam Scott':'1678','Sungjae Im':'11145','Marco Penge':'12345',
-  'Jacob Bridgeman':'11602','Gary Woodland':'5709','J.J. Spaun':'9590',
-  'Nicolai Hojgaard':'11536','Cameron Smith':'9131','Jake Knapp':'11800',
-  'Harris English':'5744','Daniel Berger':'9026','Brian Harman':'5790',
-  'Kurt Kitayama':'11442','Max Homa':'9039','Ben Griffin':'11405',
-  'Dustin Johnson':'3843','Casey Jarvis':'12400','Wyndham Clark':'10940',
-  'Ryan Fox':'10466','Sergio Garcia':'1120','Aldrich Potgieter':'12100',
-  'Rasmus Hojgaard':'11537','Keegan Bradley':'3988','Aaron Rai':'10611',
-  'Harry Hall':'12050','Sam Stevens':'12200','Bubba Watson':'1694',
-  'Danny Willett':'8455','Charl Schwartzel':'2699','Zach Johnson':'1646',
-  'Angel Cabrera':'1014','Fred Couples':'333','Vijay Singh':'385',
-  'Nick Taylor':'7340','Matt McCarty':'11611'
+  'Adam Scott':'388','Sungjae Im':'11382','Marco Penge':'4585549',
+  'Jacob Bridgeman':'5054388','Gary Woodland':'3550','J.J. Spaun':'10166',
+  'Nicolai Hojgaard':'11250','Cameron Smith':'9131','Jake Knapp':'11800',
+  'Harris English':'5408','Daniel Berger':'5678','Brian Harman':'1225',
+  'Kurt Kitayama':'10364','Max Homa':'9039','Ben Griffin':'4404992',
+  'Dustin Johnson':'3448','Casey Jarvis':'4610056','Wyndham Clark':'11119',
+  'Ryan Fox':'4251','Sergio Garcia':'158','Aldrich Potgieter':'5080439',
+  'Rasmus Hojgaard':'11253','Keegan Bradley':'4513','Aaron Rai':'10906',
+  'Harry Hall':'4589438','Sam Stevens':'4426181','Bubba Watson':'1694',
+  'Danny Willett':'4304','Charl Schwartzel':'1097','Zach Johnson':'1646',
+  'Angel Cabrera':'1014','Fred Couples':'333','Vijay Singh':'392',
+  'Nick Taylor':'3792','Matt McCarty':'4901368','Alex Noren':'3832',
+  'Max Greyserman':'11101','José María Olazábal':'329','Mike Weir':'453',
+  'Maverick McNealy':'10987','Haotong Li':'10625'
 };
 
 let currentUser='',currentCode='',currentChapeau=1,isEditMode=false;
@@ -880,7 +882,7 @@ function switchTab(tab){
   allTabs.forEach(t=>{const el=document.getElementById('tab-'+t);if(el) el.style.display=t===tab?'block':'none';});
   if(tab==='news'&&!newsLoaded) loadNews();
   if(tab==='selection'&&!selectionTabLoaded) loadMaSelection();
-  if(tab==='scores'&&!document.getElementById('tab-scores').innerHTML.trim()) loadJoueursList();
+  if(tab==='scores'&&!document.getElementById('tab-scores').innerHTML.trim()) loadJoueursList().catch(console.error);
   if(tab==='trivia'){
     // Reprendre la partie en cours si elle existe, sinon charger normalement
     if(triviaState.questions.length>0 && triviaState.idx<triviaState.questions.length){
@@ -1256,12 +1258,25 @@ async function editSelection(){
 }
 
 // ---- JOUEURS LIST (pré-tournoi) ----
-function loadJoueursList(){
+async function loadJoueursList(){
+  if(Object.keys(espnTeeTimes).length===0) await fetchTeeTimes();
   let html='<div class="card">';
   ALL_JOUEURS.forEach(n=>{
+    const eid=PLAYER_ESPN_IDS[n];
+    const photoEl=eid
+      ?`<img src="https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${eid}.png&w=60&h=44&scale=crop&location=origin&transparent=true" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(201,168,76,0.4);flex-shrink:0;" onerror="this.style.display='none'">`
+      :`<span style="font-size:22px;flex-shrink:0;">🏌️</span>`;
+    const tt=espnTeeTimes[normalizeName(n)];
+    let rightCol;
+    if(tt){
+      const hParis=new Date(tt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
+      rightCol=`<span style="font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:rgba(201,168,76,0.85);">⏱ ${hParis}</span>`;
+    } else {
+      rightCol=`<span style="color:var(--text-muted);font-size:18px">›</span>`;
+    }
     html+=`<div class="score-item" onclick="openPlayerCard('${n.replace(/'/g,"\\'")}')">
-      <span style="font-size:14px;font-style:italic">⛳ ${n}</span>
-      <span style="color:var(--text-muted);font-size:18px">›</span>
+      <div style="display:flex;align-items:center;gap:10px;">${photoEl}<span style="font-size:14px;font-style:italic">${n}</span></div>
+      ${rightCol}
     </div>`;
   });
   html+='</div>';
