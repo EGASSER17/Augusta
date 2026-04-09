@@ -1041,7 +1041,7 @@ async function loadPlayerScorecard(nom) {
     const espnId = PLAYER_ESPN_IDS[nom];
     if (!espnId) { renderScorecardParOnly(container); return; }
 
-    const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?event=401703511`);
+    const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?event=401811941`);
     const data = await res.json();
     const competitors = (data.events?.[0]?.competitions?.[0]?.competitors) || [];
     const player = competitors.find(c => c.id === espnId || String(c.athlete?.id) === String(espnId));
