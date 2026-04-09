@@ -1032,39 +1032,45 @@ let scorecardInterval = null;
 async function loadPlayerScorecard(nom) {
   const container = document.getElementById('player-scorecard-live');
   if (!container) return;
-  container.innerHTML = `<div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:1rem;margin-top:1rem;">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Carte de score du jour</div>
-    <div style="text-align:center;color:var(--text-muted);font-size:13px;font-style:italic;padding:8px;">Chargement...</div>
-  </div>`;
+  container.innerHTML = `<div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:1rem;margin-top:1rem;text-align:center;color:var(--text-muted);font-size:13px;font-style:italic;padding:8px;">Chargement...</div>`;
 
   try {
-    const espnId = PLAYER_ESPN_IDS[nom];
-    if (!espnId) { renderScorecardParOnly(container); return; }
-
     const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?event=401811941`);
     const data = await res.json();
     const competitors = (data.events?.[0]?.competitions?.[0]?.competitors) || [];
-    const player = competitors.find(c => c.id === espnId || String(c.athlete?.id) === String(espnId));
 
-    if (!player || !player.linescores?.length) {
-      renderScorecardParOnly(container);
-      return;
+    // Recherche par nom normalisé (+ fallback par ESPN ID si dispo)
+    const espnId = PLAYER_ESPN_IDS[nom];
+    const normNom = normalizeName(nom);
+    const player = competitors.find(c => {
+      const cName = normalizeName(c.athlete?.displayName || '');
+      return cName === normNom || (espnId && (c.id === espnId || String(c.athlete?.id) === String(espnId)));
+    });
+
+    if (!player) { renderScorecardParOnly(container); return; }
+
+    const status = player.status || {};
+    const period = status.period || 1;
+    const thru = status.thru || 0;
+    const inProgress = status.type?.name === 'STATUS_IN_PROGRESS';
+    const finished = status.type?.name === 'STATUS_FINISHED';
+    const rounds = (player.linescores || []);
+
+    // Endpoint secondaire ESPN pour les scores trou par trou
+    const competitorId = player.id || player.athlete?.id;
+    let holeData = [];
+    if (competitorId) {
+      try {
+        const scRes = await fetch(`https://sports.core.api.espn.com/v2/sports/golf/leagues/pga/events/401811941/competitions/401811941/competitors/${competitorId}/linescores?lang=en`);
+        const scData = await scRes.json();
+        const currentRound = (scData.items || []).find(r => r.period === period);
+        holeData = currentRound?.linescores || [];
+      } catch(e) {}
     }
 
-    const linescores = player.linescores;
     const AUGUSTA_PAR = [4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4];
-    let html = `<div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:1rem;margin-top:1rem;">
-      <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Carte de score · Round ${player.status?.period||1}</div>
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-        <table style="border-collapse:collapse;font-size:0.72rem;font-family:'EB Garamond',serif;min-width:320px;">`;
 
-    const holes = linescores.slice(0,18);
-    const front = holes.slice(0,9);
-    const back = holes.slice(9);
-
-    function scoreStyle(val, par) {
-      if (val === undefined || val === null) return 'color:rgba(245,240,232,0.3)';
-      const diff = val - par;
+    function holeStyle(diff) {
       if (diff <= -2) return 'background:#1a6b2a;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;';
       if (diff === -1) return 'background:#c9a84c;color:#0d2818;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;';
       if (diff === 0) return 'color:var(--cream)';
@@ -1072,39 +1078,67 @@ async function loadPlayerScorecard(nom) {
       return 'border:2px solid #e05;border-radius:2px;padding:1px 3px;color:#e05';
     }
 
-    function renderRow(holesArr, offset) {
-      const parRow = holesArr.map((h,i) => `<td style="text-align:center;padding:4px 3px;color:rgba(245,240,232,0.5);">${AUGUSTA_PAR[i+offset]}</td>`).join('');
-      const numRow = holesArr.map((h,i) => `<td style="text-align:center;padding:4px 3px;color:rgba(245,240,232,0.5);">${i+offset+1}</td>`).join('');
-      const scoreRow = holesArr.map((h,i) => {
-        const val = h.value !== undefined ? parseInt(h.value) : null;
-        const par = AUGUSTA_PAR[i+offset];
-        const style = val !== null ? scoreStyle(val, par) : 'color:rgba(245,240,232,0.3)';
-        const display = val !== null ? val : '·';
-        return `<td style="text-align:center;padding:4px 3px;"><span style="${style}">${display}</span></td>`;
-      }).join('');
-      const total = holesArr.reduce((s,h) => s + (h.value !== undefined ? parseInt(h.value)||0 : 0), 0);
-      const totalPar = holesArr.reduce((s,_,i) => s + AUGUSTA_PAR[i+offset], 0);
-      return { numRow, parRow, scoreRow, total, totalPar };
+    const statusLabel = finished ? 'Terminé' : inProgress ? `Round ${period} · Thru ${thru}` : `Round ${period}`;
+    let html = `<div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:1rem;margin-top:1rem;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">${statusLabel}</div>`;
+
+    // Résumé par rounds (si plusieurs rounds joués)
+    const completedRounds = rounds.filter(r => r.displayValue);
+    if (completedRounds.length > 1 || finished) {
+      html += `<div style="display:flex;gap:6px;margin-bottom:1rem;">`;
+      for (let i = 0; i < 4; i++) {
+        const r = rounds.find(x => x.period === i+1);
+        const dv = r?.displayValue;
+        const numVal = dv ? (dv === 'E' ? 0 : parseInt(dv)) : null;
+        const col = dv === undefined || dv === null ? 'color:rgba(245,240,232,0.25)' : numVal < 0 ? 'color:var(--gold)' : numVal > 0 ? 'color:#e05' : 'color:var(--cream)';
+        html += `<div style="flex:1;text-align:center;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:4px;padding:8px 4px;">
+          <div style="font-size:10px;color:rgba(201,168,76,0.5);letter-spacing:1px;margin-bottom:4px">R${i+1}</div>
+          <div style="font-size:16px;font-weight:600;${col}">${dv || '—'}</div>
+        </div>`;
+      }
+      html += `</div>`;
     }
 
-    const f = renderRow(front, 0);
-    const b = renderRow(back, 9);
+    // Scorecard trou par trou
+    if (holeData.length > 0) {
+      const holes = new Array(18).fill(null);
+      holeData.forEach(h => { const idx = (h.period||0)-1; if(idx>=0&&idx<18) holes[idx]=h; });
+      const front = holes.slice(0,9), back = holes.slice(9);
 
-    html += `<tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;white-space:nowrap;">Trou</td>${f.numRow}<td style="padding:4px 3px;color:rgba(201,168,76,0.5);font-size:0.65rem;">Out</td></tr>`;
-    html += `<tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;">Par</td>${f.parRow}<td style="text-align:center;padding:4px 3px;color:rgba(201,168,76,0.5);">${f.totalPar}</td></tr>`;
-    html += `<tr><td style="padding:4px 3px;color:var(--gold);font-size:0.65rem;">Score</td>${f.scoreRow}<td style="text-align:center;padding:4px 3px;color:var(--gold);font-weight:600;">${f.total||'·'}</td></tr>`;
-    html += `<tr style="height:6px;"></tr>`;
-    html += `<tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;white-space:nowrap;">Trou</td>${b.numRow}<td style="padding:4px 3px;color:rgba(201,168,76,0.5);font-size:0.65rem;">In</td></tr>`;
-    html += `<tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;">Par</td>${b.parRow}<td style="text-align:center;padding:4px 3px;color:rgba(201,168,76,0.5);">${b.totalPar}</td></tr>`;
-    html += `<tr><td style="padding:4px 3px;color:var(--gold);font-size:0.65rem;">Score</td>${b.scoreRow}<td style="text-align:center;padding:4px 3px;color:var(--gold);font-weight:600;">${b.total||'·'}</td></tr>`;
-    html += `</table></div>`;
+      function renderRow(holesArr, offset) {
+        const numRow = holesArr.map((_,i)=>`<td style="text-align:center;padding:4px 3px;color:rgba(245,240,232,0.5);">${i+offset+1}</td>`).join('');
+        const parRow = holesArr.map((_,i)=>`<td style="text-align:center;padding:4px 3px;color:rgba(245,240,232,0.5);">${AUGUSTA_PAR[i+offset]}</td>`).join('');
+        let runTotal = 0;
+        const scoreRow = holesArr.map((h,i)=>{
+          if(!h||h.value===undefined) return `<td style="text-align:center;padding:4px 3px;"><span style="color:rgba(245,240,232,0.3)">·</span></td>`;
+          const val=parseInt(h.value), par=AUGUSTA_PAR[i+offset];
+          runTotal+=val;
+          return `<td style="text-align:center;padding:4px 3px;"><span style="${holeStyle(val-par)}">${val}</span></td>`;
+        }).join('');
+        const totalPar = holesArr.reduce((s,_,i)=>s+AUGUSTA_PAR[i+offset],0);
+        return {numRow,parRow,scoreRow,total:runTotal||'·',totalPar};
+      }
 
-    const legend = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:0.65rem;color:rgba(245,240,232,0.5);">
-      <span><span style="background:#1a6b2a;color:#fff;border-radius:50%;padding:1px 4px;">2</span> Eagle+</span>
-      <span><span style="background:#c9a84c;color:#0d2818;border-radius:50%;padding:1px 4px;">3</span> Birdie</span>
-      <span style="border:1px solid #e05;border-radius:2px;padding:1px 4px;color:#e05;">5</span> Bogey
-    </div>`;
-    html += legend + `</div>`;
+      const f=renderRow(front,0), b=renderRow(back,9);
+      html+=`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table style="border-collapse:collapse;font-size:0.72rem;font-family:'EB Garamond',serif;min-width:320px;">
+        <tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;white-space:nowrap;">Trou</td>${f.numRow}<td style="padding:4px 3px;color:rgba(201,168,76,0.5);font-size:0.65rem;">Out</td></tr>
+        <tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;">Par</td>${f.parRow}<td style="text-align:center;padding:4px 3px;color:rgba(201,168,76,0.5);">${f.totalPar}</td></tr>
+        <tr><td style="padding:4px 3px;color:var(--gold);font-size:0.65rem;">Score</td>${f.scoreRow}<td style="text-align:center;padding:4px 3px;color:var(--gold);font-weight:600;">${f.total}</td></tr>
+        <tr style="height:6px;"></tr>
+        <tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;white-space:nowrap;">Trou</td>${b.numRow}<td style="padding:4px 3px;color:rgba(201,168,76,0.5);font-size:0.65rem;">In</td></tr>
+        <tr><td style="padding:4px 3px;color:rgba(245,240,232,0.4);font-size:0.65rem;">Par</td>${b.parRow}<td style="text-align:center;padding:4px 3px;color:rgba(201,168,76,0.5);">${b.totalPar}</td></tr>
+        <tr><td style="padding:4px 3px;color:var(--gold);font-size:0.65rem;">Score</td>${b.scoreRow}<td style="text-align:center;padding:4px 3px;color:var(--gold);font-weight:600;">${b.total}</td></tr>
+      </table></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:0.65rem;color:rgba(245,240,232,0.5);">
+        <span><span style="background:#1a6b2a;color:#fff;border-radius:50%;padding:1px 4px;">2</span> Eagle+</span>
+        <span><span style="background:#c9a84c;color:#0d2818;border-radius:50%;padding:1px 4px;">3</span> Birdie</span>
+        <span style="border:1px solid #e05;border-radius:2px;padding:1px 4px;color:#e05;">5</span> Bogey
+      </div>`;
+    } else if (!inProgress && completedRounds.length === 0) {
+      html += `<div style="text-align:center;color:var(--text-muted);font-size:13px;font-style:italic;padding:16px">Pas encore en jeu</div>`;
+    }
+
+    html += `</div>`;
     container.innerHTML = html;
 
     if (scorecardInterval) clearInterval(scorecardInterval);
