@@ -1557,11 +1557,10 @@ async function loadTriviaInline(){
   }
 
   if(!questions){
-    document.getElementById('tab-trivia').innerHTML=`
-      <div style="text-align:center;padding:2rem;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);margin-bottom:0.5rem;">⏳</div>
-        <p style="color:var(--cream);font-style:italic;">Les questions du jour ne sont pas encore disponibles.<br>Revenez ce soir !</p>
-      </div>`;
+    await showTriviaLeaderboard(`<div style="text-align:center;padding:1.5rem 0 0.5rem;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);margin-bottom:0.5rem;">⏳</div>
+      <p style="color:var(--cream);font-style:italic;margin:0;">Les questions du jour ne sont pas encore disponibles.<br>Revenez ce soir !</p>
+    </div>`);
     return;
   }
 
@@ -1649,6 +1648,46 @@ async function finishTrivia(){
     await sbFetch('trivia_scores?on_conflict=nom,jour,type','POST',{nom:currentUser,jour:today,score:triviaState.score,temps_total:totalTemps,type:'trivia'},true);
   }catch(e){}
   await showTriviaResult(triviaState.score,totalTemps,false);
+}
+
+async function showTriviaLeaderboard(headerHtml=''){
+  const [tousP1,tousP2]=await Promise.all([
+    sbFetch('trivia_scores?jour=gte.2026-04-01&jour=lte.2026-04-08&select=nom,score,temps_total'),
+    sbFetch('trivia_scores?jour=gte.2026-04-09&jour=lte.2026-04-12&select=nom,score,temps_total')
+  ]);
+  const mapP1={},mapP2={};
+  (tousP1||[]).forEach(r=>{if(!mapP1[r.nom])mapP1[r.nom]=0;mapP1[r.nom]+=r.score;});
+  (tousP2||[]).forEach(r=>{if(!mapP2[r.nom])mapP2[r.nom]=0;mapP2[r.nom]+=r.score;});
+  const allNoms=new Set([...Object.keys(mapP1),...Object.keys(mapP2)]);
+  const classement=Array.from(allNoms).map(nom=>({nom,p1:mapP1[nom]||0,p2:mapP2[nom]||0,total:(mapP1[nom]||0)+(mapP2[nom]||0)})).sort((a,b)=>b.total-a.total);
+  const rank=classement.findIndex(r=>r.nom===currentUser)+1;
+  const moi=classement.find(r=>r.nom===currentUser)||{p1:0,p2:0,total:0};
+  document.getElementById('tab-trivia').innerHTML=`<div style="padding:1rem;">
+    ${headerHtml}
+    ${moi.total>0?`<div style="text-align:center;padding:0.75rem 0;border-bottom:1px solid rgba(201,168,76,0.2);margin:0.75rem 0;">
+      <div style="font-size:0.8rem;color:rgba(245,240,232,0.5);">Total général : <strong style="color:var(--gold);">${moi.total} pts</strong> · ${rank}ème</div>
+    </div>`:''}
+    <div style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Classement Trivia · Cumulé</div>
+    <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:0 0.5rem;align-items:center;margin-bottom:0.5rem;padding:0 0.5rem;">
+      <span></span>
+      <span style="font-size:0.65rem;color:rgba(201,168,76,0.5);text-align:right;white-space:nowrap;">Pré</span>
+      <span style="font-size:0.65rem;color:rgba(201,168,76,0.5);text-align:right;white-space:nowrap;">Tournoi</span>
+      <span style="font-size:0.65rem;color:rgba(201,168,76,0.5);text-align:right;white-space:nowrap;">Total</span>
+    </div>
+    ${classement.map((r,i)=>{
+      const isMoi=r.nom===currentUser;
+      const bg=isMoi?'rgba(201,168,76,0.1)':'transparent';
+      const border=isMoi?'rgba(201,168,76,0.25)':'transparent';
+      const col=isMoi?'var(--gold)':'var(--cream)';
+      const colMuted=isMoi?'var(--gold)':'rgba(245,240,232,0.6)';
+      return`<div style="display:grid;grid-template-columns:1fr auto auto auto;gap:0 0.5rem;align-items:center;padding:0.4rem 0.5rem;border-radius:6px;margin-bottom:0.25rem;background:${bg};border:1px solid ${border};">
+        <span style="font-size:0.85rem;color:${col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i+1}. ${r.nom}</span>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:${colMuted};text-align:right;min-width:40px;">${r.p1||'—'}</span>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:0.85rem;color:${colMuted};text-align:right;min-width:40px;">${r.p2||'—'}</span>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-weight:700;color:${col};text-align:right;min-width:48px;">${r.total}</span>
+      </div>`;
+    }).join('')}
+  </div>`;
 }
 
 async function showTriviaResult(scoreDuJour,tempsDuJour,alreadyPlayed){
