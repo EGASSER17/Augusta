@@ -1287,11 +1287,12 @@ async function loadJoueursList(){
         const dayKey=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Paris'});
         if(dayKey!==lastDay){lastDay=dayKey;dayLabel=`<div style="font-family:'Cormorant Garamond',serif;font-size:0.7rem;color:rgba(201,168,76,0.5);letter-spacing:2px;text-transform:uppercase;padding:8px 0 4px;">${dayKey}</div>`;}
       } else {
-        rightCol=`<span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:${scColor};font-weight:600;">${scStr}</span>`;
+        const statusStr=j.status?`<div style="font-size:0.65rem;color:rgba(245,240,232,0.4);text-align:right;margin-top:2px;">${j.status}</div>`:'';
+        rightCol=`<div style="text-align:right;"><span style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:${scColor};font-weight:700;">${scStr}</span>${statusStr}</div>`;
       }
       html+=dayLabel+`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
         <div style="display:flex;align-items:center;gap:10px;">
-          ${allE?'':` <span style="font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:rgba(201,168,76,0.5);width:18px;text-align:right;flex-shrink:0;">${i+1}</span>`}
+          ${allE?'':` <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:rgba(201,168,76,0.8);width:24px;text-align:right;flex-shrink:0;font-weight:600;">${i+1}</span>`}
           ${photoEl}
           <span style="font-size:14px;">${j.nom}</span>
         </div>
