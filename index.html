@@ -1731,8 +1731,8 @@ async function adminPostTriviaQuestions(){
 
 
 // ---- TROU MYSTERE ----
-const MYSTERY_CLUE='On m\u2019a jou\u00e9 en par\u00a05 alors que je suis un par\u00a03. Qui suis-je\u00a0?';
-const MYSTERY_CHALLENGE='gdf_j2_2026';
+const MYSTERY_CLUE='J\u2019ai fini dans le top\u00a010 lors de 5 de mes 8 premi\u00e8res participations \u2014 soit 63\u00a0% du temps.';
+const MYSTERY_CHALLENGE='gdf_j3_2026';
 
 async function loadMysteryInline(){
   const container=document.getElementById('tab-mystere');
@@ -1743,7 +1743,7 @@ async function loadMysteryInline(){
   container.innerHTML='<div style="text-align:center;padding:20px;color:rgba(245,240,232,0.5);font-style:italic">Chargement...</div>';
   const _base=['https:','','egasser17.github.io','Augusta','img'].join('/');
   const makePhotoEl=(revealed)=>{
-    const url=_base+'/hole_mystery.jpg';
+    const url=_base+'/mystery10.jpg';
     const blurCss=revealed?'':'filter:blur(10px);-webkit-filter:blur(10px);';
     const frame=document.createElement('div');
     frame.className='mystery-photo-frame mystery-photo-fadein';
@@ -1780,13 +1780,13 @@ async function loadMysteryInline(){
       const isWinner=winner===currentUser;
       container.innerHTML=
         '<div style="text-align:center;padding:1.5rem 1rem;">'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">\u26f3 Le trou myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">\ud83d\udd75\ufe0f Le joueur myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
         +'<div id="mystery-photo-slot" style="display:flex;justify-content:center;margin-bottom:0.75rem;"></div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Le Trou\u00a010 \u2014 Fontainebleau</div>'
-        +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9couvert par <strong style="color:var(--gold);">'+winner+'</strong></div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Xander Schauffele</div>'
+        +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9masqu\u00e9 par <strong style="color:var(--gold);">'+winner+'</strong></div>'
         +(isWinner
-          ?'<div class="msg success">\u26f3\u00a0Bravo\u00a0! C\u2019\u00e9tait le trou\u00a010\u00a0! +15000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
-          :'<div class="msg info">&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le trou myst\u00e8re\u00a0!</div>')
+          ?'<div class="msg success">\ud83c\udf89\u00a0Bravo\u00a0! C\u2019\u00e9tait Xander Schauffele\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
+          :'<div class="msg info">&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le joueur myst\u00e8re\u00a0!</div>')
         +'</div>';
       document.getElementById('mystery-photo-slot').appendChild(makePhotoEl(true));
       return;
@@ -1803,7 +1803,7 @@ async function loadMysteryInline(){
     container.innerHTML=
       '<div style="padding:0 0.25rem 1.5rem;">'
       +'<div style="text-align:center;margin-bottom:1rem;">'
-      +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Trou Myst\u00e8re</div>'
+      +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Joueur Myst\u00e8re</div>'
       +'<div id="mystery-photo-slot" style="display:flex;justify-content:center;"></div>'
       +'</div>'
       +'<div style="margin-bottom:1rem;"><div class="mystery-clue-card"><span class="mystery-clue-day">Indice</span>'+MYSTERY_CLUE+'</div></div>'
@@ -1828,7 +1828,7 @@ async function submitMysteryGuess(){
     const isCorrect=await sbFetch('rpc/check_mystery_guess','POST',{p_guess:guess});
     await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:!!isCorrect,challenge:MYSTERY_CHALLENGE}),prefer:'return=minimal'});
     if(isCorrect){
-      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:15000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
+      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:5000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
       loadMysteryInline();
     }else{
       document.getElementById('tab-mystere').innerHTML='<div style="padding:1.5rem 1rem;text-align:center;"><div class="msg error" style="margin-bottom:1rem;">Mauvaise r\u00e9ponse \u2014 revenez demain pour retenter.</div><div style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">Votre r\u00e9ponse\u00a0: \u00ab\u00a0'+guess+'\u00a0\u00bb</div></div>';
