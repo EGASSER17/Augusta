@@ -1530,7 +1530,8 @@ const TRIVIA_PHASE1 = {
 let triviaState={idx:0,score:0,temps:[],timerInterval:null,startTime:null,questions:[],timeLeft:15};
 
 function getTodayDate(){
-  return new Date().toISOString().split('T')[0];
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
 async function loadTriviaInline(){
