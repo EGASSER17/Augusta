@@ -942,30 +942,15 @@ function openPlayerCard(nom){
   document.body.appendChild(modal);
   modal.addEventListener('click',e=>{if(e.target===modal) closePlayerCard();});
   const score=getScore(nom);
-  const chapeau=Object.entries(JOUEURS).find(([c,js])=>js.includes(nom))?.[0]||'?';
-  const info=PLAYER_DATA[nom]||null;
-  if(info){
-    info.photo_url=`https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${info.espn_id}.png&w=200&h=146`;
-    renderPlayerCard(info,nom,score,chapeau);
-    loadPlayerNews(nom);
-    loadPlayerScorecard(nom);
-  } else {
-    const sc=fmtScore(score),cls=scoreClass(score);
-    modal.innerHTML=`<div class="player-sheet" style="position:relative">
-      <button class="player-close" onclick="closePlayerCard()">✕</button>
-      <div class="player-header"><div class="player-photo-placeholder">🏌️</div>
-        <div><div class="player-name-h">${nom}</div><div class="player-name-sub">${CHAPEAU_TITRES[chapeau]||'Chapeau '+chapeau}</div></div>
-      </div>
-      <div class="player-stats-grid">
-        <div class="pstat"><div class="pstat-val ${cls}">${sc}</div><div class="pstat-lbl">Score Masters</div></div>
-        <div class="pstat"><div class="pstat-val">C${chapeau}</div><div class="pstat-lbl">Chapeau</div></div>
-      </div>
-      <div id="player-dynamic-info" style="text-align:center;padding:16px;color:var(--text-muted);font-style:italic;font-size:13px">Chargement des informations...</div>
-      <div id="player-scorecard-live"></div>
-    </div>`;
-    loadDynamicPlayerInfo(nom);
-    loadPlayerScorecard(nom);
-  }
+  const sc=fmtScore(score),cls=scoreClass(score);
+  const espnId=PLAYER_ESPN_IDS[nom];
+  const photoHtml=espnId?`<img class="player-photo" src="https://a.espncdn.com/combiner/i?img=/i/headshots/golf/players/full/${espnId}.png&w=200&h=146" onerror="this.outerHTML='<div class=\\'player-photo-placeholder\\'>🏌️</div>'" alt="${nom}">`:`<div class="player-photo-placeholder">🏌️</div>`;
+  modal.innerHTML=`<div class="player-sheet" style="position:relative">
+    <button class="player-close" onclick="closePlayerCard()">✕</button>
+    <div class="player-header">${photoHtml}<div><div class="player-name-h">${nom}</div><div class="pstat-val ${cls}" style="font-size:1.4rem;margin-top:4px">${sc}</div></div></div>
+    <div id="player-scorecard-live"></div>
+  </div>`;
+  loadPlayerScorecard(nom);
 }
 async function loadDynamicPlayerInfo(nom){
   const modal=document.getElementById('player-modal');
