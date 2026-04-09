@@ -530,7 +530,7 @@ async function sbFetch(path,optsOrMethod,body,upsert){
 
 // ---- UTILS ----
 function parseScore(s){if(!s||s==='E') return 0;return parseInt(s)||0;}
-function normalizeName(n){return n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z\s]/g,'').trim();}
+function normalizeName(n){return n.toLowerCase().replace(/ø/g,'o').replace(/æ/g,'ae').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z\s]/g,'').trim();}
 function getScore(nom){const k=normalizeName(nom);return espnScores[k]!==undefined?espnScores[k]:null;}
 function hasMadeCut(nom){const k=normalizeName(nom);const s=espnStatuses[k];return !s||(!s.includes('CUT')&&s!=='MC'&&s!=='WD');}
 function fmtScore(s){if(s===null||s===undefined) return 'N/A';if(s===0) return 'E';return(s>0?'+':'')+s;}
