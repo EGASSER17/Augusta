@@ -1779,7 +1779,7 @@ async function adminPostTriviaQuestions(){
 
 
 // ---- TROU MYSTERE ----
-const MYSTERY_CLUE='J\u2019ai fini dans le top\u00a010 lors de 5 de mes 8 premi\u00e8res participations \u2014 soit 63\u00a0% du temps.';
+const MYSTERY_CLUE='J\u2019ai fini dans le top\u00a010 lors de 5 de mes 8 premi\u00e8res participations \u2014 soit 63\u00a0% du temps.';\nconst MYSTERY_CLUE2='Je d\u00e9tiens la plus longue s\u00e9rie active de cuts cons\u00e9cutifs r\u00e9ussis dans les Majeurs \u2014 15 de suite.';
 const MYSTERY_CHALLENGE='gdf_j3_2026';
 
 async function loadMysteryInline(){
@@ -1854,7 +1854,7 @@ async function loadMysteryInline(){
       +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Joueur Myst\u00e8re</div>'
       +'<div id="mystery-photo-slot" style="display:flex;justify-content:center;"></div>'
       +'</div>'
-      +'<div style="margin-bottom:1rem;"><div class="mystery-clue-card"><span class="mystery-clue-day">Indice</span>'+MYSTERY_CLUE+'</div></div>'
+      +'<div style="margin-bottom:1rem;"><div class="mystery-clue-card"><span class="mystery-clue-day">Indice 1</span>'+MYSTERY_CLUE+'</div><div class="mystery-clue-card"><span class="mystery-clue-day">Indice 2</span>'+MYSTERY_CLUE2+'</div></div>'
       +actionHtml
       +'</div>';
     document.getElementById('mystery-photo-slot').appendChild(makePhotoEl(false));
