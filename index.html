@@ -1779,9 +1779,9 @@ async function adminPostTriviaQuestions(){
 
 
 // ---- TROU MYSTERE ----
-const MYSTERY_CLUE='J\u2019ai fini dans le top\u00a010 lors de 5 de mes 8 premi\u00e8res participations \u2014 soit 63\u00a0% du temps.';
-const MYSTERY_CLUE2='Je d\u00e9tiens la plus longue s\u00e9rie active de cuts cons\u00e9cutifs r\u00e9ussis dans les Majeurs \u2014 15 de suite.';
-const MYSTERY_CHALLENGE='gdf_j3_2026';
+const MYSTERY_CLUE='Je suis le seul vainqueur du Masters depuis 1998 \u00e0 avoir rat\u00e9 le cut au tournoi pr\u00e9c\u00e9dent avant de gagner ma veste verte.';
+const MYSTERY_CHALLENGE='gdf_j4_2026';
+const MYSTERY_ANSWER='patrick reed';
 
 async function loadMysteryInline(){
   const container=document.getElementById('tab-mystere');
@@ -1831,10 +1831,10 @@ async function loadMysteryInline(){
         '<div style="text-align:center;padding:1.5rem 1rem;">'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">\ud83d\udd75\ufe0f Le joueur myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
         +'<div id="mystery-photo-slot" style="display:flex;justify-content:center;margin-bottom:0.75rem;"></div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Xander Schauffele</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Patrick Reed</div>'
         +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9masqu\u00e9 par <strong style="color:var(--gold);">'+winner+'</strong></div>'
         +(isWinner
-          ?'<div class="msg success">\ud83c\udf89\u00a0Bravo\u00a0! C\u2019\u00e9tait Xander Schauffele\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
+          ?'<div class="msg success">\ud83c\udf89\u00a0Bravo\u00a0! C\u2019\u00e9tait Patrick Reed\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
           :'<div class="msg info">&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le joueur myst\u00e8re\u00a0!</div>')
         +'</div>';
       document.getElementById('mystery-photo-slot').appendChild(makePhotoEl(true));
@@ -1855,7 +1855,7 @@ async function loadMysteryInline(){
       +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.7rem;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Joueur Myst\u00e8re</div>'
       +'<div id="mystery-photo-slot" style="display:flex;justify-content:center;"></div>'
       +'</div>'
-      +'<div style="margin-bottom:1rem;"><div class="mystery-clue-card"><span class="mystery-clue-day">Indice 1</span>'+MYSTERY_CLUE+'</div><div class="mystery-clue-card"><span class="mystery-clue-day">Indice 2</span>'+MYSTERY_CLUE2+'</div></div>'
+      +'<div style="margin-bottom:1rem;"><div class="mystery-clue-card"><span class="mystery-clue-day">Indice</span>'+MYSTERY_CLUE+'</div></div>'
       +actionHtml
       +'</div>';
     document.getElementById('mystery-photo-slot').appendChild(makePhotoEl(false));
@@ -1874,7 +1874,7 @@ async function submitMysteryGuess(){
   if(btn){btn.disabled=true;btn.textContent='...';}
   const todayStr=getTodayDate();
   try{
-    const isCorrect=await sbFetch('rpc/check_mystery_guess','POST',{p_guess:guess});
+    const isCorrect=guess.trim().toLowerCase()===MYSTERY_ANSWER;
     await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:!!isCorrect,challenge:MYSTERY_CHALLENGE}),prefer:'return=minimal'});
     if(isCorrect){
       try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:5000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
