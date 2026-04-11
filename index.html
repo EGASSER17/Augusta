@@ -791,16 +791,20 @@ async function loadClassement(){
   try{
     const [_,participants]=await Promise.all([fetchESPNScores(),sbFetch('participants?select=*&order=nom')]);
     if(lastUpdated) document.getElementById('refresh-info').textContent=`Scores ESPN mis à jour à ${lastUpdated.toLocaleTimeString('fr-FR')} · Actualisation automatique`;
-    const cutActive=!tournamentIsOpen&&Object.keys(espnStatuses).length>0;
+    // cutActive dès qu'ESPN signale au moins un joueur CUT/MC (indépendant du toggle admin)
+    const cutActive=Object.keys(espnStatuses).length>0&&Object.values(espnStatuses).some(s=>s&&(s.includes('CUT')||s==='MC'));
     const results=(participants||[]).map(p=>{
       const myJ=[p.c1a,p.c1b,p.c2a,p.c2b,p.c3a,p.c3b,p.c4a,p.c4b].filter(Boolean);
       const scores=myJ.map(j=>({nom:j,score:getScore(j)??0,cut:cutActive&&!hasMadeCut(j)}));
       scores.sort((a,b)=>a.score-b.score);
-      const best4=scores.slice(0,4);
+      // best4 uniquement parmi les joueurs qui ont passé le cut
+      const eligible=cutActive?scores.filter(j=>!j.cut):scores;
+      const best4=eligible.slice(0,4);
       const total=best4.reduce((s,j)=>s+j.score,0);
       const joueursPasses=cutActive?myJ.filter(j=>hasMadeCut(j)).length:myJ.length;
       const elimine=cutActive&&joueursPasses<4;
-      return{nom:p.nom,total,best4,allJoueurs:scores,elimine,joueursPasses};
+      const best4Noms=new Set(best4.map(j=>j.nom));
+      return{nom:p.nom,total,best4,best4Noms,allJoueurs:scores,elimine,joueursPasses};
     });
     const qualifies=results.filter(r=>!r.elimine).sort((a,b)=>a.total-b.total);
     const elimines=results.filter(r=>r.elimine);
@@ -820,8 +824,8 @@ async function loadClassement(){
         <div class="rank-score ${scoreClass(r.total)}">${fmtScore(r.total)}</div>
       </div>
       <div class="participant-detail" id="d${i}">
-        ${r.allJoueurs.map((j,idx)=>`<div class="detail-row">
-          <span class="${idx<4?'best4-name':''}${j.cut?' cut-player':''}"><span class="best4-star">${idx<4?'✦':''}</span>${j.nom}${j.cut?' ✂️':''}</span>
+        ${r.allJoueurs.map((j)=>`<div class="detail-row">
+          <span class="${r.best4Noms.has(j.nom)?'best4-name':''}${j.cut?' cut-player':''}"><span class="best4-star">${r.best4Noms.has(j.nom)?'✦':''}</span>${j.nom}${j.cut?' ✂️':''}</span>
           <span class="${scoreClass(j.score)}" style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600">${fmtScore(j.score)}</span>
         </div>`).join('')}
         ${renderEvolutionChart([])}
@@ -1194,6 +1198,7 @@ async function loadMaSelection(){
     ]);
     const isOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
     if(isOpen) await fetchTeeTimes();
+    else await fetchESPNScores();
     if(!data||!data[0]){
       el.innerHTML='<p style="text-align:center;color:rgba(245,240,232,0.5);padding:2rem;">Aucune sélection trouvée.</p>';
       return;
@@ -1202,11 +1207,13 @@ async function loadMaSelection(){
     window._currentParticipant=p;
     const selMap={1:[p.c1a,p.c1b],2:[p.c2a,p.c2b],3:[p.c3a,p.c3b],4:[p.c4a,p.c4b]};
     const allPlayers=Object.values(selMap).flat().filter(Boolean);
+    const cutActive=Object.keys(espnStatuses).length>0&&Object.values(espnStatuses).some(s=>s&&(s.includes('CUT')||s==='MC'));
     const scores=allPlayers.map(name=>{
       const sc=getScore(name);
-      return{name,toPar:sc};
+      const missed=cutActive&&!hasMadeCut(name);
+      return{name,toPar:sc,cut:missed};
     });
-    const validScores=scores.filter(s=>s.toPar!==null).sort((a,b)=>a.toPar-b.toPar);
+    const validScores=scores.filter(s=>s.toPar!==null&&!s.cut).sort((a,b)=>a.toPar-b.toPar);
     const best4Names=new Set(validScores.slice(0,4).map(s=>s.name));
     const totalBest4=validScores.slice(0,4).reduce((sum,s)=>sum+s.toPar,0);
     let html=`<div style="text-align:center;padding:1rem 0;border-bottom:1px solid rgba(201,168,76,0.2);margin-bottom:1rem;">
@@ -1218,6 +1225,7 @@ async function loadMaSelection(){
       for(const name of selMap[c].filter(Boolean)){
         const s=scores.find(x=>x.name===name);
         const isBest=best4Names.has(name);
+        const isCut=s&&s.cut;
         const tp=s?s.toPar:null;
         const scoreStr=tp!==null?(tp>0?'+'+tp:(tp===0?'E':tp)):'-';
         let rightCol;
@@ -1230,13 +1238,12 @@ async function loadMaSelection(){
           } else {
             rightCol=`<span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:rgba(245,240,232,0.3);">–</span>`;
           }
+        } else if(isCut){
+          rightCol=`<span style="font-size:1rem;">✂️</span>`;
         } else {
           rightCol=`<span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:${isBest?'var(--gold)':'rgba(245,240,232,0.7)'};">${scoreStr}</span>`;
         }
-        html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.75rem;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,${isBest?'0.3':'0.1'});margin-bottom:0.35rem;">
-          <span style="font-family:'EB Garamond',serif;color:${isBest?'var(--gold)':'var(--cream)'};font-size:0.95rem;">${isBest?'✦ ':''}${name}</span>
-          ${rightCol}
-        </div>`;
+        html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.75rem;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,${isCut?'0.05':isBest?'0.3':'0.1'});margin-bottom:0.35rem;${isCut?'opacity:0.45;':''}"><span style="font-family:'EB Garamond',serif;color:${isCut?'rgba(245,240,232,0.4)':isBest?'var(--gold)':'var(--cream)'};font-size:0.95rem;${isCut?'text-decoration:line-through;':''}">${isBest?'&#x2736; ':''}${name}</span>${rightCol}</div>`;
       }
       html+='</div>';
     }
