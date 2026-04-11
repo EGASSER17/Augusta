@@ -791,11 +791,19 @@ async function loadClassement(){
   try{
     const [_,participants]=await Promise.all([fetchESPNScores(),sbFetch('participants?select=*&order=nom')]);
     if(lastUpdated) document.getElementById('refresh-info').textContent=`Scores ESPN mis à jour à ${lastUpdated.toLocaleTimeString('fr-FR')} · Actualisation automatique`;
-    // cutActive dès qu'ESPN signale au moins un joueur CUT/MC (indépendant du toggle admin)
-    const cutActive=Object.keys(espnStatuses).length>0&&Object.values(espnStatuses).some(s=>s&&(s.includes('CUT')||s==='MC'));
+    // cutActive : tournoi fermé par admin OU ESPN renvoie des statuts CUT (proxy mis à jour)
+    const hasCutStatuses=Object.values(espnStatuses).some(s=>s&&(s.includes('CUT')||s==='MC'));
+    const cutActive=espnAllPlayers.length>0&&(!tournamentIsOpen||hasCutStatuses);
     const results=(participants||[]).map(p=>{
       const myJ=[p.c1a,p.c1b,p.c2a,p.c2b,p.c3a,p.c3b,p.c4a,p.c4b].filter(Boolean);
-      const scores=myJ.map(j=>({nom:j,score:getScore(j)??0,cut:cutActive&&!hasMadeCut(j)}));
+      const scores=myJ.map(j=>{
+        const k=normalizeName(j);
+        const inField=k in espnScores;
+        // joueur absent du field ESPN (WD) = traité comme coupé dès qu'ESPN a des données
+        const missing=espnAllPlayers.length>0&&!inField;
+        const missed=(cutActive&&!hasMadeCut(j))||missing;
+        return{nom:j,score:getScore(j)??0,cut:missed};
+      });
       scores.sort((a,b)=>a.score-b.score);
       // best4 uniquement parmi les joueurs qui ont passé le cut
       const eligible=cutActive?scores.filter(j=>!j.cut):scores;
@@ -1207,11 +1215,14 @@ async function loadMaSelection(){
     window._currentParticipant=p;
     const selMap={1:[p.c1a,p.c1b],2:[p.c2a,p.c2b],3:[p.c3a,p.c3b],4:[p.c4a,p.c4b]};
     const allPlayers=Object.values(selMap).flat().filter(Boolean);
-    const cutActive=Object.keys(espnStatuses).length>0&&Object.values(espnStatuses).some(s=>s&&(s.includes('CUT')||s==='MC'));
+    const hasCutStatusesSel=Object.values(espnStatuses).some(s=>s&&(s.includes('CUT')||s==='MC'));
+    const cutActiveSel=espnAllPlayers.length>0&&(!isOpen||hasCutStatusesSel);
     const scores=allPlayers.map(name=>{
-      const sc=getScore(name);
-      const missed=cutActive&&!hasMadeCut(name);
-      return{name,toPar:sc,cut:missed};
+      const k=normalizeName(name);
+      const inField=k in espnScores;
+      const missing=espnAllPlayers.length>0&&!inField;
+      const missed=(cutActiveSel&&!hasMadeCut(name))||missing;
+      return{name,toPar:getScore(name),cut:missed};
     });
     const validScores=scores.filter(s=>s.toPar!==null&&!s.cut).sort((a,b)=>a.toPar-b.toPar);
     const best4Names=new Set(validScores.slice(0,4).map(s=>s.name));
