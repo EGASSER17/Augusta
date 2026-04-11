@@ -567,8 +567,12 @@ function showForgotForm(show){
 // ---- ESPN ----
 async function fetchESPNScores(){
   try{
-    const res=await fetch(ESPN_PROXY);
-    const data=await res.json();
+    // Proxy pour les scores + ESPN direct pour les statuts CUT (le proxy ne les transmet pas)
+    const [proxyRes,espnRes]=await Promise.allSettled([
+      fetch(ESPN_PROXY),
+      fetch('https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?league=pga')
+    ]);
+    const data=proxyRes.status==='fulfilled'?await proxyRes.value.json():{scores:[]};
     const map={},statMap={};
     espnAllPlayers=[];
     (data.scores||[]).forEach(j=>{
@@ -577,6 +581,20 @@ async function fetchESPNScores(){
       if(j.status) statMap[k]=j.status.toUpperCase();
       espnAllPlayers.push({nom:j.nom,score:parseScore(j.score),status:j.status||null});
     });
+    // Statuts CUT depuis l'API ESPN directe (le proxy ne les transmet pas)
+    if(espnRes.status==='fulfilled'){
+      try{
+        const ed=await espnRes.value.json();
+        (ed.events?.[0]?.competitions?.[0]?.competitors||[]).forEach(c=>{
+          const typeName=c.status?.type?.name||'';
+          const k=normalizeName(c.athlete?.displayName||'');
+          if(typeName==='STATUS_CUT'){statMap[k]='CUT';}
+          else if(typeName==='STATUS_WD'){statMap[k]='WD';}
+        });
+      }catch(e){console.warn('ESPN statuts direct:',e.message);}
+    }
+    // Répercuter les statuts dans espnAllPlayers (pour l'onglet Joueurs)
+    espnAllPlayers.forEach(p=>{const k=normalizeName(p.nom);if(statMap[k]) p.status=statMap[k];});
     espnAllPlayers.sort((a,b)=>a.score-b.score);
     espnScores=map;espnStatuses=statMap;lastUpdated=new Date();return true;
   }catch(e){console.error(e);return false;}
@@ -1309,14 +1327,22 @@ async function loadJoueursList(){
         const dayKey=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Paris'});
         if(dayKey!==lastDay){lastDay=dayKey;dayLabel=`<div style="font-family:'Cormorant Garamond',serif;font-size:0.7rem;color:rgba(201,168,76,0.5);letter-spacing:2px;text-transform:uppercase;padding:8px 0 4px;">${dayKey}</div>`;}
       } else {
-        const statusStr=j.status?`<div style="font-size:0.65rem;color:rgba(245,240,232,0.4);text-align:right;margin-top:2px;">${j.status}</div>`:'';
-        rightCol=`<div style="text-align:right;"><span style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:${scColor};font-weight:700;">${scStr}</span>${statusStr}</div>`;
+        const isCutPlayer=(j.status==='CUT'||j.status==='WD');
+        if(isCutPlayer){
+          rightCol=`<div style="text-align:right;"><span style="font-size:0.75rem;color:rgba(245,240,232,0.4);letter-spacing:1px;">✂ CUT</span></div>`;
+        } else {
+          rightCol=`<div style="text-align:right;"><span style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:${scColor};font-weight:700;">${scStr}</span></div>`;
+        }
       }
-      html+=dayLabel+`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')">
+      // Séparateur ligne de cut : premier joueur avec statut CUT
+      const isCut=(j.status==='CUT'||j.status==='WD');
+      const prevIsCut=i>0&&(players[i-1].status==='CUT'||players[i-1].status==='WD');
+      const cutLine=(!allE&&isCut&&!prevIsCut)?`<div style="margin:6px 0;padding:4px 8px;font-family:'Cormorant Garamond',serif;font-size:0.65rem;color:rgba(245,240,232,0.35);letter-spacing:2px;text-transform:uppercase;border-top:1px dashed rgba(245,240,232,0.12);">✂ Ligne de cut</div>`:'';
+      html+=dayLabel+cutLine+`<div class="score-item" onclick="openPlayerCard('${j.nom.replace(/'/g,"\\'")}')" style="${isCut?'opacity:0.4;':''}">
         <div style="display:flex;align-items:center;gap:10px;">
-          ${allE?'':` <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:rgba(201,168,76,0.8);width:24px;text-align:right;flex-shrink:0;font-weight:600;">${i+1}</span>`}
+          ${allE?'':` <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:rgba(201,168,76,0.8);width:24px;text-align:right;flex-shrink:0;font-weight:600;">${isCut?'':i+1}</span>`}
           ${photoEl}
-          <span style="font-size:14px;">${j.nom}</span>
+          <span style="font-size:14px;${isCut?'text-decoration:line-through;':''}">${j.nom}</span>
         </div>
         ${rightCol}
       </div>`;
