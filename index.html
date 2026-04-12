@@ -791,7 +791,7 @@ async function submitSelections(){
 function renderMainTabs(isOpen){
   tournamentIsOpen=isOpen;
   const el=document.getElementById('main-tabs');
-  const dimTab=dimancheActif?`<div class="tab" onclick="switchTab('dimanche')">&#9728;&#65039; Dimanche</div>`:'';
+  const dimTab=dimancheActif?`<div class="tab" onclick="switchTab('dimanche')">Dimanche</div>`:'';
   if(isOpen){
     el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">S&#233;lection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Myst&#232;re</div>${dimTab}`;
   } else {
@@ -1591,7 +1591,6 @@ async function loadDimancheClassement(){
     results.sort((a,b)=>a.total!==b.total?a.total-b.total:a.best1-b.best1);
 
     const medals=['&#127947;','&#127948;','&#127949;'];
-    const gains=['60&euro;','40&euro;','20&euro;'];
 
     let html='<div style="margin-bottom:18px;">';
     html+='<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.7rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;text-align:center;">Bonus Dimanche &mdash; 2 meilleurs scores R4</div>';
@@ -1633,13 +1632,6 @@ async function loadDimancheClassement(){
 
     if(!results.length) html='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Scores R4 pas encore disponibles</div>';
 
-    // Footer gains
-    html+='<div class="divider" style="margin:20px 0 14px;"></div>';
-    html+='<div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;padding:12px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:4px;">';
-    for(let i=0;i<3;i++){
-      html+=`<div style="text-align:center;"><div style="font-size:1.2rem;">${medals[i]}</div><div style="font-family:'Cormorant Garamond',serif;font-size:0.9rem;color:var(--gold);font-weight:600;">${gains[i]}</div><div style="font-size:0.7rem;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;">${i+1}er</div></div>`;
-    }
-    html+='</div>';
     html+='<div style="font-size:11px;font-style:italic;color:var(--text-muted);text-align:center;margin-top:10px;">2 meilleurs scores R4 parmi vos 8 joueurs &mdash; ';
     html+=dimancheR4Fige?'Resultats figes':'Mis a jour toutes les 5 minutes';
     html+='</div>';
