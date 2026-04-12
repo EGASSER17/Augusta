@@ -117,6 +117,7 @@ input::placeholder { color:rgba(168,196,168,0.4); }
 .tabs { display:flex; border-bottom:1px solid rgba(201,168,76,0.2); margin-bottom:20px; gap:0; }
 .tab { flex:1; padding:10px 4px; text-align:center; font-family:'Cormorant Garamond',serif; font-size:13px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); cursor:pointer; transition:all 0.2s; border-bottom:2px solid transparent; margin-bottom:-1px; }
 .tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+@media(max-width:430px){.tab{font-size:11px;letter-spacing:0;padding:10px 2px;}}
 .score-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(201,168,76,0.06); cursor:pointer; transition:all 0.2s; }
 .score-item:hover { padding-left:4px; }
 .score-item:last-child { border-bottom:none; }
@@ -791,11 +792,19 @@ async function submitSelections(){
 function renderMainTabs(isOpen){
   tournamentIsOpen=isOpen;
   const el=document.getElementById('main-tabs');
-  const dimTab=dimancheActif?`<div class="tab" onclick="switchTab('dimanche')">Dimanche</div>`:'';
-  if(isOpen){
-    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">S&#233;lection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Myst&#232;re</div>${dimTab}`;
+  if(dimancheActif){
+    // 6 onglets : noms courts pour tenir sur mobile
+    if(isOpen){
+      el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classe.</div><div class="tab" onclick="switchTab('selection')">S&#233;lec.</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Myst.</div><div class="tab" onclick="switchTab('dimanche')">Dim.</div>`;
+    } else {
+      el.innerHTML=`<div class="tab" onclick="switchTab('selection')">S&#233;lec.</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Myst.</div><div class="tab" onclick="switchTab('dimanche')">Dim.</div>`;
+    }
   } else {
-    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">S&#233;lection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Myst&#232;re</div>${dimTab}`;
+    if(isOpen){
+      el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">S&#233;lection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Myst&#232;re</div>`;
+    } else {
+      el.innerHTML=`<div class="tab" onclick="switchTab('selection')">S&#233;lection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Myst&#232;re</div>`;
+    }
   }
 }
 async function goClassement(){
