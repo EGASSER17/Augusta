@@ -323,6 +323,7 @@ input::placeholder { color:rgba(168,196,168,0.4); }
     <div id="tab-trivia" style="display:none"></div>
     <div id="tab-mystere" style="display:none"></div>
     <div id="tab-allstars" style="display:none"></div>
+    <div id="tab-dimanche" style="display:none"></div>
     <div class="divider"></div>
     <button class="btn btn-outline" onclick="showScreen('screen-accueil')" style="font-size:13px">← Retour à l'accueil</button>
   </div>
@@ -456,6 +457,18 @@ input::placeholder { color:rgba(168,196,168,0.4); }
         <div class="divider"></div>
         <button class="btn btn-danger" onclick="adminResetMystery()" style="margin-top:8px;">&#128465;&#65039; Réinitialiser le jeu</button>
       </div>
+      <div class="card">
+        <div class="card-title">&#9728;&#65039; Classement Dimanche</div>
+        <p style="font-size:13px;font-style:italic;color:var(--text-muted);margin-bottom:12px">Bonus J4 — 2 meilleurs scores R4. Visible automatiquement le 12 avril.</p>
+        <div style="display:flex;gap:10px;margin-bottom:10px">
+          <button class="btn btn-success" onclick="setDimancheActif('OUI')" style="flex:1">Activer l'onglet</button>
+          <button class="btn btn-danger" onclick="setDimancheActif('NON')" style="flex:1">Masquer</button>
+        </div>
+        <p id="statut-dimanche" style="font-size:13px;font-style:italic;color:var(--text-muted);margin-bottom:12px"></p>
+        <button class="btn btn-outline" onclick="setDimancheFige('OUI')" style="width:100%;margin-bottom:8px;font-size:13px;">&#128274; Figer les resultats</button>
+        <button class="btn btn-ghost" onclick="setDimancheFige('NON')" style="width:100%;font-size:13px;">&#128275; Degeler les resultats</button>
+        <p id="statut-dimanche-fige" style="font-size:12px;font-style:italic;color:var(--text-muted);margin-top:8px"></p>
+      </div>
         </div>
       </div>
     </div>
@@ -514,6 +527,7 @@ const PLAYER_ESPN_IDS = {
 let currentUser='',currentCode='',currentChapeau=1,isEditMode=false;
 let selections={1:[],2:[],3:[],4:[]};
 let espnScores={},espnAllPlayers=[],espnStatuses={},espnTeeTimes={},espnFullField=[],refreshTimer=null,lastUpdated=null,newsLoaded=false,selectionTabLoaded=false,tournamentIsOpen=false;
+let espnR4Scores={},dimancheActif=false,dimancheR4Fige=false,cachedDimancheData=null;
 let showingInscription=false;
 
 // ---- SUPABASE ----
@@ -777,10 +791,11 @@ async function submitSelections(){
 function renderMainTabs(isOpen){
   tournamentIsOpen=isOpen;
   const el=document.getElementById('main-tabs');
+  const dimTab=dimancheActif?`<div class="tab" onclick="switchTab('dimanche')">&#9728;&#65039; Dimanche</div>`:'';
   if(isOpen){
-    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Mystère</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('classement')">Classement</div><div class="tab" onclick="switchTab('selection')">S&#233;lection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Myst&#232;re</div>${dimTab}`;
   } else {
-    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">Sélection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Mystère</div>`;
+    el.innerHTML=`<div class="tab" onclick="switchTab('selection')">S&#233;lection</div><div class="tab" onclick="switchTab('scores')">Joueurs</div><div class="tab" onclick="switchTab('trivia')">Trivia</div><div class="tab" onclick="switchTab('mystere')">Myst&#232;re</div>${dimTab}`;
   }
 }
 async function goClassement(){
@@ -788,12 +803,19 @@ async function goClassement(){
   newsLoaded=false;selectionTabLoaded=false;
   if(refreshTimer) clearInterval(refreshTimer);
   try{
-    const cfg=await sbFetch('config?cle=eq.tournoi_ouvert&select=valeur');
-    const selectionsOpen=!cfg||!cfg[0]||cfg[0].valeur==='OUI';
+    const cfg=await sbFetch('config?select=cle,valeur');
+    const cfgMap={};
+    (cfg||[]).forEach(c=>cfgMap[c.cle]=c.valeur);
+    const selectionsOpen=!cfgMap['tournoi_ouvert']||cfgMap['tournoi_ouvert']==='OUI';
     const tournamentStarted=!selectionsOpen;
+    // Onglet Dimanche : auto le 12 avril 2026 ou activé par admin
+    const today=new Date();
+    const isSundayApr12=today.getFullYear()===2026&&today.getMonth()===3&&today.getDate()===12;
+    dimancheActif=isSundayApr12||cfgMap['dimanche_actif']==='OUI';
+    dimancheR4Fige=cfgMap['dimanche_fige']==='OUI';
     renderMainTabs(tournamentStarted);
     if(tournamentStarted){
-      refreshTimer=setInterval(async()=>{await fetchESPNScores();await loadClassement();},REFRESH_INTERVAL);
+      refreshTimer=setInterval(async()=>{await fetchESPNScores();await loadClassement();if(dimancheActif)loadDimancheClassement();},REFRESH_INTERVAL);
       await loadClassement();
       switchTab('classement');
     } else {
@@ -875,7 +897,7 @@ async function loadClassement(){
 }
 function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
 function switchTab(tab){
-  const allTabs=['classement','selection','scores','news','trivia','mystere','allstars'];
+  const allTabs=['classement','selection','scores','news','trivia','mystere','allstars','dimanche'];
   // Pause le timer trivia si on quitte l'onglet trivia en cours de partie
   if(tab!=='trivia' && triviaState.timerInterval){
     clearInterval(triviaState.timerInterval);
@@ -898,6 +920,7 @@ function switchTab(tab){
   }
   if(tab==='mystere') { loadMysteryInline(); }
   if(tab==='allstars') { loadAllStars(); }
+  if(tab==='dimanche') { loadDimancheClassement(); }
 }
 
 // ---- PLAYER DATA ----
@@ -1433,7 +1456,7 @@ function checkAdmin(){
   if(document.getElementById('admin-pwd').value===ADMIN_PWD){
     document.getElementById('admin-auth').style.display='none';
     document.getElementById('admin-panel').style.display='block';
-    loadStatutTournoi();loadAdminCodes();
+    loadStatutTournoi();loadAdminCodes();loadStatutDimanche();
   }else alert('Mot de passe incorrect');
 }
 async function loadStatutTournoi(){
@@ -1485,6 +1508,145 @@ async function syncESPN(){
   showMsg('sync-msg','Synchronisation...','info');
   const ok=await fetchESPNScores();
   showMsg('sync-msg',ok?`✓ ${Object.keys(espnScores).length} joueurs synchronisés`:'Erreur de synchronisation',ok?'success':'error');
+}
+
+// ---- ADMIN DIMANCHE ----
+async function loadStatutDimanche(){
+  try{
+    const cfg=await sbFetch('config?cle=in.(dimanche_actif,dimanche_fige)&select=cle,valeur');
+    const m={};(cfg||[]).forEach(c=>m[c.cle]=c.valeur);
+    const el1=document.getElementById('statut-dimanche');
+    const el2=document.getElementById('statut-dimanche-fige');
+    if(el1) el1.textContent='Onglet : '+(m['dimanche_actif']==='OUI'?'Visible':'Masque');
+    if(el2) el2.textContent='Resultats : '+(m['dimanche_fige']==='OUI'?'Figes (live arrete)':'En temps reel');
+  }catch(e){}
+}
+async function setDimancheActif(val){
+  try{
+    try{await sbFetch('config?cle=eq.dimanche_actif',{method:'PATCH',body:JSON.stringify({valeur:val}),prefer:'return=minimal'});}
+    catch(e){await sbFetch('config',{method:'POST',body:JSON.stringify({cle:'dimanche_actif',valeur:val}),prefer:'return=minimal'});}
+    dimancheActif=val==='OUI';
+    renderMainTabs(tournamentIsOpen);
+    loadStatutDimanche();
+    alert('Onglet Dimanche '+(val==='OUI'?'active':'masque'));
+  }catch(e){alert('Erreur');}
+}
+async function setDimancheFige(val){
+  try{
+    try{await sbFetch('config?cle=eq.dimanche_fige',{method:'PATCH',body:JSON.stringify({valeur:val}),prefer:'return=minimal'});}
+    catch(e){await sbFetch('config',{method:'POST',body:JSON.stringify({cle:'dimanche_fige',valeur:val}),prefer:'return=minimal'});}
+    dimancheR4Fige=val==='OUI';
+    if(val==='NON') cachedDimancheData=null;
+    loadStatutDimanche();
+    alert('Resultats '+(val==='OUI'?'figes':'degelés'));
+  }catch(e){alert('Erreur');}
+}
+
+// ---- ESPN R4 SCORES ----
+async function fetchESPNR4Scores(){
+  try{
+    const res=await fetch('https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?event=401811941');
+    const data=await res.json();
+    const competitors=(data.events?.[0]?.competitions?.[0]?.competitors)||[];
+    const r4Map={};
+    competitors.forEach(c=>{
+      const nom=c.athlete?.displayName;
+      if(!nom) return;
+      const k=normalizeName(nom);
+      const rounds=c.linescores||[];
+      const r4=rounds.find(x=>x.period===4);
+      if(r4&&r4.displayValue!=null){
+        const dv=r4.displayValue;
+        r4Map[k]=dv==='E'?0:(parseInt(dv)||0);
+      }
+    });
+    espnR4Scores=r4Map;
+    return true;
+  }catch(e){console.error('fetchESPNR4Scores',e);return false;}
+}
+
+// ---- CLASSEMENT DIMANCHE ----
+async function loadDimancheClassement(){
+  const el=document.getElementById('tab-dimanche');
+  if(!el) return;
+  if(dimancheR4Fige&&cachedDimancheData){el.innerHTML=cachedDimancheData;return;}
+  el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Chargement...</div>';
+  try{
+    const [_,participants]=await Promise.all([fetchESPNR4Scores(),sbFetch('participants?select=*&order=nom')]);
+    const results=(participants||[]).map(p=>{
+      const myJ=[p.c1a,p.c1b,p.c2a,p.c2b,p.c3a,p.c3b,p.c4a,p.c4b].filter(Boolean);
+      const r4s=myJ.map(j=>{
+        const k=normalizeName(j);
+        const score=espnR4Scores[k]!==undefined?espnR4Scores[k]:null;
+        return{nom:j,score};
+      }).filter(j=>j.score!==null);
+      if(r4s.length<2) return null;
+      r4s.sort((a,b)=>a.score-b.score);
+      const best2=r4s.slice(0,2);
+      const total=best2[0].score+best2[1].score;
+      return{nom:p.nom,total,best2,best1:best2[0].score,allR4:r4s};
+    }).filter(Boolean);
+
+    // Tri : total le plus bas, puis best1 en cas d'égalité
+    results.sort((a,b)=>a.total!==b.total?a.total-b.total:a.best1-b.best1);
+
+    const medals=['&#127947;','&#127948;','&#127949;'];
+    const gains=['60&euro;','40&euro;','20&euro;'];
+
+    let html='<div style="margin-bottom:18px;">';
+    html+='<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.7rem;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;text-align:center;">Bonus Dimanche &mdash; 2 meilleurs scores R4</div>';
+    html+='</div>';
+
+    // En-tête tableau
+    const thSty='padding:6px 8px;font-family:\'Cormorant Garamond\',serif;font-size:0.65rem;letter-spacing:1.5px;text-transform:uppercase;color:rgba(201,168,76,0.6);border-bottom:1px solid rgba(201,168,76,0.2);white-space:nowrap;';
+    const tdSty='padding:10px 8px;font-family:\'EB Garamond\',serif;font-size:0.9rem;border-bottom:1px solid rgba(201,168,76,0.07);vertical-align:middle;';
+    html+='<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">';
+    html+='<thead><tr>';
+    html+='<th style="'+thSty+'width:36px;text-align:center;">#</th>';
+    html+='<th style="'+thSty+'text-align:left;">Participant</th>';
+    html+='<th style="'+thSty+'text-align:center;">Joueur 1</th>';
+    html+='<th style="'+thSty+'text-align:center;">Joueur 2</th>';
+    html+='<th style="'+thSty+'text-align:center;">Total</th>';
+    html+='</tr></thead><tbody>';
+
+    results.forEach((r,i)=>{
+      // Calcul du vrai rang (ex-aequo)
+      let rank=i+1;
+      if(i>0&&r.total===results[i-1].total&&r.best1===results[i-1].best1) rank=results.findIndex((x,j)=>j<i&&x.total===r.total&&x.best1===r.best1)+1;
+      const isMedal=rank<=3;
+      const rowBg=isMedal?'background:rgba(201,168,76,0.07);':'';
+      const j1=r.best2[0],j2=r.best2[1];
+      const lastName=n=>n.split(' ').slice(-1)[0];
+      const j1Lbl=lastName(j1.nom)+' ('+fmtScore(j1.score)+')';
+      const j2Lbl=lastName(j2.nom)+' ('+fmtScore(j2.score)+')';
+      const rankCell=isMedal?`<span style="font-size:1.1rem;">${medals[rank-1]}</span>`:`<span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--text-muted);">${rank}</span>`;
+      html+=`<tr style="${rowBg}">`;
+      html+=`<td style="${tdSty}text-align:center;">${rankCell}</td>`;
+      html+=`<td style="${tdSty}font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:${isMedal?'var(--gold)':'var(--text)'};">${r.nom}</td>`;
+      html+=`<td style="${tdSty}text-align:center;font-size:0.82rem;color:var(--text-muted);">${j1Lbl}</td>`;
+      html+=`<td style="${tdSty}text-align:center;font-size:0.82rem;color:var(--text-muted);">${j2Lbl}</td>`;
+      html+=`<td style="${tdSty}text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;" class="${scoreClass(r.total)}">${fmtScore(r.total)}</td>`;
+      html+='</tr>';
+    });
+
+    html+='</tbody></table></div>';
+
+    if(!results.length) html='<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Scores R4 pas encore disponibles</div>';
+
+    // Footer gains
+    html+='<div class="divider" style="margin:20px 0 14px;"></div>';
+    html+='<div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;padding:12px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:4px;">';
+    for(let i=0;i<3;i++){
+      html+=`<div style="text-align:center;"><div style="font-size:1.2rem;">${medals[i]}</div><div style="font-family:'Cormorant Garamond',serif;font-size:0.9rem;color:var(--gold);font-weight:600;">${gains[i]}</div><div style="font-size:0.7rem;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;">${i+1}er</div></div>`;
+    }
+    html+='</div>';
+    html+='<div style="font-size:11px;font-style:italic;color:var(--text-muted);text-align:center;margin-top:10px;">2 meilleurs scores R4 parmi vos 8 joueurs &mdash; ';
+    html+=dimancheR4Fige?'Resultats figes':'Mis a jour toutes les 5 minutes';
+    html+='</div>';
+
+    if(dimancheR4Fige) cachedDimancheData=html;
+    el.innerHTML=html;
+  }catch(e){el.innerHTML='<div class="msg error">Erreur de chargement</div>';console.error(e);}
 }
 
 // ---- COUNTDOWN ----
