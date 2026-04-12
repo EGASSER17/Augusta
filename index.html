@@ -1989,9 +1989,9 @@ async function adminPostTriviaQuestions(){
 
 
 // ---- TROU MYSTERE ----
-const MYSTERY_CLUE='Je suis le seul vainqueur du Masters depuis 1998 \u00e0 avoir rat\u00e9 le cut au tournoi pr\u00e9c\u00e9dent avant de gagner ma veste verte.';
-const MYSTERY_CHALLENGE='gdf_j4_2026';
-const MYSTERY_ANSWER='patrick reed';
+const MYSTERY_CLUE='J\'ai perdu 0,41 coup dans un secteur cl\u00e9 jeudi avant de regagner 0,86 coup dans le m\u00eame secteur vendredi pour une raison bien pr\u00e9cise. Qui suis-je\u00a0?';
+const MYSTERY_CHALLENGE='gdf_koepka_2026';
+const MYSTERY_ANSWER='brooks koepka';
 
 async function loadMysteryInline(){
   const container=document.getElementById('tab-mystere');
@@ -2002,7 +2002,7 @@ async function loadMysteryInline(){
   container.innerHTML='<div style="text-align:center;padding:20px;color:rgba(245,240,232,0.5);font-style:italic">Chargement...</div>';
   const _base=['https:','','egasser17.github.io','Augusta','img'].join('/');
   const makePhotoEl=(revealed)=>{
-    const url=_base+'/mystery11.jpg';
+    const url=_base+'/mystery12.jpg';
     const blurCss=revealed?'':'filter:blur(10px);-webkit-filter:blur(10px);';
     const frame=document.createElement('div');
     frame.className='mystery-photo-frame mystery-photo-fadein';
@@ -2041,10 +2041,10 @@ async function loadMysteryInline(){
         '<div style="text-align:center;padding:1.5rem 1rem;">'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem;">\ud83d\udd75\ufe0f Le joueur myst\u00e8re a \u00e9t\u00e9 d\u00e9masqu\u00e9\u00a0!</div>'
         +'<div id="mystery-photo-slot" style="display:flex;justify-content:center;margin-bottom:0.75rem;"></div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Patrick Reed</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold);margin:0.5rem 0;font-style:italic;">Brooks Koepka</div>'
         +'<div style="font-size:0.9rem;color:var(--cream-dark);margin-bottom:1rem;">D\u00e9masqu\u00e9 par <strong style="color:var(--gold);">'+winner+'</strong></div>'
         +(isWinner
-          ?'<div class="msg success">\ud83c\udf89\u00a0Bravo\u00a0! C\u2019\u00e9tait Patrick Reed\u00a0! +5000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
+          ?'<div class="msg success">\ud83c\udf89\u00a0Bravo\u00a0! C\u2019\u00e9tait Brooks Koepka\u00a0! +10000\u00a0pts ajout\u00e9s \u00e0 votre score.</div>'
           :'<div class="msg info">&#127881; F\u00e9licitations \u00e0 <strong>'+winner+'</strong> pour avoir trouv\u00e9 le joueur myst\u00e8re\u00a0!</div>')
         +'</div>';
       document.getElementById('mystery-photo-slot').appendChild(makePhotoEl(true));
@@ -2087,7 +2087,7 @@ async function submitMysteryGuess(){
     const isCorrect=guess.trim().toLowerCase()===MYSTERY_ANSWER;
     await sbFetch('mystery_guesses',{method:'POST',body:JSON.stringify({nom:currentUser,guess,jour:todayStr,correct:!!isCorrect,challenge:MYSTERY_CHALLENGE}),prefer:'return=minimal'});
     if(isCorrect){
-      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:5000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
+      try{await sbFetch('trivia_scores?on_conflict=nom,jour,type',{method:'POST',body:JSON.stringify({nom:currentUser,jour:todayStr,score:10000,temps_total:0,type:'mystere'}),prefer:'resolution=merge-duplicates,return=minimal'});}catch(e){console.warn('Bonus:',e);}
       loadMysteryInline();
     }else{
       document.getElementById('tab-mystere').innerHTML='<div style="padding:1.5rem 1rem;text-align:center;"><div class="msg error" style="margin-bottom:1rem;">Mauvaise r\u00e9ponse \u2014 revenez demain pour retenter.</div><div style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">Votre r\u00e9ponse\u00a0: \u00ab\u00a0'+guess+'\u00a0\u00bb</div></div>';
